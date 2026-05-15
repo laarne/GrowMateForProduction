@@ -95,7 +95,7 @@ const benefits = [
 const testimonials = [
   {
     quote:
-      "FlowGuard AI gave us a three-week warning before a supplier-heavy month. We moved a few payouts and avoided drawing on our credit line.",
+      "Smart Cash Flow gave us a three-week warning before a supplier-heavy month. We moved a few payouts and avoided drawing on our credit line.",
     name: "Lyxter",
     role: "Founder, Laguna Home Living",
     img: "/lyxter-profile.png",
@@ -141,7 +141,7 @@ const pricing = [
 const faqs = [
   {
     q: "How accurate is the AI?",
-    a: "FlowGuard AI combines accounting history, payment timing, expense trends, and market signals. Accuracy varies by data quality, but customers typically see forecast confidence above 90% after the first complete workbook upload.",
+    a: "Smart Cash Flow combines accounting history, payment timing, expense trends, and market signals. Accuracy varies by data quality, but customers typically see forecast confidence above 90% after the first complete workbook upload.",
   },
   {
     q: "Is my financial data secure?",
@@ -149,7 +149,7 @@ const faqs = [
   },
   {
     q: "Can small businesses use this?",
-    a: "Absolutely. FlowGuard AI is built for SMEs that need CFO-level foresight without hiring a finance team.",
+    a: "Absolutely. Smart Cash Flow is built for SMEs that need CFO-level foresight without hiring a finance team.",
   },
   {
     q: "Does it integrate with accounting software?",
@@ -280,7 +280,7 @@ function Navbar({ dark, setDark }) {
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-mint to-ocean text-slate-950 shadow-mint">
             <ShieldCheck size={22} />
           </span>
-          <span className="text-lg font-semibold tracking-tight text-white">FlowGuard AI</span>
+          <span className="text-lg font-semibold tracking-tight text-white">Smart Cash Flow</span>
         </a>
         <div className="hidden items-center gap-8 md:flex">
           {links.map((link) => (
@@ -415,7 +415,7 @@ function Hero() {
             Predict Cash Flow Problems Before They Happen
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-            FlowGuard AI helps SMEs forecast cash shortages, analyze financial risks, and make smarter business decisions using AI-powered insights.
+            Smart Cash Flow helps SMEs forecast cash shortages, analyze financial risks, and make smarter business decisions using AI-powered insights.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a href="/app" className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-mint to-ocean px-6 py-3 font-semibold text-slate-950 shadow-mint transition hover:scale-[1.02]">
@@ -476,7 +476,7 @@ function Problem() {
         <div>
           <p className="section-kicker">The SME cash gap</p>
           <h2 className="section-title">Most cash flow problems are visible too late.</h2>
-          <p className="section-copy">FlowGuard AI turns delayed payments, expense changes, and forecasting uncertainty into early signals your business can act on.</p>
+          <p className="section-copy">Smart Cash Flow turns delayed payments, expense changes, and forecasting uncertainty into early signals your business can act on.</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {items.map(([Icon, title, text]) => (
@@ -498,7 +498,7 @@ function Solution() {
   return (
     <motion.section id="platform" variants={section} initial="hidden" whileInView="show" viewport={{ once: true }} className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
       <div className="mx-auto max-w-3xl text-center">
-        <p className="section-kicker">The FlowGuard AI platform</p>
+        <p className="section-kicker">The Smart Cash Flow platform</p>
         <h2 className="section-title">AI forecasting, risk scoring, and alerts in one finance cockpit.</h2>
       </div>
       <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -710,7 +710,7 @@ function AssistantWidget() {
           <Bot size={20} />
         </span>
         <div>
-          <p className="text-sm font-semibold text-white">FlowGuard Assistant</p>
+          <p className="text-sm font-semibold text-white">Smart Cash Flow Assistant</p>
           <p className="text-xs text-slate-400">Cash risk changed 4 min ago</p>
         </div>
       </div>
@@ -728,7 +728,7 @@ function Footer() {
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-mint to-ocean text-slate-950">
               <ShieldCheck size={22} />
             </span>
-            <span className="text-lg font-semibold">FlowGuard AI</span>
+            <span className="text-lg font-semibold">Smart Cash Flow</span>
           </div>
           <p className="mt-4 max-w-sm text-sm leading-6 text-slate-400">AI-powered cash flow risk prediction for ambitious SMEs.</p>
         </div>

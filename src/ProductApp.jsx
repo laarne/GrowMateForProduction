@@ -111,7 +111,7 @@ const appGuide = [
   {
     icon: LineChart,
     title: "What the app does",
-    text: "FlowGuard AI tracks cash balance, receivables, expenses, and runway so teams can see future cash pressure before it becomes urgent.",
+    text: "Smart Cash Flow tracks cash balance, receivables, expenses, and runway so teams can see future cash pressure before it becomes urgent.",
   },
   {
     icon: SlidersHorizontal,
@@ -224,7 +224,7 @@ function Sidebar({ activeView, setActiveView }) {
   return (
     <aside className="flex w-full shrink-0 flex-col gap-4 rounded-[1.6rem] border border-[#d9e6f6] bg-[linear-gradient(180deg,#ffffff,#f4f8fd)] px-3 py-4 shadow-[0_24px_70px_rgba(113,146,190,0.12)] lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:w-24 lg:rounded-[2rem] lg:px-3">
       <div className="flex items-center justify-between gap-3 lg:flex-col lg:justify-start">
-        <a href="/" aria-label="FlowGuard AI home" className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-[#4d96e6] to-[#3bb7a7] text-white shadow-[0_18px_36px_rgba(81,134,208,0.24)]">
+        <a href="/" aria-label="Smart Cash Flow home" className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-[#4d96e6] to-[#3bb7a7] text-white shadow-[0_18px_36px_rgba(81,134,208,0.24)]">
           <ShieldCheck size={24} />
         </a>
         <div className="hidden h-px w-10 bg-[#d9e6f6] lg:block" />
@@ -612,7 +612,7 @@ function Overview({ greeting, setShowModel, setShowPlan, alerts, setAlerts, impo
           <div>
             <p className="text-sm font-semibold text-[#5f8dcc]">{greeting}, Lyxter</p>
             <h1 className="mt-2 max-w-4xl text-2xl font-semibold tracking-tight text-[#294770] sm:text-3xl xl:text-4xl">Your cash position is stable, but June has two watchpoints.</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#7b93b4] sm:text-base">FlowGuard AI found supplier timing and late receivables as the biggest short-term risk drivers.</p>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#7b93b4] sm:text-base">Smart Cash Flow found supplier timing and late receivables as the biggest short-term risk drivers.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <button onClick={() => setShowModel(true)} className="inline-flex items-center gap-2 rounded-full border border-[#dbe7f5] bg-white px-4 py-3 text-sm font-semibold text-[#294770] transition hover:bg-[#f7fbff]">
@@ -702,7 +702,7 @@ function AppGuidePanel() {
     <Panel>
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-lg font-semibold text-[#294770]">How FlowGuard Works</p>
+          <p className="text-lg font-semibold text-[#294770]">How Smart Cash Flow Works</p>
           <p className="mt-1 text-sm text-[#7b93b4]">Quick instructions for new users and client walkthroughs.</p>
         </div>
         <Bot className="text-[#4f8df7]" size={24} />
