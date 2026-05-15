@@ -1,1045 +1,814 @@
 import React, { useMemo, useState } from "react";
-import { motion } from "framer-motion";
 import {
-  ArrowDownRight,
+  Award,
   ArrowLeft,
-  ArrowUpRight,
-  BellRing,
-  Bot,
-  Building2,
-  Calculator,
-  CircleDollarSign,
-  Clock3,
-  Download,
-  FileWarning,
-  Gauge,
-  LayoutDashboard,
-  LineChart,
-  Lock,
-  Mail,
-  MoreHorizontal,
-  Plug,
+  Bell,
+  Camera,
+  Check,
+  ChevronRight,
+  Heart,
+  Home,
+  Leaf,
+  MapPin,
+  MessageCircle,
   Plus,
-  ReceiptText,
   Search,
-  Settings,
+  Send,
   ShieldCheck,
-  SlidersHorizontal,
+  ShoppingBag,
   Sparkles,
-  TrendingDown,
-  TrendingUp,
+  Sprout,
+  Trophy,
+  UserRound,
   Users,
-  WalletCards,
-  X,
 } from "lucide-react";
 
-const appForecast = [
-  { label: "May 20", cash: 482, risk: 16, inflow: 122, outflow: 78 },
-  { label: "May 27", cash: 456, risk: 21, inflow: 118, outflow: 84 },
-  { label: "Jun 03", cash: 411, risk: 32, inflow: 101, outflow: 92 },
-  { label: "Jun 10", cash: 376, risk: 48, inflow: 94, outflow: 111 },
-  { label: "Jun 17", cash: 418, risk: 29, inflow: 138, outflow: 88 },
-  { label: "Jun 24", cash: 463, risk: 18, inflow: 146, outflow: 82 },
-  { label: "Jul 01", cash: 512, risk: 14, inflow: 158, outflow: 80 },
-];
+const plantPhotos = {
+  monstera:
+    "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=900&q=80",
+  calathea:
+    "https://images.unsplash.com/photo-1620803366004-119b57f54cd6?auto=format&fit=crop&w=900&q=80",
+  pothos:
+    "https://images.unsplash.com/photo-1598880940080-ff9a29891b85?auto=format&fit=crop&w=900&q=80",
+  anthurium:
+    "https://images.unsplash.com/photo-1632207691143-643e2a9a9361?auto=format&fit=crop&w=900&q=80",
+  cactus:
+    "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?auto=format&fit=crop&w=900&q=80",
+  fern:
+    "https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&w=900&q=80",
+  herb:
+    "https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=900&q=80",
+  snake:
+    "https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?auto=format&fit=crop&w=900&q=80",
+  orchid:
+    "https://images.unsplash.com/photo-1566907225475-3a1c8b8e95c8?auto=format&fit=crop&w=900&q=80",
+  bonsai:
+    "https://images.unsplash.com/photo-1509223197845-458d87318791?auto=format&fit=crop&w=900&q=80",
+  fiddle:
+    "https://images.unsplash.com/photo-1597055181300-e3633a917c24?auto=format&fit=crop&w=900&q=80",
+  hoya:
+    "https://images.unsplash.com/photo-1616500156884-a44d174db6a6?auto=format&fit=crop&w=900&q=80",
+  succulent:
+    "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=80",
+  alocasia:
+    "https://images.unsplash.com/photo-1604762512526-b706f14042e3?auto=format&fit=crop&w=900&q=80",
+  peperomia:
+    "https://images.unsplash.com/photo-1620127682229-33388276e540?auto=format&fit=crop&w=900&q=80",
+};
 
-const navItems = [
-  [LayoutDashboard, "Overview"],
-  [LineChart, "Forecasts"],
-  [Gauge, "Risk Score"],
-  [Calculator, "What-If"],
-  [BellRing, "Alerts"],
-  [Plug, "Imports"],
-  [Users, "Team"],
-  [Settings, "Settings"],
-];
-
-const alertsSeed = [
+const collection = [
   {
-    level: "High",
-    title: "Supplier payment may pressure payroll buffer",
-    detail: "\u20b142,800 invoice due 3 days before payroll. Suggested action: split payment.",
-    due: "Due Jun 08",
-    owner: "Lyxter",
+    id: 1,
+    name: "Monstera Thai Constellation",
+    nickname: "Nova",
+    image: plantPhotos.monstera,
+    status: "Thriving",
+    tag: "Rare",
+    availability: "Cuttings soon",
+    likes: 284,
+    age: "1y 8m",
+    updates: ["New fenestrated leaf opened", "Repotted into chunky aroid mix", "Moss pole extended"],
   },
   {
-    level: "Medium",
-    title: "Three invoices trending late",
-    detail: "Customers Alpha Foods, Clarity Retail, and Maven Labs are 9-14 days slower than normal.",
-    due: "Watchlist",
-    owner: "Paolo",
+    id: 2,
+    name: "Calathea Orbifolia",
+    nickname: "Luna",
+    image: plantPhotos.calathea,
+    status: "Recovering",
+    tag: "Pet friendly",
+    availability: "Not available",
+    likes: 143,
+    age: "9m",
+    updates: ["Humidity tray added", "Brown edges trimmed", "Moved away from afternoon sun"],
   },
   {
-    level: "Low",
-    title: "Tax reserve below target",
-    detail: "Reserve is \u20b18,400 under your Q2 target, but projected recovery is likely by Jul 01.",
-    due: "Review",
-    owner: "Trisha",
-  },
-];
-
-const recommendations = [
-  "Collect invoice INV-204 before Jun 12 to keep runway above 7 months.",
-  "Move the supplier order from Jun 07 to Jun 14 to lower risk score by 17 points.",
-  "Offer 1.5% early-payment discount to two late accounts with strong payment history.",
-];
-
-const importsSeed = [
-  ["Cash Position.xlsx", "Imported", "Updated 4 minutes ago"],
-  ["Receivables Tracker.xlsx", "Needs upload", "Last file was uploaded 3 days ago"],
-  ["Payroll Schedule.xlsx", "Imported", "Next cutoff already modeled"],
-  ["Supplier Payables.xlsx", "Needs review", "2 rows need category mapping"],
-  ["Sales Summary.xlsx", "Imported", "Weekly revenue tab detected"],
-  ["Expense Ledger.xlsx", "Needs upload", "Awaiting latest workbook"],
-];
-
-const team = [
-  ["Lyxter", "Owner", "Full access", "Online"],
-  ["Paolo Reyes", "Operations", "Forecasts, alerts", "Online"],
-  ["Trisha Santos", "Accountant", "Reports, imports", "Invited"],
-  ["Evan Brooks", "Advisor", "Read-only", "Offline"],
-];
-
-const activity = [
-  ["4 min ago", "Cash Position.xlsx imported", "482 rows analyzed"],
-  ["18 min ago", "Risk score changed from 27 to 32", "Late receivable pattern detected"],
-  ["1 hr ago", "Action plan generated", "3 recommendations shared with operators"],
-  ["Yesterday", "Supplier Payables.xlsx reviewed", "2 rows were remapped"],
-];
-
-const appGuide = [
-  {
-    icon: LineChart,
-    title: "What the app does",
-    text: "Smart Cash Flow tracks cash balance, receivables, expenses, and runway so teams can see future cash pressure before it becomes urgent.",
+    id: 3,
+    name: "Golden Pothos",
+    nickname: "Milo",
+    image: plantPhotos.pothos,
+    status: "Propagating",
+    tag: "Easy care",
+    availability: "Open to trade",
+    likes: 96,
+    age: "2y",
+    updates: ["Five nodes rooted", "Two cuttings ready", "Trailing shelf reset"],
   },
   {
-    icon: SlidersHorizontal,
-    title: "How to operate it",
-    text: "Start in Overview, upload or refresh your workbooks, review the forecast and risk score, test scenarios in What-If, then work through alerts and recommendations.",
+    id: 4,
+    name: "Anthurium Clarinervium",
+    nickname: "Velvet",
+    image: plantPhotos.anthurium,
+    status: "Flowering",
+    tag: "Collector",
+    availability: "Wishlist only",
+    likes: 219,
+    age: "1y 2m",
+    updates: ["First inflorescence spotted", "Leaf shine cleaned", "Switched to filtered water"],
   },
   {
-    icon: Sparkles,
-    title: "How it helps",
-    text: "It turns financial activity into clear priorities, helping operators prevent shortages, protect payroll, and plan with more confidence.",
+    id: 5,
+    name: "Snake Plant Laurentii",
+    nickname: "Scout",
+    image: plantPhotos.snake,
+    status: "Thriving",
+    tag: "Low light",
+    availability: "Pups available",
+    likes: 88,
+    age: "3y",
+    updates: ["Two pups emerged", "Moved to brighter corner", "Soil fully dried between watering"],
   },
+  {
+    id: 6,
+    name: "Mini Phalaenopsis Orchid",
+    nickname: "Pearl",
+    image: plantPhotos.orchid,
+    status: "Flowering",
+    tag: "Blooming",
+    availability: "Not available",
+    likes: 176,
+    age: "7m",
+    updates: ["Second bloom spike opened", "Root tips are active", "Bark mix refreshed"],
+  },
+  {
+    id: 7,
+    name: "Fiddle Leaf Fig",
+    nickname: "Atlas",
+    image: plantPhotos.fiddle,
+    status: "Growing",
+    tag: "Statement",
+    availability: "Not available",
+    likes: 132,
+    age: "2y 4m",
+    updates: ["Rotated for even growth", "New top leaf hardened", "Dust cleaned from leaves"],
+  },
+  {
+    id: 8,
+    name: "Hoya Carnosa Compacta",
+    nickname: "Rope",
+    image: plantPhotos.hoya,
+    status: "Propagating",
+    tag: "Trailing",
+    availability: "Open to trade",
+    likes: 201,
+    age: "1y 5m",
+    updates: ["Cutting callused", "Peduncle spotted", "Moved near morning light"],
+  },
+  {
+    id: 9,
+    name: "Alocasia Frydek",
+    nickname: "Emerald",
+    image: plantPhotos.alocasia,
+    status: "Recovering",
+    tag: "Velvet",
+    availability: "Wishlist only",
+    likes: 157,
+    age: "11m",
+    updates: ["Humidity increased", "Old leaf removed", "New spear visible"],
+  },
+  {
+    id: 10,
+    name: "Peperomia Watermelon",
+    nickname: "Melon",
+    image: plantPhotos.peperomia,
+    status: "Thriving",
+    tag: "Compact",
+    availability: "Leaf cuttings soon",
+    likes: 119,
+    age: "10m",
+    updates: ["Three new leaves", "Self-watering pot tested", "Moved to shelf level two"],
+  },
+];
+
+const marketPlants = [
+  ["Silver Sword Philodendron", "PHP 2,100", "Quezon City", "Sell", plantPhotos.fern],
+  ["Rooted Cebu Blue Cutting", "PHP 650", "Makati", "Trade", plantPhotos.pothos],
+  ["Desert Cactus Trio", "PHP 1,250", "Pasig", "Sell", plantPhotos.cactus],
+  ["Kitchen Herb Starter Set", "PHP 980", "Taguig", "Sell", plantPhotos.herb],
+  ["Snake Plant Pup", "PHP 420", "Marikina", "Trade", plantPhotos.snake],
+  ["Mini Orchid in Bloom", "PHP 1,850", "San Juan", "Sell", plantPhotos.orchid],
+  ["Hoya Carnosa Cutting", "PHP 700", "Mandaluyong", "Trade", plantPhotos.hoya],
+  ["Watermelon Peperomia", "PHP 950", "Pasay", "Sell", plantPhotos.peperomia],
+];
+
+const trades = [
+  ["Maya Cruz", "Wants Golden Pothos cuttings", "Offering: Hoya carnosa rooted cutting", "92% match"],
+  ["Jun Park", "Asked about Monstera nodes", "Offering: cash or rare soil mix", "78% match"],
+  ["Nina Santos", "Wishlist match found", "Offering: Philodendron micans", "85% match"],
+];
+
+const communityGardens = [
+  {
+    id: "maya",
+    owner: "Maya Cruz",
+    name: "Balcony Jungle",
+    location: "Mandaluyong",
+    cover: plantPhotos.calathea,
+    score: "9.8k",
+    followers: "1.4k",
+    rank: "#1",
+    bio: "Rare foliage, humid balcony shelves, and weekly growth updates.",
+    badges: ["Most admired", "Rare collector", "Top trader"],
+    plants: [
+      { name: "Philodendron Gloriosum", image: plantPhotos.fern, tag: "Rare" },
+      { name: "Calathea Orbifolia", image: plantPhotos.calathea, tag: "Humidity" },
+      { name: "Hoya Carnosa", image: plantPhotos.hoya, tag: "Cuttings" },
+    ],
+  },
+  {
+    id: "sofia",
+    owner: "Sofia Reyes",
+    name: "Herb Roof",
+    location: "Taguig",
+    cover: plantPhotos.herb,
+    score: "8.7k",
+    followers: "940",
+    rank: "#3",
+    bio: "Edible balcony garden with basil, mint, chili, and weekend harvest logs.",
+    badges: ["Harvest streak", "Community helper", "Beginner friendly"],
+    plants: [
+      { name: "Sweet Basil", image: plantPhotos.herb, tag: "Harvest" },
+      { name: "Mini Cactus Trio", image: plantPhotos.cactus, tag: "Sunny" },
+      { name: "Golden Pothos", image: plantPhotos.pothos, tag: "Trade" },
+    ],
+  },
+  {
+    id: "jun",
+    owner: "Jun Park",
+    name: "Bonsai Courtyard",
+    location: "Pasig",
+    cover: plantPhotos.bonsai,
+    score: "8.4k",
+    followers: "812",
+    rank: "#5",
+    bio: "Slow-growing bonsai collection, shape updates, and local swap meetups.",
+    badges: ["Trusted trader", "Care streak", "Slow grower"],
+    plants: [
+      { name: "Juniper Bonsai", image: plantPhotos.bonsai, tag: "Showcase" },
+      { name: "Snake Plant", image: plantPhotos.snake, tag: "Low light" },
+      { name: "Peperomia", image: plantPhotos.peperomia, tag: "Compact" },
+    ],
+  },
+];
+
+const leaderboard = {
+  Gardens: [
+    ["Maya", "Balcony Jungle", 9840, "142 admirers"],
+    ["Lyxter", "Aroid Shelf Lab", 9120, "38 updates"],
+    ["Sofia", "Herb Roof", 8730, "21 harvests"],
+  ],
+  Traders: [
+    ["Jun", "Trusted Trader", 7620, "54 clean trades"],
+    ["Maya", "Cutting Queen", 7210, "4.9 rating"],
+    ["Paolo", "Weekend Swapper", 6840, "fast replies"],
+  ],
+  Helpers: [
+    ["Nina", "Plant Doctor", 6420, "89 care answers"],
+    ["Lyxter", "ID Specialist", 6185, "47 IDs solved"],
+    ["Sam", "Pest Rescue", 5900, "32 saves"],
+  ],
+};
+
+const tabs = [
+  [Home, "Home"],
+  [ShoppingBag, "Market"],
+  [Leaf, "Garden"],
+  [Send, "Trade"],
+  [Trophy, "Rank"],
 ];
 
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-function formatPhp(value) {
-  return new Intl.NumberFormat("en-PH", {
-    style: "currency",
-    currency: "PHP",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-function formatUsdCompact(value) {
-  return `\u20b1${Math.round(value)}K`;
-}
-
-function getRange(values, padding = 24) {
-  return {
-    min: Math.min(...values) - padding,
-    max: Math.max(...values) + padding,
+function StatusPill({ children, tone = "green" }) {
+  const tones = {
+    green: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    blue: "bg-sky-50 text-sky-700 ring-sky-100",
+    amber: "bg-amber-50 text-amber-700 ring-amber-100",
+    rose: "bg-rose-50 text-rose-700 ring-rose-100",
   };
+
+  return <span className={cn("rounded-full px-3 py-1 text-[11px] font-bold ring-1", tones[tone])}>{children}</span>;
 }
 
-function linePoints(data, key, { width = 760, height = 280, padLeft = 72, padRight = 26, padTop = 26, padBottom = 28, min, max } = {}) {
-  return data
-    .map((item, index) => {
-      const x = padLeft + (index * (width - padLeft - padRight)) / (data.length - 1);
-      const y = height - padBottom - ((item[key] - min) / (max - min)) * (height - padTop - padBottom);
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(" ");
-}
-
-function AppChart({ focus = "cash" }) {
-  const width = 760;
-  const height = 280;
-  const padLeft = 74;
-  const padRight = 22;
-  const padTop = 20;
-  const padBottom = 32;
-
-  const cashRange = getRange(appForecast.map((item) => item.cash), 24);
-  const riskRange = getRange(appForecast.map((item) => item.risk), 6);
-  const flowRange = getRange([...appForecast.map((item) => item.inflow), ...appForecast.map((item) => item.outflow)], 10);
-
-  const cash = linePoints(appForecast, "cash", { width, height, padLeft, padRight, padTop, padBottom, ...cashRange });
-  const risk = linePoints(appForecast, "risk", { width, height, padLeft, padRight, padTop, padBottom, ...riskRange });
-  const inflow = linePoints(appForecast, "inflow", { width, height, padLeft, padRight, padTop, padBottom, ...flowRange });
-  const outflow = linePoints(appForecast, "outflow", { width, height, padLeft, padRight, padTop, padBottom, ...flowRange });
-  const cashTicks = Array.from({ length: 4 }, (_, index) => {
-    const ratio = index / 3;
-    const value = cashRange.max - (cashRange.max - cashRange.min) * ratio;
-    const y = padTop + (height - padTop - padBottom) * ratio;
-
-    return {
-      value,
-      y,
-    };
-  });
-
+function PhoneShell({ children }) {
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="h-full w-full overflow-visible" role="img" aria-label="Cash flow and risk forecast">
-      <defs>
-        <linearGradient id="lightCash" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#4f8df7" stopOpacity="0.22" />
-          <stop offset="100%" stopColor="#4f8df7" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      {cashTicks.map((tick) => (
-        <g key={tick.y}>
-          <line x1={padLeft} x2={width - padRight} y1={tick.y} y2={tick.y} stroke="rgba(121, 150, 187, 0.16)" />
-          <text x={padLeft - 10} y={tick.y + 4} textAnchor="end" className="fill-slate-400 text-[12px]">
-            {formatUsdCompact(tick.value)}
-          </text>
-        </g>
-      ))}
-      <line x1={padLeft} x2={padLeft} y1={padTop} y2={height - padBottom} stroke="rgba(121, 150, 187, 0.12)" />
-      <polygon points={`${padLeft},${height - padBottom} ${cash} ${width - padRight},${height - padBottom}`} fill="url(#lightCash)" />
-      <polyline points={cash} fill="none" stroke="#4f8df7" strokeWidth={focus === "cash" ? "5" : "3.5"} strokeLinecap="round" strokeLinejoin="round" />
-      <polyline points={risk} fill="none" stroke="#f0a23c" strokeWidth={focus === "risk" ? "4.5" : "3.5"} strokeLinecap="round" strokeLinejoin="round" strokeDasharray="8 9" />
-      {focus === "detail" && (
-        <>
-          <polyline points={inflow} fill="none" stroke="#3bb7a7" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-          <polyline points={outflow} fill="none" stroke="#ec6a5d" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-        </>
-      )}
-      {appForecast.map((item, index) => (
-        <text key={item.label} x={padLeft + (index * (width - padLeft - padRight)) / (appForecast.length - 1)} y={height - 8} textAnchor="middle" className="fill-slate-400 text-[12px]">
-          {item.label}
-        </text>
-      ))}
-    </svg>
-  );
-}
-
-function Sidebar({ activeView, setActiveView }) {
-  return (
-    <aside className="flex w-full shrink-0 flex-col gap-4 rounded-[1.6rem] border border-[#d9e6f6] bg-[linear-gradient(180deg,#ffffff,#f4f8fd)] px-3 py-4 shadow-[0_24px_70px_rgba(113,146,190,0.12)] lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:w-24 lg:rounded-[2rem] lg:px-3">
-      <div className="flex items-center justify-between gap-3 lg:flex-col lg:justify-start">
-        <a href="/" aria-label="Smart Cash Flow home" className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-[#4d96e6] to-[#3bb7a7] text-white shadow-[0_18px_36px_rgba(81,134,208,0.24)]">
-          <ShieldCheck size={24} />
-        </a>
-        <div className="hidden h-px w-10 bg-[#d9e6f6] lg:block" />
-        <button
-          type="button"
-          onClick={() => setActiveView("Overview")}
-          className="grid h-12 w-12 place-items-center rounded-2xl border border-[#dce8f6] bg-white text-[#4d78b2] transition hover:bg-[#f5f9ff] lg:mt-2"
-          title="Laguna Home Living"
-        >
-          <Building2 size={22} />
-        </button>
+    <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col overflow-hidden bg-[#f5f8ef] shadow-[0_28px_90px_rgba(37,61,41,0.24)] sm:my-6 sm:min-h-[880px] sm:rounded-[2.4rem] sm:border-[10px] sm:border-[#1e2a20]">
+      <div className="hidden h-6 items-center justify-center bg-[#1e2a20] sm:flex">
+        <span className="h-1.5 w-20 rounded-full bg-white/25" />
       </div>
-      <nav className="flex gap-2 overflow-x-auto pb-1 lg:mt-4 lg:flex-1 lg:flex-col lg:items-center lg:gap-4 lg:overflow-visible lg:pb-0">
-        {navItems.slice(0, 5).map(([Icon, label]) => (
-          <button
-            key={label}
-            type="button"
-            onClick={() => setActiveView(label)}
-            title={label}
-            aria-label={label}
-            aria-current={activeView === label ? "page" : undefined}
-            className={cn(
-              "flex h-11 min-w-max items-center gap-2 rounded-2xl px-3 text-sm font-semibold transition lg:grid lg:h-12 lg:w-12 lg:place-items-center lg:px-0",
-              activeView === label ? "bg-[#4f8df7] text-white shadow-[0_18px_34px_rgba(79,141,247,0.26)]" : "bg-white/70 text-[#7a93b5] hover:bg-white hover:text-[#3a6399] lg:bg-transparent"
-            )}
-          >
-            <Icon size={20} />
-            <span className="lg:hidden">{label}</span>
-          </button>
-        ))}
-        {navItems.slice(5).map(([Icon, label]) => (
-          <button
-            key={label}
-            type="button"
-            onClick={() => setActiveView(label)}
-            title={label}
-            aria-label={label}
-            aria-current={activeView === label ? "page" : undefined}
-            className={cn(
-              "flex h-11 min-w-max items-center gap-2 rounded-2xl px-3 text-sm font-semibold transition lg:grid lg:h-12 lg:w-12 lg:place-items-center lg:px-0",
-              activeView === label ? "bg-[#4f8df7] text-white shadow-[0_18px_34px_rgba(79,141,247,0.26)]" : "bg-white/70 text-[#7a93b5] hover:bg-white hover:text-[#3a6399] lg:bg-transparent"
-            )}
-          >
-            <Icon size={20} />
-            <span className="lg:hidden">{label}</span>
-          </button>
-        ))}
-      </nav>
-      <div className="hidden h-px w-full bg-[#d9e6f6] lg:block" />
-      <div className="hidden items-center justify-center pb-2 lg:flex">
-        <div className="grid h-12 w-12 place-items-center rounded-2xl border border-[#cfe3d6] bg-[#eef8f0] text-[#5a9a62]" title="Secure data room">
-          <Lock size={19} />
-        </div>
-      </div>
-      <div className="flex items-center gap-2 overflow-x-auto lg:hidden">
-        <div className="inline-flex min-w-max items-center gap-2 rounded-2xl border border-[#cfe3d6] bg-[#eef8f0] px-3 py-2 text-sm font-semibold text-[#5a9a62]">
-          <Lock size={18} /> Secure data room
-        </div>
-      </div>
-    </aside>
-  );
-}
-
-function MetricCard({ icon: Icon, label, value, delta, good = true }) {
-  return (
-    <div className="min-h-40 rounded-[1.4rem] border border-[#dbe7f5] bg-[linear-gradient(180deg,#ffffff,#f7fbff)] p-5 shadow-[0_22px_60px_rgba(109,142,188,0.1)]">
-      <div className="flex items-center justify-between">
-        <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#edf4fe] text-[#4f8df7]">
-          <Icon size={20} />
-        </span>
-        <span className={cn("flex items-center gap-1 text-xs font-semibold", good ? "text-[#5b9a62]" : "text-[#e26d5d]")}>
-          {good ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />} {delta}
-        </span>
-      </div>
-      <p className="mt-5 text-2xl font-semibold tracking-tight text-[#294770] xl:text-3xl">{value}</p>
-      <p className="mt-1 text-sm text-[#7b93b4]">{label}</p>
+      {children}
     </div>
   );
 }
 
-function Panel({ children, className = "" }) {
-  return <section className={cn("rounded-[1.5rem] border border-[#dbe7f5] bg-[linear-gradient(180deg,#ffffff,#f8fbff)] p-5 shadow-[0_22px_60px_rgba(109,142,188,0.1)]", className)}>{children}</section>;
+function TopBar() {
+  return (
+    <header className="flex items-center justify-between px-5 pb-3 pt-5">
+      <div>
+        <div className="flex items-center gap-2">
+          <span className="grid h-9 w-9 place-items-center rounded-2xl bg-[#23422a] text-[#d9f99d]">
+            <Sprout size={20} />
+          </span>
+          <p className="text-2xl font-black tracking-tight text-[#203522]">growMate</p>
+        </div>
+        <p className="mt-1 text-sm font-medium text-[#73806c]">Buy, trade, and grow together.</p>
+      </div>
+      <button className="relative grid h-11 w-11 place-items-center rounded-2xl bg-white text-[#203522] shadow-sm">
+        <Bell size={19} />
+        <span className="absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full bg-[#f97316] ring-2 ring-white" />
+      </button>
+    </header>
+  );
 }
 
-function RiskMeter({ score = 32 }) {
-  const status = score > 60 ? "HIGH" : score > 40 ? "MED" : "LOW-MED";
-  const color = score > 60 ? "text-[#e26d5d]" : score > 40 ? "text-[#f0a23c]" : "text-[#5b9a62]";
-
+function HomeView({ setActiveTab }) {
   return (
-    <Panel className="bg-[linear-gradient(180deg,#ffffff,#f6fbff)]">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-semibold text-[#294770]">AI Risk Score</p>
-          <p className="mt-1 text-xs text-[#8aa0bc]">Updated 4 minutes ago</p>
-        </div>
-        <Gauge className="text-[#5f8dcc]" size={22} />
-      </div>
-      <div className="mx-auto mt-7 grid h-44 w-44 place-items-center rounded-full bg-[conic-gradient(from_230deg,#3bb7a7_0deg,#4f8df7_96deg,#f0a23c_132deg,rgba(216,227,242,0.9)_134deg_360deg)]">
-        <div className="grid h-32 w-32 place-items-center rounded-full bg-white">
-          <div className="text-center">
-            <p className="text-5xl font-semibold text-[#294770]">{score}</p>
-            <p className={cn("text-xs font-bold tracking-[0.2em]", color)}>{status}</p>
+    <div className="space-y-5 px-5 pb-24">
+      <section className="relative overflow-hidden rounded-[2rem] bg-[#203522] p-5 text-white">
+        <img src={plantPhotos.monstera} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
+        <div className="relative">
+          <StatusPill tone="amber">Garden level 18</StatusPill>
+          <h1 className="mt-16 max-w-64 text-3xl font-black leading-none tracking-tight">Your garden is trending this week.</h1>
+          <div className="mt-5 flex gap-2">
+            <button onClick={() => setActiveTab("Garden")} className="rounded-full bg-[#d9f99d] px-4 py-2 text-sm font-bold text-[#203522]">
+              View garden
+            </button>
+            <button onClick={() => setActiveTab("Market")} className="rounded-full bg-white/18 px-4 py-2 text-sm font-bold backdrop-blur">
+              Browse plants
+            </button>
           </div>
         </div>
-      </div>
-      <div className="mt-6 grid gap-2 text-center text-xs sm:grid-cols-3">
-        <span className="rounded-lg bg-[#eef8f0] py-2 text-[#5b9a62]">Cash stable</span>
-        <span className="rounded-lg bg-[#fff5e6] py-2 text-[#d18d2c]">Invoices late</span>
-        <span className="rounded-lg bg-[#edf4fe] py-2 text-[#4f8df7]">Runway OK</span>
-      </div>
-    </Panel>
+      </section>
+
+      <section className="grid grid-cols-3 gap-3">
+        {[
+          ["42", "Plants"],
+          ["18", "Trades"],
+          ["9.1k", "Score"],
+        ].map(([value, label]) => (
+          <div key={label} className="rounded-3xl bg-white p-4 text-center shadow-sm">
+            <p className="text-2xl font-black text-[#203522]">{value}</p>
+            <p className="mt-1 text-xs font-bold text-[#7a8572]">{label}</p>
+          </div>
+        ))}
+      </section>
+
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-black text-[#203522]">Today in your garden</h2>
+          <Sparkles size={18} className="text-[#f97316]" />
+        </div>
+        <div className="space-y-3">
+          {[
+            ["Water check", "3 plants due today", Check],
+            ["New admirer", "Maya saved your Monstera", Heart],
+            ["Trade match", "Golden Pothos matches Nina's wishlist", Send],
+          ].map(([title, detail, Icon]) => (
+            <button key={title} className="flex w-full items-center gap-3 rounded-3xl bg-white p-4 text-left shadow-sm">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[#edf7dc] text-[#315d37]">
+                <Icon size={19} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-bold text-[#203522]">{title}</span>
+                <span className="block text-sm text-[#73806c]">{detail}</span>
+              </span>
+              <ChevronRight size={18} className="text-[#9aa690]" />
+            </button>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }
 
-function WhatIfSimulator({ embedded = false }) {
-  const [delay, setDelay] = useState(14);
-  const [expense, setExpense] = useState(12000);
-  const [discount, setDiscount] = useState(1.5);
-  const risk = Math.min(91, 22 + Math.round(delay * 1.4) + Math.round(expense / 1800) - Math.round(discount * 3));
-  const runway = Math.max(2.1, 8.4 - delay * 0.08 - expense / 18000 + discount * 0.18).toFixed(1);
-  const cashImpact = Math.round(-delay * 1900 - expense + discount * 7200);
-
-  return (
-    <Panel className={embedded ? "" : "min-h-[540px]"}>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-semibold text-[#294770]">What-If Simulator</p>
-          <p className="mt-1 text-xs text-[#8aa0bc]">Stress test payment timing, expenses, and collection incentives.</p>
-        </div>
-        <Calculator className="text-[#3bb7a7]" size={22} />
-      </div>
-      <div className="mt-5 space-y-5">
-        <label className="block">
-          <span className="flex justify-between text-sm text-[#6f87a8]">
-            Customer payment delay <b className="text-[#294770]">{delay} days</b>
-          </span>
-          <input className="mt-3 w-full accent-[#3bb7a7]" type="range" min="0" max="45" value={delay} onChange={(event) => setDelay(Number(event.target.value))} />
-        </label>
-        <label className="block">
-          <span className="flex justify-between text-sm text-[#6f87a8]">
-            Extra expense <b className="text-[#294770]">{formatPhp(expense)}</b>
-          </span>
-          <input className="mt-3 w-full accent-[#4f8df7]" type="range" min="0" max="50000" step="1000" value={expense} onChange={(event) => setExpense(Number(event.target.value))} />
-        </label>
-        <label className="block">
-          <span className="flex justify-between text-sm text-[#6f87a8]">
-            Early-payment discount <b className="text-[#294770]">{discount.toFixed(1)}%</b>
-          </span>
-          <input className="mt-3 w-full accent-[#f0a23c]" type="range" min="0" max="4" step="0.25" value={discount} onChange={(event) => setDiscount(Number(event.target.value))} />
-        </label>
-      </div>
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-xl bg-[#f5f9ff] p-4">
-          <p className="text-xs text-[#8aa0bc]">Projected risk</p>
-          <p className={cn("mt-2 text-2xl font-semibold", risk > 60 ? "text-[#e26d5d]" : risk > 40 ? "text-[#f0a23c]" : "text-[#5b9a62]")}>{risk}</p>
-        </div>
-        <div className="rounded-xl bg-[#f5f9ff] p-4">
-          <p className="text-xs text-[#8aa0bc]">Runway</p>
-          <p className="mt-2 text-2xl font-semibold text-[#294770]">{runway} mo</p>
-        </div>
-        <div className="rounded-xl bg-[#f5f9ff] p-4">
-          <p className="text-xs text-[#8aa0bc]">Cash impact</p>
-          <p className={cn("mt-2 text-2xl font-semibold", cashImpact >= 0 ? "text-[#5b9a62]" : "text-[#e26d5d]")}>{cashImpact >= 0 ? "+" : "-"}{"\u20b1"}{Math.abs(cashImpact / 1000).toFixed(1)}K</p>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function AlertsList({ alerts, setAlerts }) {
+function MarketView() {
   const [filter, setFilter] = useState("All");
-  const shown = alerts.filter((alert) => filter === "All" || alert.level === filter);
+  const shown = filter === "All" ? marketPlants : marketPlants.filter((item) => item[3] === filter);
 
   return (
-    <Panel>
-      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-        <div>
-          <p className="text-lg font-semibold text-[#294770]">Alerts Center</p>
-          <p className="mt-1 text-sm text-[#7b93b4]">Prioritized warnings with recommended next actions.</p>
+    <div className="px-5 pb-24">
+      <div className="sticky top-0 z-10 -mx-5 bg-[#f5f8ef]/90 px-5 pb-3 pt-1 backdrop-blur">
+        <div className="flex items-center gap-2 rounded-3xl bg-white px-4 py-3 shadow-sm">
+          <Search size={18} className="text-[#89947f]" />
+          <input className="w-full bg-transparent text-sm outline-none placeholder:text-[#89947f]" placeholder="Search monstera, cactus, cuttings..." />
         </div>
-        <div className="flex gap-2">
-          {["All", "High", "Medium", "Low"].map((item) => (
+        <div className="mt-3 flex gap-2">
+          {["All", "Sell", "Trade"].map((item) => (
             <button
               key={item}
-              type="button"
               onClick={() => setFilter(item)}
-              className={cn("rounded-full px-3 py-2 text-xs font-bold transition", filter === item ? "bg-[#4f8df7] text-white" : "bg-[#f3f8ff] text-[#7188a8] hover:bg-[#eaf2fd]")}
+              className={cn(
+                "rounded-full px-4 py-2 text-sm font-bold transition",
+                filter === item ? "bg-[#203522] text-white" : "bg-white text-[#63705e]"
+              )}
             >
               {item}
             </button>
           ))}
         </div>
       </div>
-      <div className="mt-5 space-y-3">
-        {shown.map((alert) => (
-          <div key={alert.title} className="rounded-[1.2rem] border border-[#e0ebf8] bg-[#fbfdff] p-5">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className={cn("w-fit rounded-full px-3 py-1 text-xs font-bold", alert.level === "High" ? "bg-[#feeae7] text-[#df6c5e]" : alert.level === "Medium" ? "bg-[#fff4e2] text-[#d18d2c]" : "bg-[#eef8f0] text-[#5b9a62]")}>{alert.level}</span>
-                  <p className="text-lg font-semibold text-[#294770]">{alert.title}</p>
-                </div>
-                <p className="mt-3 text-sm leading-7 text-[#7b93b4]">{alert.detail}</p>
-              </div>
-              <div className="flex shrink-0 items-center gap-2 text-sm text-[#8aa0bc] lg:pt-0.5">
-                <span className="rounded-full bg-[#f2f7fe] px-3 py-1.5 font-medium text-[#6e86a7]">{alert.due}</span>
-                <button
-                  type="button"
-                  onClick={() => setAlerts((items) => items.filter((item) => item.title !== alert.title))}
-                  className="rounded-full bg-white px-3 py-1.5 font-semibold text-[#5f7da2] transition hover:bg-[#e8f0fb] hover:text-[#294770]"
-                >
-                  Resolve
-                </button>
-              </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        {shown.map(([name, price, location, type, image]) => (
+          <article key={name} className="overflow-hidden rounded-[1.6rem] bg-white shadow-sm">
+            <img src={image} alt={name} className="h-36 w-full object-cover" />
+            <div className="p-3">
+              <StatusPill tone={type === "Trade" ? "blue" : "green"}>{type}</StatusPill>
+              <h3 className="mt-2 min-h-10 text-sm font-black leading-tight text-[#203522]">{name}</h3>
+              <p className="mt-2 text-lg font-black text-[#315d37]">{price}</p>
+              <p className="mt-1 flex items-center gap-1 text-xs font-semibold text-[#7a8572]">
+                <MapPin size={12} /> {location}
+              </p>
             </div>
-            <div className="mt-3 flex items-center gap-2 text-xs text-[#9bb0c9]">
-              <span className="font-medium">Owner:</span>
-              <span>{alert.owner}</span>
-            </div>
-          </div>
+          </article>
         ))}
       </div>
-    </Panel>
+    </div>
   );
 }
 
-function ImportsPanel({ imports, setImports }) {
-  function toggleImport(name) {
-    setImports((items) =>
-      items.map(([itemName, status, detail]) =>
-        itemName === name
-          ? [
-              itemName,
-              status === "Imported" ? "Needs upload" : "Imported",
-              status === "Imported" ? "Waiting for latest workbook" : "Uploaded just now",
-            ]
-          : [itemName, status, detail]
-      )
+function GardenModeSwitch({ gardenMode, setGardenMode, setSelectedGarden }) {
+  return (
+    <div className="mb-4 flex gap-2 px-5">
+      {["Mine", "Visit"].map((mode) => (
+        <button
+          key={mode}
+          onClick={() => {
+            setGardenMode(mode);
+            setSelectedGarden(null);
+          }}
+          className={cn(
+            "rounded-full px-4 py-2 text-sm font-black transition",
+            gardenMode === mode ? "bg-[#203522] text-white" : "bg-white text-[#63705e]"
+          )}
+        >
+          {mode}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function VisitGardensView({ selectedGarden, setSelectedGarden }) {
+  if (selectedGarden) {
+    return (
+      <div className="px-5 pb-24">
+        <button
+          onClick={() => setSelectedGarden(null)}
+          className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-[#63705e] shadow-sm"
+        >
+          <ArrowLeft size={16} /> Gardens
+        </button>
+
+        <section className="overflow-hidden rounded-[2rem] bg-white shadow-sm">
+          <div className="relative h-52">
+            <img src={selectedGarden.cover} alt="" className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <p className="text-sm font-black uppercase tracking-[0.14em] text-white/75">{selectedGarden.owner}</p>
+              <h2 className="mt-1 text-3xl font-black leading-none">{selectedGarden.name}</h2>
+              <p className="mt-2 flex items-center gap-1 text-sm font-semibold text-white/85">
+                <MapPin size={14} /> {selectedGarden.location}
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 divide-x divide-[#edf1e8] p-4 text-center">
+            {[
+              [selectedGarden.score, "Score"],
+              [selectedGarden.followers, "Followers"],
+              [selectedGarden.rank, "Rank"],
+            ].map(([value, label]) => (
+              <div key={label}>
+                <p className="font-black text-[#203522]">{value}</p>
+                <p className="text-[11px] font-bold text-[#7a8572]">{label}</p>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-[#edf1e8] p-4">
+            <p className="text-sm font-semibold leading-6 text-[#63705e]">{selectedGarden.bio}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {selectedGarden.badges.map((badge) => (
+                <StatusPill key={badge} tone="amber">{badge}</StatusPill>
+              ))}
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button className="rounded-full bg-[#203522] px-4 py-3 text-sm font-black text-white">Follow garden</button>
+              <button className="rounded-full bg-[#edf7dc] px-4 py-3 text-sm font-black text-[#315d37]">Message</button>
+            </div>
+          </div>
+        </section>
+
+        <h3 className="mt-5 text-lg font-black text-[#203522]">Garden plants</h3>
+        <div className="mt-3 grid grid-cols-3 gap-3">
+          {selectedGarden.plants.map((plant) => (
+            <article key={plant.name} className="overflow-hidden rounded-[1.3rem] bg-white shadow-sm">
+              <img src={plant.image} alt={plant.name} className="h-24 w-full object-cover" />
+              <div className="p-2">
+                <p className="line-clamp-2 min-h-9 text-xs font-black leading-tight text-[#203522]">{plant.name}</p>
+                <p className="mt-1 text-[11px] font-bold text-[#7a8572]">{plant.tag}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
     );
   }
 
   return (
-    <Panel>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-lg font-semibold text-[#294770]">Spreadsheet Imports</p>
-          <p className="mt-1 text-sm text-[#7b93b4]">Upload the Excel files your team already maintains.</p>
-        </div>
-        <ReceiptText className="text-[#5f8dcc]" size={22} />
-      </div>
-      <div className="mt-5 grid gap-3 lg:grid-cols-2">
-        {imports.map(([name, status, detail]) => (
-          <div key={name} className="flex items-center justify-between gap-3 rounded-xl border border-[#e0ebf8] bg-[#fbfdff] p-4">
-            <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#edf4fe] text-[#4f8df7]">
-                <ReceiptText size={19} />
-              </span>
-              <div>
-                <p className="font-semibold text-[#294770]">{name}</p>
-                <p className="text-xs text-[#7b93b4]">{detail}</p>
-              </div>
+    <div className="space-y-4 px-5 pb-24">
+      {communityGardens.map((garden) => (
+        <button
+          key={garden.id}
+          onClick={() => setSelectedGarden(garden)}
+          className="w-full overflow-hidden rounded-[1.8rem] bg-white text-left shadow-sm"
+        >
+          <div className="relative h-36">
+            <img src={garden.cover} alt="" className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
+            <div className="absolute bottom-3 left-3 text-white">
+              <p className="text-xs font-black uppercase tracking-[0.12em] text-white/75">{garden.owner}</p>
+              <p className="text-2xl font-black">{garden.name}</p>
             </div>
-            <button
-              type="button"
-              onClick={() => toggleImport(name)}
-              className={cn(
-                "rounded-full px-3 py-1 text-xs font-bold transition",
-                status === "Imported"
-                  ? "bg-[#eef8f0] text-[#5b9a62] hover:bg-[#e5f4e8]"
-                  : status === "Needs review"
-                    ? "bg-[#fff5e6] text-[#d18d2c] hover:bg-[#ffefd3]"
-                    : "bg-[#edf4fe] text-[#4f8df7] hover:bg-[#e5effd]"
-              )}
-            >
-              {status === "Imported" ? "Imported" : status === "Needs review" ? "Review" : "Upload"}
-            </button>
+            <span className="absolute right-3 top-3 rounded-full bg-white px-3 py-1 text-xs font-black text-[#203522]">
+              {garden.rank}
+            </span>
           </div>
-        ))}
-      </div>
-    </Panel>
+          <div className="p-4">
+            <p className="text-sm font-semibold leading-6 text-[#63705e]">{garden.bio}</p>
+            <div className="mt-3 flex items-center justify-between">
+              <span className="text-xs font-black text-[#315d37]">{garden.score} garden score</span>
+              <span className="inline-flex items-center gap-1 text-xs font-black text-[#7a8572]">
+                Visit <ChevronRight size={14} />
+              </span>
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
   );
 }
 
-function Header({ activeView, setActiveView, search, setSearch, showNotifications, setShowNotifications, setShowModel, setShowPlan, unread }) {
+function GardenView() {
+  const [selectedPlant, setSelectedPlant] = useState(collection[0]);
+  const [gardenMode, setGardenMode] = useState("Mine");
+  const [selectedGarden, setSelectedGarden] = useState(null);
+
+  if (gardenMode === "Visit") {
+    return (
+      <>
+        <GardenModeSwitch gardenMode={gardenMode} setGardenMode={setGardenMode} setSelectedGarden={setSelectedGarden} />
+        <VisitGardensView selectedGarden={selectedGarden} setSelectedGarden={setSelectedGarden} />
+      </>
+    );
+  }
+
   return (
-    <header className="sticky top-0 z-20 w-full rounded-[1.6rem] border border-[#d9e6f6] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(246,250,255,0.92))] px-4 py-4 shadow-[0_24px_70px_rgba(113,146,190,0.12)] backdrop-blur-xl sm:px-6 lg:rounded-[2rem]">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <a href="/" className="hidden items-center gap-2 rounded-full border border-[#dbe7f5] bg-white px-3 py-2 text-sm text-[#6881a2] transition hover:text-[#294770] sm:flex">
-            <ArrowLeft size={16} /> Landing
-          </a>
-          <label className="hidden w-80 max-w-[34vw] items-center gap-3 rounded-full border border-[#dbe7f5] bg-white px-4 py-2 text-[#8aa0bc] lg:flex">
-            <Search size={17} />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search invoices, risks, forecasts..."
-              className="min-w-0 flex-1 bg-transparent text-sm text-[#294770] outline-none placeholder:text-[#8aa0bc]"
-            />
-          </label>
-        </div>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            type="button"
-            onClick={() => setShowModel(true)}
-            className="hidden items-center gap-2 rounded-full border border-[#dbe7f5] bg-white px-4 py-2 text-sm font-semibold text-[#6881a2] transition hover:bg-[#f7fbff] hover:text-[#294770] xl:inline-flex"
-          >
-            <SlidersHorizontal size={16} /> Model
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowPlan(true)}
-            className="hidden items-center gap-2 rounded-full bg-gradient-to-r from-[#4f8df7] to-[#3bb7a7] px-4 py-2 text-sm font-semibold text-white shadow-[0_18px_36px_rgba(79,141,247,0.22)] xl:inline-flex"
-          >
-            <Sparkles size={16} /> Action plan
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="relative grid h-10 w-10 place-items-center rounded-full border border-[#dbe7f5] bg-white text-[#6881a2] transition hover:bg-[#f7fbff] hover:text-[#294770]"
-          >
-            <BellRing size={18} />
-            {unread > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#ef7257] px-1 text-[10px] font-bold text-white">{unread}</span>}
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveView("Team")}
-            className={cn("flex items-center gap-2 rounded-full border border-[#dbe7f5] bg-white py-1 pl-1 pr-3 transition hover:bg-[#f7fbff] sm:gap-3 sm:pr-4", activeView === "Team" && "border-[#bfd8ff] bg-[#edf4fe]")}
-          >
-            <img src="/lyxter-profile.png" alt="Lyxter" className="h-9 w-9 rounded-full object-cover object-top" />
-            <span className="hidden text-sm font-medium text-[#294770] sm:block">Lyxter</span>
-          </button>
-        </div>
+    <div className="px-5 pb-24">
+      <div className="-mx-5">
+        <GardenModeSwitch gardenMode={gardenMode} setGardenMode={setGardenMode} setSelectedGarden={setSelectedGarden} />
       </div>
-      <label className="mt-4 flex items-center gap-3 rounded-full border border-[#dbe7f5] bg-white px-4 py-2 text-[#8aa0bc] lg:hidden">
-        <Search size={17} />
-        <input
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search invoices, risks, forecasts..."
-          className="min-w-0 flex-1 bg-transparent text-sm text-[#294770] outline-none placeholder:text-[#8aa0bc]"
-        />
-      </label>
-    </header>
-  );
-}
+      <section className="overflow-hidden rounded-[2rem] bg-white shadow-sm">
+        <div className="relative h-44">
+          <img src={plantPhotos.fern} alt="" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
+          <button className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-2xl bg-white/90 text-[#203522]">
+            <Camera size={18} />
+          </button>
+          <div className="absolute bottom-4 left-4 text-white">
+            <p className="text-2xl font-black">Lyxter's Aroid Shelf Lab</p>
+            <p className="mt-1 text-sm font-semibold text-white/85">42 plants · 6 open to trade · Rank #2</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 divide-x divide-[#edf1e8] p-4 text-center">
+          {[
+            ["9.1k", "Garden score"],
+            ["284", "Top likes"],
+            ["38", "Updates"],
+          ].map(([value, label]) => (
+            <div key={label}>
+              <p className="font-black text-[#203522]">{value}</p>
+              <p className="text-[11px] font-bold text-[#7a8572]">{label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-function SearchResults({ search, setSearch, setActiveView }) {
-  const items = [
-    ["Forecasts", "Jun 10 cash low point", "Projected balance falls to \u20b1376K."],
-    ["Alerts", "Supplier payment may pressure payroll buffer", "\u20b142.8K invoice needs action."],
-    ["Imports", "Receivables Tracker.xlsx", "Upload the latest workbook to refresh the forecast."],
-    ["Team", "Trisha Santos", "Accountant invited to reports."],
-  ].filter((item) => item.join(" ").toLowerCase().includes(search.toLowerCase()));
-
-  if (!search) return null;
-
-  return (
-    <Panel className="mb-5">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-[#294770]">Search results for "{search}"</p>
-        <button type="button" onClick={() => setSearch("")} className="text-[#8aa0bc] transition hover:text-[#294770]">
-          <X size={18} />
+      <div className="mt-5 flex items-center justify-between">
+        <h2 className="text-lg font-black text-[#203522]">Plant collection</h2>
+        <button className="inline-flex items-center gap-1 rounded-full bg-[#203522] px-3 py-2 text-xs font-bold text-white">
+          <Plus size={14} /> Add
         </button>
       </div>
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {items.map(([view, title, detail]) => (
-          <button key={title} type="button" onClick={() => setActiveView(view)} className="rounded-xl border border-[#e0ebf8] bg-[#fbfdff] p-4 text-left transition hover:bg-[#f5f9ff]">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#4f8df7]">{view}</p>
-            <p className="mt-2 font-semibold text-[#294770]">{title}</p>
-            <p className="mt-1 text-sm text-[#7b93b4]">{detail}</p>
-          </button>
-        ))}
-        {items.length === 0 && <p className="text-sm text-[#7b93b4]">No matching finance signals found.</p>}
-      </div>
-    </Panel>
-  );
-}
 
-function Overview({ greeting, setShowModel, setShowPlan, alerts, setAlerts, imports, setImports }) {
-  return (
-    <>
-      <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="rounded-[1.8rem] border border-[#dbe7f5] bg-[radial-gradient(circle_at_15%_0%,rgba(79,141,247,0.14),transparent_28%),radial-gradient(circle_at_85%_0%,rgba(59,183,167,0.14),transparent_26%),linear-gradient(180deg,#ffffff,#f8fbff)] p-5 shadow-[0_24px_70px_rgba(113,146,190,0.12)] sm:p-6">
-        <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
-          <div>
-            <p className="text-sm font-semibold text-[#5f8dcc]">{greeting}, Lyxter</p>
-            <h1 className="mt-2 max-w-4xl text-2xl font-semibold tracking-tight text-[#294770] sm:text-3xl xl:text-4xl">Your cash position is stable, but June has two watchpoints.</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#7b93b4] sm:text-base">Smart Cash Flow found supplier timing and late receivables as the biggest short-term risk drivers.</p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <button onClick={() => setShowModel(true)} className="inline-flex items-center gap-2 rounded-full border border-[#dbe7f5] bg-white px-4 py-3 text-sm font-semibold text-[#294770] transition hover:bg-[#f7fbff]">
-              <SlidersHorizontal size={17} /> Adjust model
-            </button>
-            <button onClick={() => setShowPlan(true)} className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#4f8df7] to-[#3bb7a7] px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_36px_rgba(79,141,247,0.22)]">
-              <Sparkles size={17} /> Generate action plan
-            </button>
-          </div>
-        </div>
-      </motion.section>
-
-      <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard icon={WalletCards} label="Current cash balance" value="₱482.4K" delta="+8.4%" />
-        <MetricCard icon={Gauge} label="Forecast risk score" value="32 / 100" delta="+11 pts" good={false} />
-        <MetricCard icon={Clock3} label="Projected runway" value="7.6 mo" delta="+0.8 mo" />
-        <MetricCard icon={ReceiptText} label="At-risk receivables" value="₱38.2K" delta="3 late" good={false} />
-      </section>
-
-      <section className="mt-5">
-        <AppGuidePanel />
-      </section>
-
-      <section className="mt-5 grid gap-5 2xl:grid-cols-[1.45fr_.85fr]">
-        <ForecastCard />
-        <RiskMeter />
-      </section>
-
-      <section className="mt-5 grid gap-5 2xl:grid-cols-[.95fr_1.05fr]">
-        <RecommendationsPanel />
-        <WhatIfSimulator embedded />
-      </section>
-
-      <section className="mt-5 grid gap-5 2xl:grid-cols-[1.1fr_.9fr]">
-        <AlertsList alerts={alerts} setAlerts={setAlerts} />
-        <ImportsPanel imports={imports.slice(0, 4)} setImports={setImports} />
-      </section>
-    </>
-  );
-}
-
-function ForecastCard({ detail = false }) {
-  return (
-    <Panel>
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <p className="text-lg font-semibold text-[#294770]">Cash Flow Forecast</p>
-          <p className="mt-1 text-sm text-[#7b93b4]">Blue is projected cash in PHP. Amber dashed line is risk pressure.</p>
-        </div>
-        <div className="flex gap-2 text-xs">
-          <span className="rounded-full bg-[#fff5e6] px-3 py-1 font-semibold text-[#c27a18]">PHP</span>
-          <span className="rounded-full bg-[#edf4fe] px-3 py-1 text-[#4f8df7]">95% confidence</span>
-          <span className="rounded-full bg-[#eef8f0] px-3 py-1 text-[#5b9a62]">7-week horizon</span>
-        </div>
-      </div>
-      <div className="mt-5 h-72 sm:h-80">
-        <AppChart focus={detail ? "detail" : "cash"} />
-      </div>
-    </Panel>
-  );
-}
-
-function RecommendationsPanel() {
-  return (
-    <Panel>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-lg font-semibold text-[#294770]">AI Recommendations</p>
-          <p className="mt-1 text-sm text-[#7b93b4]">Ranked by cash impact and confidence.</p>
-        </div>
-        <Bot className="text-[#3bb7a7]" size={24} />
-      </div>
-      <div className="mt-5 space-y-3">
-        {recommendations.map((item, index) => (
-          <div key={item} className="flex gap-3 rounded-xl border border-[#e0ebf8] bg-[#fbfdff] p-4">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#4f8df7] text-sm font-bold text-white">{index + 1}</span>
-            <p className="text-sm leading-6 text-[#6881a2]">{item}</p>
-          </div>
-        ))}
-      </div>
-    </Panel>
-  );
-}
-
-function AppGuidePanel() {
-  return (
-    <Panel>
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-lg font-semibold text-[#294770]">How Smart Cash Flow Works</p>
-          <p className="mt-1 text-sm text-[#7b93b4]">Quick instructions for new users and client walkthroughs.</p>
-        </div>
-        <Bot className="text-[#4f8df7]" size={24} />
-      </div>
-      <div className="mt-5 grid gap-3 lg:grid-cols-3">
-        {appGuide.map(({ icon: Icon, title, text }) => (
-          <div key={title} className="rounded-xl border border-[#e0ebf8] bg-[#fbfdff] p-4">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#edf4fe] text-[#4f8df7]">
-              <Icon size={18} />
-            </span>
-            <p className="mt-4 font-semibold text-[#294770]">{title}</p>
-            <p className="mt-2 text-sm leading-6 text-[#7b93b4]">{text}</p>
-          </div>
-        ))}
-      </div>
-    </Panel>
-  );
-}
-
-function ForecastsView() {
-  return (
-    <div className="space-y-5">
-      <ViewTitle kicker="Forecasts" title="Forecast every cash movement before it reaches the bank." text="Compare inflows, outflows, cash balance, and risk pressure across the next seven weeks." />
-      <ForecastCard detail />
-      <div className="grid gap-5 xl:grid-cols-3">
-        {appForecast.map((week) => (
-          <Panel key={week.label}>
-            <p className="text-sm font-semibold text-[#294770]">{week.label}</p>
-            <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-              <span className="rounded-xl bg-[#edf4fe] p-3 text-[#4f8df7]">Cash ₱{week.cash}K</span>
-              <span className="rounded-xl bg-[#fff5e6] p-3 text-[#d18d2c]">Risk {week.risk}</span>
-              <span className="rounded-xl bg-[#eef8f0] p-3 text-[#5b9a62]">Inflow ₱{week.inflow}K</span>
-              <span className="rounded-xl bg-[#feeae7] p-3 text-[#df6c5e]">Outflow ₱{week.outflow}K</span>
-            </div>
-          </Panel>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function RiskView() {
-  const drivers = [
-    [TrendingDown, "Late receivables", "+14 pts", "Three customers are paying 9-14 days slower than their baseline."],
-    [ReceiptText, "Supplier timing", "+11 pts", "One major invoice lands before payroll buffer rebuilds."],
-    [CircleDollarSign, "Tax reserve", "+5 pts", "Q2 target reserve is temporarily underfunded."],
-    [TrendingUp, "Sales momentum", "-8 pts", "Recent workbook uploads show weekly sales pacing above the prior 4-week average."],
-  ];
-
-  return (
-    <div className="space-y-5">
-      <ViewTitle kicker="Risk Score" title="Understand what changed, why it matters, and what to do next." text="Risk scoring combines balance trajectory, payment behavior, expense timing, and confidence bands." />
-      <div className="grid gap-5 xl:grid-cols-[.75fr_1.25fr]">
-        <RiskMeter />
-        <Panel>
-          <p className="text-lg font-semibold text-[#294770]">Risk Drivers</p>
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
-            {drivers.map(([Icon, title, value, detail]) => (
-              <div key={title} className="rounded-xl border border-[#e0ebf8] bg-[#fbfdff] p-4">
-                <div className="flex items-center justify-between">
-                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#edf4fe] text-[#4f8df7]">
-                    <Icon size={19} />
-                  </span>
-                  <span className={cn("text-sm font-bold", value.startsWith("-") ? "text-[#5b9a62]" : "text-[#d18d2c]")}>{value}</span>
-                </div>
-                <p className="mt-4 font-semibold text-[#294770]">{title}</p>
-                <p className="mt-2 text-sm leading-6 text-[#7b93b4]">{detail}</p>
-              </div>
-            ))}
-          </div>
-        </Panel>
-      </div>
-    </div>
-  );
-}
-
-function AlertsView({ alerts, setAlerts }) {
-  return (
-    <div className="space-y-5">
-      <ViewTitle kicker="Alerts" title="Work the warnings before they become cash events." text="Filter, assign, and resolve cash flow alerts from one queue." />
-      <AlertsList alerts={alerts} setAlerts={setAlerts} />
-    </div>
-  );
-}
-
-function ImportsView({ imports, setImports }) {
-  return (
-    <div className="space-y-5">
-      <ViewTitle kicker="Imports" title="Keep your Excel workbooks current and your forecast fresh." text="Upload balances, receivables, payables, payroll, and sales sheets without changing your current process." />
-      <ImportsPanel imports={imports} setImports={setImports} />
-    </div>
-  );
-}
-
-function TeamView() {
-  return (
-    <div className="space-y-5">
-      <ViewTitle kicker="Team" title="Control access for operators, accountants, and advisors." text="Invite collaborators, tune permission scopes, and monitor finance activity." />
-      <div className="grid gap-5 xl:grid-cols-[1.1fr_.9fr]">
-        <Panel>
-          <div className="flex items-center justify-between">
-            <p className="text-lg font-semibold text-[#294770]">Members</p>
-            <button className="inline-flex items-center gap-2 rounded-full bg-[#294770] px-3 py-2 text-sm font-semibold text-white">
-              <Plus size={16} /> Invite
-            </button>
-          </div>
-          <div className="mt-5 space-y-3">
-            {team.map(([name, role, access, status]) => (
-              <div key={name} className="grid gap-3 rounded-xl border border-[#e0ebf8] bg-[#fbfdff] p-4 sm:grid-cols-[1fr_auto_auto] sm:items-center">
-                <div>
-                  <p className="font-semibold text-[#294770]">{name}</p>
-                  <p className="text-sm text-[#7b93b4]">{role} - {access}</p>
-                </div>
-                <span className={cn("w-fit rounded-full px-3 py-1 text-xs font-bold", status === "Online" ? "bg-[#eef8f0] text-[#5b9a62]" : status === "Invited" ? "bg-[#edf4fe] text-[#4f8df7]" : "bg-[#f4f7fb] text-[#7b93b4]")}>{status}</span>
-                <button className="text-[#8aa0bc] transition hover:text-[#294770]">
-                  <MoreHorizontal size={18} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </Panel>
-        <Panel>
-          <p className="text-lg font-semibold text-[#294770]">Recent Activity</p>
-          <div className="mt-5 space-y-4">
-            {activity.map(([time, title, detail]) => (
-              <div key={title} className="border-l border-[#dbe7f5] pl-4">
-                <p className="text-xs font-semibold text-[#4f8df7]">{time}</p>
-                <p className="mt-1 font-semibold text-[#294770]">{title}</p>
-                <p className="mt-1 text-sm text-[#7b93b4]">{detail}</p>
-              </div>
-            ))}
-          </div>
-        </Panel>
-      </div>
-    </div>
-  );
-}
-
-function SettingsView() {
-  const [weeklyDigest, setWeeklyDigest] = useState(true);
-  const [cashFloor, setCashFloor] = useState(220000);
-  const [riskLimit, setRiskLimit] = useState(55);
-
-  return (
-    <div className="space-y-5">
-      <ViewTitle kicker="Settings" title="Tune alert thresholds and reporting preferences." text="These controls update locally so the product feels like a real operating console." />
-      <div className="grid gap-5 xl:grid-cols-2">
-        <Panel>
-          <p className="text-lg font-semibold text-[#294770]">Alert Thresholds</p>
-          <label className="mt-5 block">
-            <span className="flex justify-between text-sm text-[#6f87a8]">
-              Minimum cash floor <b className="text-[#294770]">{formatPhp(cashFloor)}</b>
-            </span>
-            <input className="mt-3 w-full accent-[#3bb7a7]" type="range" min="100000" max="500000" step="10000" value={cashFloor} onChange={(event) => setCashFloor(Number(event.target.value))} />
-          </label>
-          <label className="mt-5 block">
-            <span className="flex justify-between text-sm text-[#6f87a8]">
-              Risk alert limit <b className="text-[#294770]">{riskLimit}</b>
-            </span>
-            <input className="mt-3 w-full accent-[#f0a23c]" type="range" min="20" max="90" value={riskLimit} onChange={(event) => setRiskLimit(Number(event.target.value))} />
-          </label>
-        </Panel>
-        <Panel>
-          <p className="text-lg font-semibold text-[#294770]">Reports</p>
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        {collection.map((plant) => (
           <button
-            type="button"
-            onClick={() => setWeeklyDigest(!weeklyDigest)}
-            className="mt-5 flex w-full items-center justify-between rounded-xl border border-[#e0ebf8] bg-[#fbfdff] p-4 text-left"
+            key={plant.id}
+            onClick={() => setSelectedPlant(plant)}
+            className={cn(
+              "overflow-hidden rounded-[1.5rem] bg-white text-left shadow-sm ring-2 transition",
+              selectedPlant.id === plant.id ? "ring-[#8bc34a]" : "ring-transparent"
+            )}
           >
-            <span>
-              <span className="block font-semibold text-[#294770]">Weekly owner digest</span>
-              <span className="mt-1 block text-sm text-[#7b93b4]">Send forecast summary every Monday.</span>
-            </span>
-            <span className={cn("rounded-full px-3 py-1 text-xs font-bold", weeklyDigest ? "bg-[#eef8f0] text-[#5b9a62]" : "bg-[#f4f7fb] text-[#7b93b4]")}>{weeklyDigest ? "On" : "Off"}</span>
+            <img src={plant.image} alt={plant.name} className="h-32 w-full object-cover" />
+            <div className="p-3">
+              <p className="text-xs font-bold text-[#7a8572]">{plant.nickname}</p>
+              <p className="mt-1 line-clamp-2 min-h-10 text-sm font-black leading-tight text-[#203522]">{plant.name}</p>
+              <div className="mt-2 flex items-center justify-between">
+                <StatusPill tone={plant.status === "Recovering" ? "amber" : "green"}>{plant.status}</StatusPill>
+                <span className="flex items-center gap-1 text-xs font-bold text-[#7a8572]">
+                  <Heart size={13} /> {plant.likes}
+                </span>
+              </div>
+            </div>
           </button>
-          <button className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#dbe7f5] bg-white px-4 py-3 text-sm font-semibold text-[#294770] transition hover:bg-[#f7fbff]">
-            <Download size={17} /> Export audit log
-          </button>
-        </Panel>
+        ))}
       </div>
+
+      <section key={selectedPlant.id} className="mt-5 rounded-[1.7rem] bg-white p-4 shadow-sm">
+          <div className="flex items-start gap-3">
+            <img src={selectedPlant.image} alt="" className="h-20 w-20 rounded-3xl object-cover" />
+            <div className="min-w-0 flex-1">
+              <p className="font-black leading-tight text-[#203522]">{selectedPlant.name}</p>
+              <p className="mt-1 text-sm font-semibold text-[#73806c]">
+                {selectedPlant.nickname} · {selectedPlant.age} · {selectedPlant.availability}
+              </p>
+              <div className="mt-2 flex gap-2">
+                <StatusPill>{selectedPlant.tag}</StatusPill>
+                <StatusPill tone="blue">{selectedPlant.status}</StatusPill>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 space-y-3">
+            {selectedPlant.updates.map((update, index) => (
+              <div key={update} className="flex gap-3">
+                <span className="mt-1 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#edf7dc] text-xs font-black text-[#315d37]">
+                  {index + 1}
+                </span>
+                <p className="text-sm font-semibold text-[#63705e]">{update}</p>
+              </div>
+            ))}
+          </div>
+      </section>
     </div>
   );
 }
 
-function ViewTitle({ kicker, title, text }) {
+function TradeView() {
   return (
-    <div className="rounded-[1.8rem] border border-[#dbe7f5] bg-[radial-gradient(circle_at_20%_0%,rgba(79,141,247,0.12),transparent_30%),linear-gradient(180deg,#ffffff,#f8fbff)] p-5 shadow-[0_24px_70px_rgba(113,146,190,0.12)] sm:p-6">
-      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#4f8df7]">{kicker}</p>
-      <h1 className="mt-3 max-w-4xl text-2xl font-semibold tracking-tight text-[#294770] sm:text-3xl">{title}</h1>
-      <p className="mt-3 max-w-3xl text-sm leading-6 text-[#7b93b4] sm:text-base">{text}</p>
+    <div className="space-y-4 px-5 pb-24">
+      <section className="rounded-[2rem] bg-[#203522] p-5 text-white">
+        <div className="flex items-center gap-2">
+          <ShieldCheck size={20} className="text-[#d9f99d]" />
+          <p className="font-black">Trade trust score</p>
+        </div>
+        <p className="mt-5 text-5xl font-black">4.9</p>
+        <p className="mt-1 text-sm font-semibold text-white/75">18 completed trades · no disputes · fast responder</p>
+      </section>
+
+      <h2 className="text-lg font-black text-[#203522]">Trade requests</h2>
+      {trades.map(([name, title, detail, match]) => (
+        <article key={title} className="rounded-[1.6rem] bg-white p-4 shadow-sm">
+          <div className="flex items-start gap-3">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#edf7dc] text-[#315d37]">
+              <UserRound size={20} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-black text-[#203522]">{name}</p>
+                <StatusPill tone="blue">{match}</StatusPill>
+              </div>
+              <p className="mt-1 text-sm font-bold text-[#315d37]">{title}</p>
+              <p className="mt-1 text-sm text-[#73806c]">{detail}</p>
+              <div className="mt-4 flex gap-2">
+                <button className="rounded-full bg-[#203522] px-4 py-2 text-xs font-bold text-white">Accept</button>
+                <button className="rounded-full bg-[#f0f4e8] px-4 py-2 text-xs font-bold text-[#63705e]">Message</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      ))}
     </div>
   );
 }
 
-function FloatingPanel({ title, children, onClose, icon: Icon }) {
+function RankView() {
+  const [board, setBoard] = useState("Gardens");
+  const rows = leaderboard[board];
+
   return (
-    <div className="fixed inset-0 z-40 bg-[#d8e5f7]/55 px-4 py-6 backdrop-blur-sm">
-      <div className="ml-auto max-h-[calc(100vh-3rem)] w-full max-w-xl overflow-auto rounded-[1.8rem] border border-[#dbe7f5] bg-[linear-gradient(180deg,#ffffff,#f8fbff)] p-5 shadow-[0_30px_80px_rgba(113,146,190,0.18)]">
+    <div className="px-5 pb-24">
+      <section className="rounded-[2rem] bg-white p-5 shadow-sm">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#edf4fe] text-[#4f8df7]">{Icon && <Icon size={20} />}</span>
-            <p className="text-lg font-semibold text-[#294770]">{title}</p>
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-[#8bc34a]">This month</p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-[#203522]">Leaderboard</h1>
           </div>
-          <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-full bg-white text-[#8aa0bc] transition hover:bg-[#f7fbff] hover:text-[#294770]">
-            <X size={18} />
-          </button>
+          <span className="grid h-14 w-14 place-items-center rounded-3xl bg-[#fff4db] text-[#f97316]">
+            <Award size={26} />
+          </span>
         </div>
-        <div className="mt-5">{children}</div>
+        <p className="mt-3 text-sm font-medium leading-6 text-[#73806c]">
+          Ranking rewards garden activity, admired collections, clean trades, and helpful community answers.
+        </p>
+      </section>
+
+      <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+        {Object.keys(leaderboard).map((item) => (
+          <button
+            key={item}
+            onClick={() => setBoard(item)}
+            className={cn(
+              "min-w-max rounded-full px-4 py-2 text-sm font-bold transition",
+              board === item ? "bg-[#203522] text-white" : "bg-white text-[#63705e]"
+            )}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-4 space-y-3">
+        {rows.map(([name, title, score, detail], index) => (
+          <article key={name} className="flex items-center gap-3 rounded-[1.6rem] bg-white p-4 shadow-sm">
+            <span className={cn("grid h-11 w-11 shrink-0 place-items-center rounded-2xl font-black", index === 0 ? "bg-[#fff4db] text-[#f97316]" : "bg-[#edf7dc] text-[#315d37]")}>
+              #{index + 1}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-black text-[#203522]">{name}</p>
+              <p className="text-sm font-semibold text-[#73806c]">{title} · {detail}</p>
+            </div>
+            <div className="text-right">
+              <p className="font-black text-[#203522]">{score.toLocaleString()}</p>
+              <p className="text-[11px] font-bold text-[#8a967f]">pts</p>
+            </div>
+          </article>
+        ))}
       </div>
     </div>
   );
 }
 
-function NotificationsPanel({ alerts, onClose, setActiveView }) {
+function BottomNav({ activeTab, setActiveTab }) {
   return (
-    <FloatingPanel title="Notifications" icon={BellRing} onClose={onClose}>
-      <div className="space-y-3">
-        {alerts.map((alert) => (
-          <button key={alert.title} type="button" onClick={() => { setActiveView("Alerts"); onClose(); }} className="w-full rounded-xl border border-[#e0ebf8] bg-[#fbfdff] p-4 text-left transition hover:bg-[#f5f9ff]">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#d18d2c]">{alert.level} alert</p>
-            <p className="mt-2 font-semibold text-[#294770]">{alert.title}</p>
-            <p className="mt-1 text-sm text-[#7b93b4]">{alert.due}</p>
-          </button>
-        ))}
-      </div>
-    </FloatingPanel>
-  );
-}
-
-function ModelPanel({ onClose }) {
-  const [seasonality, setSeasonality] = useState(68);
-  const [latePayment, setLatePayment] = useState(74);
-  const [expenseSensitivity, setExpenseSensitivity] = useState(52);
-
-  return (
-    <FloatingPanel title="Forecast Model" icon={SlidersHorizontal} onClose={onClose}>
-      <div className="space-y-5">
-        {[
-          ["Seasonality weight", seasonality, setSeasonality],
-          ["Late-payment sensitivity", latePayment, setLatePayment],
-          ["Expense volatility", expenseSensitivity, setExpenseSensitivity],
-        ].map(([label, value, setter]) => (
-          <label key={label} className="block rounded-xl border border-[#e0ebf8] bg-[#fbfdff] p-4">
-            <span className="flex justify-between text-sm text-[#6f87a8]">
-              {label} <b className="text-[#294770]">{value}%</b>
-            </span>
-            <input className="mt-3 w-full accent-[#4f8df7]" type="range" min="0" max="100" value={value} onChange={(event) => setter(Number(event.target.value))} />
-          </label>
-        ))}
-        <div className="rounded-xl bg-[#edf4fe] p-4 text-sm leading-6 text-[#4f8df7]">
-          Current model confidence remains 95%. Changes affect dashboard projections instantly in a live deployment.
-        </div>
-      </div>
-    </FloatingPanel>
-  );
-}
-
-function ActionPlanPanel({ onClose, setActiveView }) {
-  return (
-    <FloatingPanel title="Action Plan" icon={Sparkles} onClose={onClose}>
-      <div className="space-y-3">
-        {recommendations.map((item, index) => (
-          <div key={item} className="rounded-xl border border-[#e0ebf8] bg-[#fbfdff] p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#4f8df7]">Step {index + 1}</p>
-            <p className="mt-2 text-sm leading-6 text-[#6881a2]">{item}</p>
-          </div>
-        ))}
-        <div className="mt-5 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setActiveView("Alerts")} className="inline-flex items-center gap-2 rounded-full bg-[#294770] px-4 py-3 text-sm font-semibold text-white">
-            <FileWarning size={17} /> Review alerts
-          </button>
-          <button type="button" className="inline-flex items-center gap-2 rounded-full border border-[#dbe7f5] bg-white px-4 py-3 text-sm font-semibold text-[#294770]">
-            <Mail size={17} /> Share plan
-          </button>
-        </div>
-      </div>
-    </FloatingPanel>
+    <nav className="z-30 grid w-full shrink-0 grid-cols-5 gap-1 border-t border-[#e3eadb] bg-white/95 px-3 pb-3 pt-2 backdrop-blur sm:rounded-b-[1.75rem]">
+      {tabs.map(([Icon, label]) => (
+        <button
+          key={label}
+          onClick={() => setActiveTab(label)}
+          className={cn(
+            "flex flex-col items-center gap-1 rounded-2xl px-1 py-2 text-[11px] font-black transition",
+            activeTab === label ? "bg-[#203522] text-white" : "text-[#7d8974]"
+          )}
+        >
+          <Icon size={19} />
+          {label}
+        </button>
+      ))}
+    </nav>
   );
 }
 
 export default function ProductApp() {
-  const [activeView, setActiveView] = useState("Overview");
-  const [search, setSearch] = useState("");
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [showModel, setShowModel] = useState(false);
-  const [showPlan, setShowPlan] = useState(false);
-  const [alerts, setAlerts] = useState(alertsSeed);
-  const [imports, setImports] = useState(importsSeed);
+  const [activeTab, setActiveTab] = useState("Garden");
 
-  const greeting = useMemo(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  }, []);
+  const title = useMemo(() => {
+    if (activeTab === "Garden") return "My Garden";
+    if (activeTab === "Rank") return "Leaderboard";
+    return activeTab;
+  }, [activeTab]);
 
   const view = {
-    Overview: <Overview greeting={greeting} setShowModel={setShowModel} setShowPlan={setShowPlan} alerts={alerts} setAlerts={setAlerts} imports={imports} setImports={setImports} />,
-    Forecasts: <ForecastsView />,
-    "Risk Score": <RiskView />,
-    "What-If": (
-      <div className="space-y-5">
-        <ViewTitle kicker="What-If" title="Stress test cash decisions before you make them." text="Use scenario controls to model delayed collections, expense shocks, and early-payment incentives." />
-        <WhatIfSimulator />
-      </div>
-    ),
-    Alerts: <AlertsView alerts={alerts} setAlerts={setAlerts} />,
-    Imports: <ImportsView imports={imports} setImports={setImports} />,
-    Team: <TeamView />,
-    Settings: <SettingsView />,
-  }[activeView];
+    Home: <HomeView setActiveTab={setActiveTab} />,
+    Market: <MarketView />,
+    Garden: <GardenView />,
+    Trade: <TradeView />,
+    Rank: <RankView />,
+  }[activeTab];
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(79,141,247,0.18),transparent_28%),radial-gradient(circle_at_top_right,rgba(59,183,167,0.15),transparent_24%),linear-gradient(180deg,#f6faff_0%,#edf4fb_46%,#f8fbff_100%)] px-3 py-3 text-[#294770] sm:px-4 sm:py-4">
-      <div className="mx-auto flex max-w-[1540px] flex-col gap-4 lg:flex-row">
-        <Sidebar activeView={activeView} setActiveView={setActiveView} />
-        <main className="min-w-0 flex-1">
-          <Header
-            activeView={activeView}
-            setActiveView={setActiveView}
-            search={search}
-            setSearch={setSearch}
-            showNotifications={showNotifications}
-            setShowNotifications={setShowNotifications}
-            setShowModel={setShowModel}
-            setShowPlan={setShowPlan}
-            unread={alerts.length}
-          />
-          <div id="overview" className="w-full px-2 py-5 sm:px-4 lg:px-6">
-            <SearchResults search={search} setSearch={setSearch} setActiveView={setActiveView} />
-            {view}
-          </div>
-        </main>
-      </div>
-      {showNotifications && <NotificationsPanel alerts={alerts} onClose={() => setShowNotifications(false)} setActiveView={setActiveView} />}
-      {showModel && <ModelPanel onClose={() => setShowModel(false)} />}
-      {showPlan && <ActionPlanPanel onClose={() => setShowPlan(false)} setActiveView={setActiveView} />}
-    </div>
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(217,249,157,0.34),transparent_28%),linear-gradient(135deg,#e8f0df,#f7faf1_45%,#dbe8d1)] font-sans text-[#203522]">
+      <PhoneShell>
+        <div className="flex-1 overflow-y-auto">
+          <TopBar />
+          {activeTab !== "Home" && (
+            <div className="mb-4 flex items-center justify-between px-5">
+              <h1 className="text-3xl font-black tracking-tight text-[#203522]">{title}</h1>
+              <div className="flex items-center gap-2">
+                <button className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-[#203522] shadow-sm">
+                  <Users size={18} />
+                </button>
+                <button className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-[#203522] shadow-sm">
+                  <MessageCircle size={18} />
+                </button>
+              </div>
+            </div>
+          )}
+          <div key={activeTab}>{view}</div>
+        </div>
+        <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      </PhoneShell>
+    </main>
   );
 }
