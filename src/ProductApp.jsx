@@ -25,29 +25,20 @@ import {
 } from "lucide-react";
 
 const plantPhotos = {
-  monstera:
-    "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=900&q=80",
-  calathea:
-    "https://images.unsplash.com/photo-1620803366004-119b57f54cd6?auto=format&fit=crop&w=900&q=80",
-  pothos:
-    "https://images.unsplash.com/photo-1598880940080-ff9a29891b85?auto=format&fit=crop&w=900&q=80",
-  anthurium:
-    "https://images.unsplash.com/photo-1632207691143-643e2a9a9361?auto=format&fit=crop&w=900&q=80",
-  cactus:
-    "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?auto=format&fit=crop&w=900&q=80",
-  fern:
-    "https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&w=900&q=80",
-  herb:
-    "https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=900&q=80",
-  snake:
-    "https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?auto=format&fit=crop&w=900&q=80",
+  monstera: "/plants/monstera-real.jpg",
+  calathea: "/plants/calathea-real-2.jpg",
+  pothos: "/plants/pothos-real.jpg",
+  anthurium: "/plants/anthurium-real.jpg",
+  cactus: "/plants/cactus-real.jpg",
+  fern: "/plants/fern-real.jpg",
+  herb: "/plants/herb-real.jpg",
+  snake: "/plants/snake-real.jpg",
   orchid: "/plants/orchid-real.jpg",
-  bonsai:
-    "https://images.unsplash.com/photo-1509223197845-458d87318791?auto=format&fit=crop&w=900&q=80",
+  bonsai: "/plants/bonsai-real.jpg",
   fiddle: "/plants/fiddle-real.jpg",
   hoya: "/plants/hoya-real.jpg",
-  succulent:
-    "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=80",
+  succulent: "/plants/succulent-real.jpg",
+  walingWaling: "/plants/waling-waling-real.jpg",
   alocasia: "/plants/alocasia-real.jpg",
   peperomia: "/plants/peperomia-real.jpg",
   eggplant: "/plants/eggplant-real.jpg",
@@ -259,13 +250,13 @@ const collection = [
   },
   {
     id: 16,
-    name: "Calamansi Seedling",
+    name: "Calamansi Backyard Tree",
     nickname: "Sour",
     image: plantPhotos.calamansi,
     status: "Growing",
     tag: "Citrus",
     category: "Fruit Trees",
-    availability: "Cuttings later",
+    availability: "Fruit tree showcase",
     likes: 118,
     age: "8m",
     updates: ["New citrus flush appeared", "Moved to full morning sun", "Compost top-dress added"],
@@ -281,7 +272,7 @@ const marketPlants = [
   {
     name: "Silver Sword Philodendron",
     price: "PHP 2,100",
-    location: "Quezon City",
+    location: "Butuan City",
     type: "Buy",
     category: "Rare",
     image: plantPhotos.fern,
@@ -292,7 +283,7 @@ const marketPlants = [
   {
     name: "Rooted Cebu Blue Cutting",
     price: "Community",
-    location: "Makati",
+    location: "Libertad",
     type: "Community",
     category: "Cuttings",
     image: plantPhotos.pothos,
@@ -303,7 +294,7 @@ const marketPlants = [
   {
     name: "Desert Cactus Trio",
     price: "PHP 1,250",
-    location: "Pasig",
+    location: "Ampayon",
     type: "Buy",
     category: "Succulents",
     image: plantPhotos.cactus,
@@ -314,7 +305,7 @@ const marketPlants = [
   {
     name: "Kitchen Herb Starter Set",
     price: "PHP 980",
-    location: "Taguig",
+    location: "Bancasi",
     type: "Buy",
     category: "Herbs",
     image: plantPhotos.herb,
@@ -325,7 +316,7 @@ const marketPlants = [
   {
     name: "Snake Plant Pup",
     price: "Community",
-    location: "Marikina",
+    location: "Tiniwisan",
     type: "Community",
     category: "Indoor",
     image: plantPhotos.snake,
@@ -336,7 +327,7 @@ const marketPlants = [
   {
     name: "Mini Orchid in Bloom",
     price: "PHP 1,850",
-    location: "San Juan",
+    location: "Cabadbaran",
     type: "Buy",
     category: "Flowering",
     image: plantPhotos.orchid,
@@ -347,7 +338,7 @@ const marketPlants = [
   {
     name: "Hoya Carnosa Cutting",
     price: "Community",
-    location: "Mandaluyong",
+    location: "Nasipit",
     type: "Community",
     category: "Cuttings",
     image: plantPhotos.hoya,
@@ -358,7 +349,7 @@ const marketPlants = [
   {
     name: "Watermelon Peperomia",
     price: "PHP 950",
-    location: "Pasay",
+    location: "Buenavista",
     type: "Buy",
     category: "Indoor",
     image: plantPhotos.peperomia,
@@ -369,7 +360,7 @@ const marketPlants = [
   {
     name: "Bougainvillea Patio Starter",
     price: "PHP 780",
-    location: "Paranaque",
+    location: "Bayugan City",
     type: "Buy",
     category: "Outdoor",
     image: plantPhotos.orchid,
@@ -380,7 +371,7 @@ const marketPlants = [
   {
     name: "Juniper Bonsai Starter",
     price: "Community",
-    location: "Pasig",
+    location: "Ampayon",
     type: "Community",
     category: "Trees",
     image: plantPhotos.bonsai,
@@ -391,7 +382,7 @@ const marketPlants = [
   {
     name: "Talong Seedling Set",
     price: "PHP 120",
-    location: "Quezon City",
+    location: "Butuan City",
     type: "Buy",
     category: "Veggies",
     image: plantPhotos.eggplant,
@@ -402,7 +393,7 @@ const marketPlants = [
   {
     name: "Spring Onion Regrow Bunch",
     price: "Community",
-    location: "Taguig",
+    location: "Bancasi",
     type: "Community",
     category: "Veggies",
     image: plantPhotos.onion,
@@ -411,20 +402,20 @@ const marketPlants = [
     stock: "6 bunches",
   },
   {
-    name: "Calamansi Seedling",
-    price: "PHP 180",
-    location: "Caloocan",
+    name: "Rooted Calamansi Cuttings",
+    price: "PHP 120",
+    location: "San Vicente",
     type: "Buy",
-    category: "Fruit Trees",
+    category: "Cuttings",
     image: plantPhotos.calamansi,
     seller: "Mang Lito Santos",
     rating: "4.7",
-    stock: "9 seedlings",
+    stock: "8 rooted cuttings",
   },
   {
     name: "Pechay Seedling Tray",
     price: "PHP 95",
-    location: "Caloocan",
+    location: "San Vicente",
     type: "Buy",
     category: "Veggies",
     image: plantPhotos.pechay,
@@ -435,7 +426,7 @@ const marketPlants = [
   {
     name: "Siling Labuyo Seed Pack",
     price: "PHP 70",
-    location: "Taguig",
+    location: "Bancasi",
     type: "Buy",
     category: "Veggies",
     image: plantPhotos.chili,
@@ -446,7 +437,7 @@ const marketPlants = [
   {
     name: "Cherry Tomato Starter",
     price: "PHP 150",
-    location: "Mandaluyong",
+    location: "Nasipit",
     type: "Buy",
     category: "Veggies",
     image: plantPhotos.tomato,
@@ -457,7 +448,7 @@ const marketPlants = [
   {
     name: "Basil and Mint Pair",
     price: "PHP 240",
-    location: "Taguig",
+    location: "Bancasi",
     type: "Buy",
     category: "Herbs",
     image: plantPhotos.herb,
@@ -468,7 +459,7 @@ const marketPlants = [
   {
     name: "Golden Pothos Cuttings",
     price: "PHP 180",
-    location: "Makati",
+    location: "Libertad",
     type: "Buy",
     category: "Cuttings",
     image: plantPhotos.pothos,
@@ -479,7 +470,7 @@ const marketPlants = [
   {
     name: "Alocasia Frydek Pup",
     price: "PHP 1,450",
-    location: "Mandaluyong",
+    location: "Nasipit",
     type: "Buy",
     category: "Rare",
     image: plantPhotos.alocasia,
@@ -490,7 +481,7 @@ const marketPlants = [
   {
     name: "Fiddle Leaf Fig Small",
     price: "PHP 1,100",
-    location: "Quezon City",
+    location: "Butuan City",
     type: "Buy",
     category: "Trees",
     image: plantPhotos.fiddle,
@@ -501,7 +492,7 @@ const marketPlants = [
   {
     name: "Anthurium Clarinervium",
     price: "Community",
-    location: "Mandaluyong",
+    location: "Nasipit",
     type: "Community",
     category: "Rare",
     image: plantPhotos.anthurium,
@@ -512,7 +503,7 @@ const marketPlants = [
   {
     name: "Calathea Orbifolia Division",
     price: "Community",
-    location: "Quezon City",
+    location: "Butuan City",
     type: "Community",
     category: "Indoor",
     image: plantPhotos.calathea,
@@ -523,7 +514,7 @@ const marketPlants = [
   {
     name: "Mini Cactus Sunny Set",
     price: "PHP 390",
-    location: "Pasig",
+    location: "Ampayon",
     type: "Buy",
     category: "Succulents",
     image: plantPhotos.cactus,
@@ -534,7 +525,7 @@ const marketPlants = [
   {
     name: "Onion and Pechay Bundle",
     price: "Community",
-    location: "Caloocan",
+    location: "San Vicente",
     type: "Community",
     category: "Veggies",
     image: plantPhotos.onion,
@@ -545,7 +536,7 @@ const marketPlants = [
   {
     name: "Monstera Node Cutting",
     price: "PHP 850",
-    location: "Quezon City",
+    location: "Butuan City",
     type: "Buy",
     category: "Cuttings",
     image: plantPhotos.monstera,
@@ -556,7 +547,7 @@ const marketPlants = [
   {
     name: "Calamansi Backyard Pair",
     price: "Community",
-    location: "Caloocan",
+    location: "San Vicente",
     type: "Community",
     category: "Fruit Trees",
     image: plantPhotos.calamansi,
@@ -567,7 +558,7 @@ const marketPlants = [
   {
     name: "Phalaenopsis Bloom Pot",
     price: "PHP 1,350",
-    location: "San Juan",
+    location: "Cabadbaran",
     type: "Buy",
     category: "Flowering",
     image: plantPhotos.orchid,
@@ -578,7 +569,7 @@ const marketPlants = [
   {
     name: "Balcony Herb Cuttings",
     price: "Community",
-    location: "Taguig",
+    location: "Bancasi",
     type: "Community",
     category: "Herbs",
     image: plantPhotos.herb,
@@ -590,14 +581,14 @@ const marketPlants = [
 
 const sellerAvatars = {
   "Laarne Ramos": "/laarne-profile.png",
-  "Maria Dela Cruz": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&q=80",
-  "Ana Santos": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=240&q=80",
-  "Aling Nena": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=240&q=80",
-  "Miguel Bautista": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&q=80",
-  "Mang Lito Santos": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=240&q=80",
-  "Halaman Corner": "/avatars/pinoy-ana.svg",
-  "Tita Pearl's Garden": "/avatars/pinoy-nena.svg",
-  "Paolo Reyes": "/avatars/pinoy-miguel.svg",
+  "Maria Dela Cruz": "/avatars/avatar-maria.png",
+  "Ana Santos": "/avatars/avatar-aling.png",
+  "Aling Nena": "/avatars/avatar-aling.png",
+  "Miguel Bautista": "/avatars/avatar-miguel.png",
+  "Mang Lito Santos": "/avatars/pinoy-lito.svg",
+  "Halaman Corner": "/avatars/avatar-aling.png",
+  "Tita Pearl's Garden": "/avatars/avatar-maria.png",
+  "Paolo Reyes": "/avatars/avatar-miguel.png",
 };
 
 const aiScanResults = [
@@ -628,16 +619,16 @@ const aiScanResults = [
     action: "Send to review",
   },
   {
-    id: "cycad",
-    commonName: "King Sago Cycad",
-    scientificName: "Cycas revoluta",
-    image: plantPhotos.bonsai,
-    confidence: "88%",
+    id: "waling-waling",
+    commonName: "Waling-waling Orchid",
+    scientificName: "Vanda sanderiana",
+    image: plantPhotos.walingWaling,
+    confidence: "94%",
     decision: "Listing blocked",
     status: "Blocked",
     tone: "rose",
     icon: Ban,
-    note: "Potential protected species risk. Selling is not allowed until verified by moderation.",
+    note: "Protected Philippine orchid risk. Selling is blocked unless legal nursery permits are verified.",
     action: "Blocked",
   },
 ];
@@ -655,13 +646,14 @@ const photoOptions = [
   ["Onion", plantPhotos.onion],
   ["Tomato", plantPhotos.tomato],
   ["Pechay", plantPhotos.pechay],
-  ["Calamansi", plantPhotos.calamansi],
+  ["Calamansi Tree", plantPhotos.calamansi],
+  ["Waling-waling", plantPhotos.walingWaling],
 ];
 
 const messageThreads = [
   {
     name: "Maria Dela Cruz",
-    avatar: "/avatars/pinoy-maria.svg",
+    avatar: sellerAvatars["Maria Dela Cruz"],
     context: "Silver Sword Philodendron",
     preview: "Available pa. I can reserve it until tonight.",
     time: "2m",
@@ -669,12 +661,12 @@ const messageThreads = [
     messages: [
       ["Maria Dela Cruz", "Hi Laarne, available pa yung Silver Sword."],
       ["You", "Nice. Pwede meetup this weekend?"],
-      ["Maria Dela Cruz", "Yes, Mandaluyong or Cubao is okay."],
+      ["Maria Dela Cruz", "Yes, Nasipit or Butuan downtown is okay."],
     ],
   },
   {
     name: "Miguel Bautista",
-    avatar: "/avatars/pinoy-miguel.svg",
+    avatar: sellerAvatars["Miguel Bautista"],
     context: "Bonsai Courtyard",
     preview: "I uploaded new root photos for the bonsai.",
     time: "18m",
@@ -686,7 +678,7 @@ const messageThreads = [
   },
   {
     name: "Aling Nena",
-    avatar: "/avatars/pinoy-lito.svg",
+    avatar: sellerAvatars["Aling Nena"],
     context: "Balcony Herb Cuttings",
     preview: "Basil and mint are ready for pickup.",
     time: "1h",
@@ -699,12 +691,12 @@ const messageThreads = [
   {
     name: "Mang Lito Santos",
     avatar: "/avatars/pinoy-lito.svg",
-    context: "Calamansi Seedling",
+    context: "Pechay Seedling Tray",
     preview: "Seven seedlings are still available.",
     time: "3h",
     unread: 0,
     messages: [
-      ["You", "Available pa po yung calamansi?"],
+      ["You", "Available pa po yung pechay tray?"],
       ["Mang Lito Santos", "Yes, seven seedlings are still available."],
     ],
   },
@@ -719,9 +711,13 @@ const feedPosts = [
     title: "New leaf on the balcony shelf",
     text: "My Calathea bounced back after moving it away from afternoon sun.",
     image: plantPhotos.calathea,
-    meta: "Mandaluyong - 2h",
+    meta: "Nasipit - 2h",
     likes: 128,
     comments: 14,
+    mockComments: [
+      { author: "Aling Nena", avatar: sellerAvatars["Aling Nena"], text: "Ganda ng new leaf! The color looks healthy." },
+      { author: "Miguel Bautista", avatar: sellerAvatars["Miguel Bautista"], text: "Try morning light only, it helped my Calathea too." },
+    ],
   },
   {
     id: "feed-laarne-ai",
@@ -731,9 +727,13 @@ const feedPosts = [
     title: "Leafy AI says bright indirect light",
     text: "Testing the new plant diagnosis flow on Luna before I add another update.",
     image: plantPhotos.anthurium,
-    meta: "Quezon City - 4h",
+    meta: "Butuan City - 4h",
     likes: 96,
     comments: 9,
+    mockComments: [
+      { author: "Maria Dela Cruz", avatar: sellerAvatars["Maria Dela Cruz"], text: "Leafy AI tip is useful, I need this for my orchids." },
+      { author: "Ana Santos", avatar: sellerAvatars["Ana Santos"], text: "Please share the diagnosis result after a week." },
+    ],
   },
   {
     id: "feed-nena-harvest",
@@ -743,9 +743,13 @@ const feedPosts = [
     title: "Weekend herbs are ready",
     text: "Basil, pechay, and chili are growing nicely after the rain.",
     image: plantPhotos.herb,
-    meta: "Taguig - 6h",
+    meta: "Bancasi - 6h",
     likes: 211,
     comments: 22,
+    mockComments: [
+      { author: "Maria Dela Cruz", avatar: sellerAvatars["Maria Dela Cruz"], text: "Looks healthy! Your basil is so full." },
+      { author: "Mang Lito Santos", avatar: sellerAvatars["Mang Lito Santos"], text: "Nice growth update. Rainwater really helped." },
+    ],
   },
   {
     id: "feed-miguel-bonsai",
@@ -755,9 +759,13 @@ const feedPosts = [
     title: "Should I prune this bonsai branch?",
     text: "Trying to keep the courtyard bonsai compact without stressing it.",
     image: plantPhotos.bonsai,
-    meta: "Pasig - 1d",
+    meta: "Ampayon - 1d",
     likes: 74,
     comments: 18,
+    mockComments: [
+      { author: "Laarne Ramos", avatar: "/laarne-profile.png", text: "Maybe trim only the crossing branch first." },
+      { author: "Maria Dela Cruz", avatar: sellerAvatars["Maria Dela Cruz"], text: "I would wait until the new leaves harden." },
+    ],
   },
 ];
 
@@ -768,7 +776,7 @@ const communityGardens = [
     handle: "@mariahalaman",
     avatar: sellerAvatars["Maria Dela Cruz"],
     name: "Balcony Jungle",
-    location: "Mandaluyong",
+    location: "Nasipit",
     cover: plantPhotos.calathea,
     coverPhotos: [plantPhotos.calathea, plantPhotos.alocasia, plantPhotos.hoya, plantPhotos.tomato],
     score: "9.8k",
@@ -789,7 +797,7 @@ const communityGardens = [
     handle: "@nenasrooftop",
     avatar: sellerAvatars["Aling Nena"],
     name: "Herb Roof",
-    location: "Taguig",
+    location: "Bancasi",
     cover: plantPhotos.herb,
     coverPhotos: [plantPhotos.herb, plantPhotos.chili, plantPhotos.pechay, plantPhotos.eggplant],
     score: "8.7k",
@@ -812,7 +820,7 @@ const communityGardens = [
     handle: "@miguelbonsai",
     avatar: sellerAvatars["Miguel Bautista"],
     name: "Bonsai Courtyard",
-    location: "Pasig",
+    location: "Ampayon",
     cover: plantPhotos.bonsai,
     coverPhotos: [plantPhotos.bonsai, plantPhotos.snake, plantPhotos.peperomia, plantPhotos.calamansi],
     score: "8.4k",
@@ -824,7 +832,7 @@ const communityGardens = [
       { name: "Juniper Bonsai", image: plantPhotos.bonsai, tag: "Showcase" },
       { name: "Snake Plant", image: plantPhotos.snake, tag: "Low light" },
       { name: "Peperomia", image: plantPhotos.peperomia, tag: "Compact" },
-      { name: "Calamansi Seedling", image: plantPhotos.calamansi, tag: "Fruit tree" },
+      { name: "Calamansi Backyard Tree", image: plantPhotos.calamansi, tag: "Fruit tree" },
     ],
   },
   {
@@ -833,7 +841,7 @@ const communityGardens = [
     handle: "@bahaykubogrower",
     avatar: sellerAvatars["Mang Lito Santos"],
     name: "Bahay Kubo Patch",
-    location: "Caloocan",
+    location: "San Vicente",
     cover: plantPhotos.eggplant,
     coverPhotos: [plantPhotos.eggplant, plantPhotos.tomato, plantPhotos.chili, plantPhotos.calamansi],
     score: "7.9k",
@@ -847,7 +855,7 @@ const communityGardens = [
       { name: "Cherry Tomato", image: plantPhotos.tomato, tag: "Veggies" },
       { name: "Siling Labuyo", image: plantPhotos.chili, tag: "Spicy" },
       { name: "Pechay", image: plantPhotos.pechay, tag: "Leafy" },
-      { name: "Calamansi Seedling", image: plantPhotos.calamansi, tag: "Fruit tree" },
+      { name: "Calamansi Backyard Tree", image: plantPhotos.calamansi, tag: "Fruit tree" },
     ],
   },
 ];
@@ -855,7 +863,7 @@ const communityGardens = [
 const leaderboard = {
   Growers: [
     ["Maria Dela Cruz", "Balcony Jungle", 9840, "142 admirers"],
-    ["Laarne Ramos", "Aroid Shelf Lab", 9120, "38 updates"],
+    ["Laarne Ramos", "My Plant Collection", 9120, "38 updates"],
     ["Aling Nena", "Herb Roof", 8730, "21 harvests"],
   ],
   Sellers: [
@@ -1009,28 +1017,7 @@ function AvatarImage({ src, alt = "", className = "" }) {
   );
 }
 
-function ActionNotice({ notice, onClear }) {
-  if (!notice) return null;
-
-  return (
-    <div className="gm-sheet-in mx-5 mb-4 rounded-[1.4rem] bg-[#203522] p-4 text-white shadow-sm">
-      <div className="flex items-start gap-3">
-        <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[#d9f99d] text-[#203522]">
-          <Check size={16} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-black">{notice.title}</p>
-          <p className="mt-1 text-sm font-semibold leading-5 text-white/75">{notice.detail}</p>
-        </div>
-        <button onClick={onClear} className="gm-tap rounded-full bg-white/12 px-3 py-1 text-xs font-black text-white">
-          Done
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function PhotoPicker({ title, detail, options = photoOptions, onSelect, onUpload, onCancel }) {
+function PhotoPicker({ title, detail, options = photoOptions, onSelect, onCancel }) {
   return (
     <section className="gm-sheet-in mt-3 rounded-[1.6rem] bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
@@ -1050,21 +1037,33 @@ function PhotoPicker({ title, detail, options = photoOptions, onSelect, onUpload
           </button>
         ))}
       </div>
-      <label className="gm-tap mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-full bg-[#203522] px-4 py-3 text-sm font-black text-white">
-        <Camera size={16} /> Upload photo
-        <input
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (!file) return;
-            onUpload(URL.createObjectURL(file), file.name);
-            event.target.value = "";
-          }}
-        />
-      </label>
+      <p className="mt-3 rounded-2xl bg-[#edf7dc] px-3 py-2 text-xs font-bold leading-5 text-[#315d37]">
+        Camera scan only. Saved uploads are disabled to help prove this is a real plant.
+      </p>
     </section>
+  );
+}
+
+function ActionPanel({ action, onClose }) {
+  if (!action) return null;
+
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-[80] flex justify-center bg-gradient-to-t from-[#203522]/18 to-transparent px-4 pb-4 pt-16">
+      <section className="gm-sheet-in w-full max-w-[430px] rounded-[1.6rem] bg-white p-4 shadow-[0_22px_60px_rgba(32,53,34,0.25)] ring-1 ring-[#dfe8d7]">
+        <div className="flex items-start gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[#edf7dc] text-[#203522]">
+            <Check size={18} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-black text-[#203522]">{action.title}</p>
+            {action.detail && <p className="mt-1 text-sm font-semibold leading-5 text-[#63705e]">{action.detail}</p>}
+          </div>
+          <button onClick={onClose} className="gm-tap rounded-full bg-[#f0f4e8] px-3 py-2 text-xs font-black text-[#52604d]">
+            Close
+          </button>
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -1313,19 +1312,19 @@ function SellerListingCheck({ notify }) {
 }
 
 function MarketPlantDetail({ plant, onClose, notify, openMessages }) {
-  const sellerAvatar = sellerAvatars[plant.seller] ?? "/avatars/pinoy-maria.svg";
+  const sellerAvatar = sellerAvatars[plant.seller] ?? "/avatars/avatar-maria.png";
   const condition = plant.category === "Cuttings" ? "Rooted and healthy" : "Healthy";
   const plantType = plant.category === "Cuttings" ? "Cutting (Rooted)" : plant.category;
   const distance = {
-    "Quezon City": "3.2 km away",
-    Caloocan: "6.4 km away",
-    Pasig: "4.1 km away",
-    Taguig: "5.8 km away",
-    Mandaluyong: "2.6 km away",
-    Makati: "3.9 km away",
-    "San Juan": "2.8 km away",
-    Pasay: "7.1 km away",
-    Paranaque: "8.5 km away",
+    "Butuan City": "3.2 km away",
+    "San Vicente": "6.4 km away",
+    Ampayon: "4.1 km away",
+    Bancasi: "5.8 km away",
+    Nasipit: "2.6 km away",
+    Libertad: "3.9 km away",
+    "Cabadbaran": "2.8 km away",
+    Buenavista: "7.1 km away",
+    "Bayugan City": "8.5 km away",
   }[plant.location] ?? "Nearby";
   const carePreview =
     plant.category === "Veggies"
@@ -1337,7 +1336,7 @@ function MarketPlantDetail({ plant, onClose, notify, openMessages }) {
           : plant.category === "Herbs"
             ? ["Morning sun", "Keep soil lightly moist"]
             : ["Bright indirect light", "Water when top soil dries"];
-  const heroImageClass = plant.name === "Calamansi Seedling" ? "h-full w-full object-cover object-bottom" : "h-full w-full object-cover";
+  const heroImageClass = plant.name === "Calamansi Backyard Tree" ? "h-full w-full object-cover object-bottom" : "h-full w-full object-cover";
   const about =
     plant.category === "Veggies"
       ? "Good for balcony or backyard growing."
@@ -1474,6 +1473,7 @@ function MarketPlantDetail({ plant, onClose, notify, openMessages }) {
 }
 
 function MarketListingCreator({ onCreate, onCancel, notify }) {
+  const topRef = React.useRef(null);
   const [scanResult, setScanResult] = useState(aiScanResults[0]);
   const [localName, setLocalName] = useState("");
   const [category, setCategory] = useState("Indoor");
@@ -1511,6 +1511,7 @@ function MarketListingCreator({ onCreate, onCancel, notify }) {
     setCategory(nextResult.suggestedCategory ?? category);
     setDescription(`${nextResult.commonName} identified by Leafy AI. Add price, stock, delivery, and care notes before posting.`);
     notify("Leafy AI scanned", `${nextResult.commonName} checked for Market listing.`);
+    requestAnimationFrame(() => topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
   const createListing = () => {
@@ -1528,7 +1529,7 @@ function MarketListingCreator({ onCreate, onCancel, notify }) {
       aiName: scanResult.commonName,
       scientificName: scanResult.scientificName,
       price,
-      location: "Quezon City",
+      location: "Butuan City",
       type: "Buy",
       category,
       image: scanResult.image,
@@ -1537,12 +1538,14 @@ function MarketListingCreator({ onCreate, onCancel, notify }) {
       stock,
       delivery,
       about: description,
+      reviewStatus: isReview ? "Review" : "Active",
+      reviewNote: isReview ? "Rare plant source check required before publishing." : "",
     });
     notify(isReview ? "Sent to review" : "Market listing created", isReview ? "A moderator should approve this before it appears publicly." : `${listingName} was added to your Market listings.`);
   };
 
   return (
-    <div className="px-5 pb-44">
+    <div ref={topRef} className="px-5 pb-44">
       <button
         onClick={onCancel}
         className="gm-tap mb-3 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-[#63705e] shadow-sm"
@@ -1731,7 +1734,7 @@ function MarketView({ notify, openListing, myMarketListings, onOpenCreator }) {
   const [sortBy, setSortBy] = useState("Nearest");
   const [showMoreFilters, setShowMoreFilters] = useState(false);
   const normalizedQuery = query.trim().toLowerCase();
-  const saleListings = [...myMarketListings, ...marketPlants.filter((item) => item.type === "Buy")];
+  const saleListings = [...myMarketListings.filter((item) => item.reviewStatus !== "Review"), ...marketPlants.filter((item) => item.type === "Buy")];
   const saleCategories = PLANT_CATEGORIES.filter((item) => saleListings.some((listing) => listing.category === item));
   const categories = ["All", ...saleCategories];
   const primaryCategories = ["All", "Indoor", "Outdoor", "Rare", "Flowering"].filter((item) => categories.includes(item));
@@ -1929,33 +1932,14 @@ function GardenModeSwitch({ gardenMode, setGardenMode, setSelectedGarden }) {
   );
 }
 
-function GardenPhotoControls({ photos, currentIndex, setCurrentIndex }) {
+function GardenPhotoControls({ photos, currentIndex }) {
   if (photos.length <= 1) return null;
-
-  const goTo = (event, nextIndex) => {
-    event.stopPropagation();
-    setCurrentIndex((nextIndex + photos.length) % photos.length);
-  };
 
   return (
     <>
       <span className="pointer-events-none absolute left-4 top-4 rounded-full bg-black/45 px-3 py-1 text-xs font-black text-white">
         {currentIndex + 1}/{photos.length}
       </span>
-      <button
-        onClick={(event) => goTo(event, currentIndex - 1)}
-        className="gm-tap absolute left-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-[#203522] shadow-sm"
-        aria-label="Previous garden photo"
-      >
-        <ArrowLeft size={16} />
-      </button>
-      <button
-        onClick={(event) => goTo(event, currentIndex + 1)}
-        className="gm-tap absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-[#203522] shadow-sm"
-        aria-label="Next garden photo"
-      >
-        <ChevronRight size={18} />
-      </button>
     </>
   );
 }
@@ -2153,7 +2137,7 @@ function VisitGardensView({ selectedGarden, setSelectedGarden, notify, openMessa
               <PlantImage src={currentCover} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
             </button>
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition duration-300 group-hover:from-black/95" />
-            <GardenPhotoControls photos={coverPhotos} currentIndex={currentCoverIndex} setCurrentIndex={setCoverIndex} />
+            <GardenPhotoControls photos={coverPhotos} currentIndex={currentCoverIndex} />
             <div className="pointer-events-none absolute bottom-4 left-4 right-4 text-white">
               <div className="flex items-end gap-3">
                 <button
@@ -2435,24 +2419,24 @@ function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSele
         onTouchEnd={handleGardenCoverSwipe}
         role="button"
         tabIndex={0}
-        className="group gm-card-in gm-tap cursor-pointer overflow-hidden rounded-[2rem] bg-white shadow-sm outline-none transition hover:shadow-[0_18px_42px_rgba(37,61,41,0.18)] focus-visible:ring-4 focus-visible:ring-[#d9f99d]"
+        className="group gm-card-in gm-tap cursor-pointer select-none overflow-hidden rounded-[2rem] bg-white shadow-sm outline-none transition hover:shadow-[0_18px_42px_rgba(37,61,41,0.18)] focus-visible:ring-4 focus-visible:ring-[#d9f99d]"
       >
         <div className="relative h-44">
-          <PlantImage src={currentGardenCover} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-transparent transition duration-300 group-hover:from-black/95" />
+          <PlantImage src={currentGardenCover} alt="" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-transparent" />
           <button
             onClick={(event) => {
               event.stopPropagation();
               setShowGardenPhotoPicker((value) => !value);
             }}
-            className="gm-tap absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-2xl bg-white/90 text-[#203522] transition group-hover:scale-105"
+            className="gm-tap absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-2xl bg-white/90 text-[#203522]"
             aria-label="Change garden photo"
           >
             <Camera size={18} />
           </button>
-          <GardenPhotoControls photos={gardenCovers} currentIndex={currentGardenCoverIndex} setCurrentIndex={setGardenCoverIndex} />
-          <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-black/30 p-3 text-white backdrop-blur-[1px]">
-            <p className="text-2xl font-black">Laarne Ramos' Aroid Shelf Lab</p>
+          <GardenPhotoControls photos={gardenCovers} currentIndex={currentGardenCoverIndex} />
+          <div className="absolute bottom-5 left-5 right-5 text-white">
+            <p className="text-2xl font-black">My Plant Collection</p>
             <p className="mt-1 text-sm font-semibold text-white/85">42 plants - 38 updates - Rank #2</p>
           </div>
         </div>
@@ -2473,9 +2457,8 @@ function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSele
       {showGardenPhotoPicker && (
         <PhotoPicker
           title="Change garden photo"
-          detail="Pick or upload a garden cover."
+          detail="Scan a real garden cover photo."
           onSelect={updateGardenCover}
-          onUpload={(image, name) => updateGardenCover(image, name)}
           onCancel={() => setShowGardenPhotoPicker(false)}
         />
       )}
@@ -2509,10 +2492,10 @@ function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSele
       {showAddPlant && (
         <section className="gm-sheet-in mt-3 rounded-[1.6rem] bg-white p-4 shadow-sm">
           <p className="font-black text-[#203522]">Add plant to My Garden</p>
-          <p className="mt-1 text-sm font-semibold text-[#73806c]">Scan or upload a plant.</p>
+          <p className="mt-1 text-sm font-semibold text-[#73806c]">Scan a real plant to prove it is yours.</p>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button onClick={addPlant} className="gm-tap rounded-full bg-[#203522] px-4 py-3 text-sm font-black text-white">
-              Add sample
+              Scan plant
             </button>
             <button onClick={() => setShowAddPlant(false)} className="gm-tap rounded-full bg-[#edf7dc] px-4 py-3 text-sm font-black text-[#315d37]">
               Cancel
@@ -2653,9 +2636,8 @@ function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSele
           {showPlantPhotoPicker && (
             <PhotoPicker
               title={`Add ${selectedPlant.nickname}'s photo`}
-              detail="Add up to 5 photos."
+              detail="Scan up to 5 real plant photos."
               onSelect={updateSelectedPlantPhoto}
-              onUpload={(image, name) => updateSelectedPlantPhoto(image, name)}
               onCancel={() => setShowPlantPhotoPicker(false)}
             />
           )}
@@ -2869,9 +2851,13 @@ function FeedView({ notify, openMessages, openGarden }) {
               {activeComments === post.id && (
                 <section className="gm-sheet-in mt-3 rounded-[1.3rem] bg-[#f7faf1] p-3 ring-1 ring-[#edf1e8]">
                   <div className="space-y-2">
-                    {["Looks healthy!", "Nice growth update.", ...(postComments[post.id] ?? [])].map((comment, index) => (
-                      <div key={`${post.id}-${index}-${comment}`} className="rounded-2xl bg-white px-3 py-2 text-xs font-semibold text-[#52604d]">
-                        {comment}
+                    {[...(post.mockComments ?? []), ...(postComments[post.id] ?? []).map((text) => ({ author: "You", avatar: "/laarne-profile.png", text }))].map((comment, index) => (
+                      <div key={`${post.id}-${index}-${comment.author}-${comment.text}`} className="flex items-start gap-2 rounded-2xl bg-white px-3 py-2">
+                        <AvatarImage src={comment.avatar} alt={`${comment.author} profile`} className="h-8 w-8 shrink-0 rounded-xl object-cover" />
+                        <div className="min-w-0">
+                          <p className="text-xs font-black text-[#203522]">{comment.author}</p>
+                          <p className="mt-0.5 text-xs font-semibold leading-5 text-[#52604d]">{comment.text}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -2913,7 +2899,7 @@ function RankView({ notify, openGarden }) {
     "bg-[#fff1e6] text-[#9a3412] ring-1 ring-[#fdba74]",
   ];
   const fallbackAvatars = {
-    "Benjie Cruz": "/avatars/pinoy-miguel.svg",
+    "Benjie Cruz": "/avatars/avatar-miguel.png",
   };
   const ownRank = {
     Growers: ["#12", "2,430 pts", "320 pts away from Top 10"],
@@ -3075,9 +3061,26 @@ function RankView({ notify, openGarden }) {
   );
 }
 
-function ProfileView({ setActiveTab, notify }) {
+function ProfileView({ setActiveTab, notify, myMarketListings = [] }) {
   const featuredPlants = collection.slice(0, 3);
-  const myMarketListings = marketPlants.filter((item) => item.seller === "Laarne Ramos" && item.type === "Buy");
+  const activeMarketListings = [
+    ...myMarketListings.filter((item) => item.reviewStatus !== "Review"),
+    ...marketPlants.filter((item) => item.seller === "Laarne Ramos" && item.type === "Buy"),
+  ];
+  const reviewListings = [
+    ...myMarketListings.filter((item) => item.reviewStatus === "Review"),
+    {
+      listingId: "review-alocasia-frydek",
+      name: "Alocasia Frydek Pup",
+      price: "PHP 1,450",
+      location: "Nasipit",
+      category: "Rare",
+      image: plantPhotos.alocasia,
+      stock: "1 pup",
+      reviewStatus: "Review",
+      reviewNote: "Rare plant source check required before publishing.",
+    },
+  ];
   const myFeedPosts = feedPosts.filter((item) => item.author === "Laarne Ramos");
   const [editing, setEditing] = useState(false);
   const [profileName, setProfileName] = useState("Laarne Ramos");
@@ -3124,7 +3127,7 @@ function ProfileView({ setActiveTab, notify }) {
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h2 className="text-2xl font-black tracking-tight text-[#203522]">{profileName}</h2>
-              <p className="mt-1 text-sm font-bold text-[#7a8572]">@laarne.grows - Quezon City</p>
+              <p className="mt-1 text-sm font-bold text-[#7a8572]">@laarne.grows - Butuan City</p>
             </div>
             <div className="w-24 shrink-0 text-right">
               <StatusPill tone="green">Level 18</StatusPill>
@@ -3187,11 +3190,42 @@ function ProfileView({ setActiveTab, notify }) {
           </div>
           <div className="flex items-center gap-2">
             <InfoButton title="Marketplace fee" detail="GrowMate charges 10% only after an item is sold." notify={notify} />
-            <StatusPill tone="green">{myMarketListings.length} active</StatusPill>
+            <StatusPill tone="green">{activeMarketListings.length} active</StatusPill>
           </div>
         </div>
         <div className="space-y-3">
-          {myMarketListings.map(renderProfileListing)}
+          {activeMarketListings.map(renderProfileListing)}
+        </div>
+      </section>
+
+      <section className="mt-5">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-black text-[#203522]">For Review Listings</h3>
+            <p className="text-xs font-bold text-[#52604d]">Needs Leafy AI or moderator approval</p>
+          </div>
+          <StatusPill tone="amber">{reviewListings.length} pending</StatusPill>
+        </div>
+        <div className="space-y-3">
+          {reviewListings.map((item) => (
+            <article key={item.listingId ?? item.name} className="gm-card-in gm-tap flex items-center gap-3 rounded-[1.5rem] bg-white p-3 shadow-sm ring-1 ring-amber-100">
+              <PlantImage src={item.image} alt={item.name} className="h-16 w-16 shrink-0 rounded-2xl object-cover" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <StatusPill tone="amber">For review</StatusPill>
+                  <p className="truncate text-xs font-black text-[#7a8572]">{item.stock}</p>
+                </div>
+                <p className="mt-2 truncate font-black text-[#203522]">{item.name}</p>
+                <p className="mt-1 line-clamp-2 text-xs font-semibold leading-4 text-[#52604d]">{item.reviewNote}</p>
+              </div>
+              <button
+                onClick={() => notify("Review listing", `${item.name} is waiting for approval before it appears in Market.`)}
+                className="gm-tap shrink-0 rounded-full bg-[#fff4db] px-3 py-2 text-xs font-black text-[#b45309]"
+              >
+                Check
+              </button>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -3301,7 +3335,7 @@ function BottomNav({ activeTab, setActiveTab }) {
   );
 }
 
-function MessagesPanel({ targetName, onClose }) {
+function MessagesPanel({ targetName, collapsed, onCollapse, onExpand, onClose }) {
   const inboxFilters = ["All", "Friends", "Market", "Garden", "Requests"];
   const getThreadType = (thread) => {
     if (thread.type) return thread.type;
@@ -3321,9 +3355,9 @@ function MessagesPanel({ targetName, onClose }) {
   const extraThreads = [
     {
       name: "Ana Santos",
-      avatar: "/avatars/pinoy-ana.svg",
+      avatar: sellerAvatars["Ana Santos"],
       type: "Garden",
-      context: "Laarne Ramos' Aroid Shelf Lab",
+      context: "Laarne Ramos' My Plant Collection",
       meta: "Garden visitor",
       preview: "I followed your garden!",
       time: "1d",
@@ -3335,7 +3369,7 @@ function MessagesPanel({ targetName, onClose }) {
     },
     {
       name: "Mika Santos",
-      avatar: "/avatars/pinoy-maria.svg",
+      avatar: "/avatars/avatar-maria.png",
       type: "Requests",
       context: "Calathea question",
       meta: "Message request",
@@ -3350,7 +3384,7 @@ function MessagesPanel({ targetName, onClose }) {
     targetName && targetName !== "__inbox" && !availableThreads.some((thread) => thread.name === targetName)
       ? {
           name: targetName,
-          avatar: sellerAvatars[targetName] ?? "/avatars/pinoy-maria.svg",
+          avatar: sellerAvatars[targetName] ?? "/avatars/avatar-maria.png",
           type: "Friends",
           context: "GrowMate chat",
           meta: "Friend",
@@ -3400,23 +3434,38 @@ function MessagesPanel({ targetName, onClose }) {
     setDraft("");
   };
 
+  if (collapsed) {
+    return (
+      <button
+        onClick={onExpand}
+        className="gm-tap fixed bottom-5 right-5 z-[70] flex items-center gap-3 rounded-full bg-[#203522] px-4 py-3 text-left text-white shadow-[0_18px_48px_rgba(32,53,34,0.28)]"
+        aria-label="Open messages"
+      >
+        <span className="grid h-10 w-10 place-items-center rounded-full bg-white/12">
+          <MessageCircle size={19} />
+        </span>
+        <span className="hidden sm:block">
+          <span className="block text-sm font-black">Messages</span>
+          <span className="block max-w-36 truncate text-xs font-bold text-white/70">{selectedThread.name}</span>
+        </span>
+      </button>
+    );
+  }
+
   return (
-    <div className="fixed inset-0 z-[60] flex justify-center bg-[#203522]/40 sm:items-center sm:py-6">
-      <section className="gm-sheet-in flex h-full w-full max-w-[430px] flex-col overflow-hidden bg-[#f5f8ef] shadow-2xl sm:h-[880px] sm:rounded-[2rem] md:max-w-[760px]">
+    <div className="pointer-events-none fixed inset-y-0 right-0 z-[70] flex justify-end p-0 sm:p-4">
+      <section className="gm-sheet-in pointer-events-auto flex h-full w-full max-w-[430px] flex-col overflow-hidden bg-[#f5f8ef] shadow-2xl ring-1 ring-[#dfe8d7] sm:rounded-[2rem]">
         <div className="border-b border-[#dfe8d7] bg-white px-5 py-4">
           <div className="flex items-center justify-between gap-3">
-          <button onClick={onClose} className="gm-tap grid h-10 w-10 place-items-center rounded-2xl bg-[#f0f4e8] text-[#203522]" aria-label="Close messages">
-            <ArrowLeft size={18} />
+          <button onClick={onCollapse} className="gm-tap grid h-10 w-10 place-items-center rounded-2xl bg-[#f0f4e8] text-[#203522]" aria-label="Collapse messages">
+            <ChevronRight size={18} />
           </button>
           <div className="min-w-0 flex-1">
             <p className="text-lg font-black text-[#203522]">Messages</p>
             <p className="text-xs font-bold text-[#52604d]">Friends, buyers, sellers, and garden visitors</p>
           </div>
-            <button className="gm-tap grid h-10 w-10 place-items-center rounded-2xl bg-[#f0f4e8] text-[#203522]" aria-label="Search messages">
-              <Search size={18} />
-            </button>
-            <button className="gm-tap grid h-10 w-10 place-items-center rounded-2xl bg-[#203522] text-white" aria-label="New message">
-              <Plus size={18} />
+            <button onClick={onClose} className="gm-tap rounded-full bg-[#f0f4e8] px-3 py-2 text-xs font-black text-[#52604d]" aria-label="Close messages">
+              Close
             </button>
           </div>
           <div className="mt-4 flex items-center gap-2 rounded-2xl bg-[#f7faf1] px-3 py-2">
@@ -3444,7 +3493,7 @@ function MessagesPanel({ targetName, onClose }) {
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto p-4 md:grid md:grid-cols-[260px_1fr] md:gap-4">
+        <div className="min-h-0 flex-1 overflow-y-auto p-4">
           <section className="space-y-2">
             <p className="px-1 text-xs font-black uppercase tracking-[0.12em] text-[#8bc34a]">Today</p>
             {filteredThreads.map((thread) => {
@@ -3479,7 +3528,7 @@ function MessagesPanel({ targetName, onClose }) {
             )}
           </section>
 
-          <section className="mt-4 flex min-h-[420px] flex-col rounded-[1.7rem] bg-white shadow-sm md:mt-0">
+          <section className="mt-4 flex min-h-[420px] flex-col rounded-[1.7rem] bg-white shadow-sm">
             <div className="flex items-center gap-3 border-b border-[#edf1e8] p-4">
               <AvatarImage src={selectedThread.avatar} alt={`${selectedThread.name} profile`} className="h-12 w-12 rounded-2xl object-cover" />
               <div className="min-w-0 flex-1">
@@ -3544,22 +3593,23 @@ function MessagesPanel({ targetName, onClose }) {
 
 export default function ProductApp() {
   const [activeTab, setActiveTab] = useState("Garden");
-  const [notice, setNotice] = useState(null);
   const [gardenMode, setGardenMode] = useState("Mine");
   const [selectedGarden, setSelectedGarden] = useState(null);
   const [marketListing, setMarketListing] = useState(null);
   const [messageTarget, setMessageTarget] = useState(null);
+  const [messageCollapsed, setMessageCollapsed] = useState(false);
+  const [actionPanel, setActionPanel] = useState(null);
   const [myMarketListings, setMyMarketListings] = useState([]);
   const [marketCreator, setMarketCreator] = useState(null);
-  const notify = (title, detail) => setNotice({ title, detail });
+  const notify = (title, detail) => setActionPanel({ title, detail });
   const openMessages = (target = "__inbox") => {
-    setNotice(null);
+    setActionPanel(null);
     setMessageTarget(target);
+    setMessageCollapsed(false);
   };
   const openCommunityGarden = (ownerName) => {
-    setNotice(null);
-
     if (ownerName === "Laarne Ramos") {
+      setActionPanel(null);
       setSelectedGarden(null);
       setGardenMode("Mine");
       setActiveTab("Garden");
@@ -3575,6 +3625,7 @@ export default function ProductApp() {
     setSelectedGarden(garden);
     setGardenMode("Visit");
     setActiveTab("Garden");
+    setActionPanel(null);
   };
 
   const title = useMemo(() => {
@@ -3631,7 +3682,7 @@ export default function ProductApp() {
     ),
     Feed: <FeedView notify={notify} openMessages={openMessages} openGarden={openCommunityGarden} />,
     Rankings: <RankView notify={notify} openGarden={openCommunityGarden} />,
-    Profile: <ProfileView setActiveTab={setActiveTab} notify={notify} />,
+    Profile: <ProfileView setActiveTab={setActiveTab} notify={notify} myMarketListings={myMarketListings} />,
   }[activeTab];
 
   return (
@@ -3658,13 +3709,24 @@ export default function ProductApp() {
               </button>
             </div>
           </header>
-          <ActionNotice notice={notice} onClear={() => setNotice(null)} />
           <div key={activeTab} className="gm-screen-in">{view}</div>
         </div>
         <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
       </PhoneShell>
       {marketListing && <MarketPlantDetail plant={marketListing} onClose={() => setMarketListing(null)} notify={notify} openMessages={openMessages} />}
-      {messageTarget && <MessagesPanel targetName={messageTarget} onClose={() => setMessageTarget(null)} />}
+      {messageTarget && (
+        <MessagesPanel
+          targetName={messageTarget}
+          collapsed={messageCollapsed}
+          onCollapse={() => setMessageCollapsed(true)}
+          onExpand={() => setMessageCollapsed(false)}
+          onClose={() => {
+            setMessageTarget(null);
+            setMessageCollapsed(false);
+          }}
+        />
+      )}
+      <ActionPanel action={actionPanel} onClose={() => setActionPanel(null)} />
     </main>
   );
 }
