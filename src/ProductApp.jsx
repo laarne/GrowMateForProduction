@@ -95,7 +95,7 @@ const collection = [
     status: "Propagating",
     tag: "Easy care",
     category: "Cuttings",
-    availability: "Open to trade",
+    availability: "Cuttings soon",
     likes: 96,
     age: "2y",
     updates: ["Five nodes rooted", "Two cuttings ready", "Trailing shelf reset"],
@@ -160,7 +160,7 @@ const collection = [
     status: "Propagating",
     tag: "Trailing",
     category: "Cuttings",
-    availability: "Open to trade",
+    availability: "Sharing soon",
     likes: 201,
     age: "1y 5m",
     updates: ["Cutting callused", "Peduncle spotted", "Moved near morning light"],
@@ -290,9 +290,9 @@ const marketPlants = [
   },
   {
     name: "Rooted Cebu Blue Cutting",
-    price: "Trade",
+    price: "Community",
     location: "Makati",
-    type: "Trade",
+    type: "Community",
     category: "Cuttings",
     image: plantPhotos.pothos,
     seller: "Ana Santos",
@@ -323,9 +323,9 @@ const marketPlants = [
   },
   {
     name: "Snake Plant Pup",
-    price: "Trade",
+    price: "Community",
     location: "Marikina",
-    type: "Trade",
+    type: "Community",
     category: "Indoor",
     image: plantPhotos.snake,
     seller: "Miguel Bautista",
@@ -345,9 +345,9 @@ const marketPlants = [
   },
   {
     name: "Hoya Carnosa Cutting",
-    price: "Trade",
+    price: "Community",
     location: "Mandaluyong",
-    type: "Trade",
+    type: "Community",
     category: "Cuttings",
     image: plantPhotos.hoya,
     seller: "Maria Dela Cruz",
@@ -378,9 +378,9 @@ const marketPlants = [
   },
   {
     name: "Juniper Bonsai Starter",
-    price: "Trade",
+    price: "Community",
     location: "Pasig",
-    type: "Trade",
+    type: "Community",
     category: "Trees",
     image: plantPhotos.bonsai,
     seller: "Miguel Bautista",
@@ -400,9 +400,9 @@ const marketPlants = [
   },
   {
     name: "Spring Onion Regrow Bunch",
-    price: "Trade",
+    price: "Community",
     location: "Taguig",
-    type: "Trade",
+    type: "Community",
     category: "Veggies",
     image: plantPhotos.onion,
     seller: "Aling Nena",
@@ -499,20 +499,20 @@ const marketPlants = [
   },
   {
     name: "Anthurium Clarinervium",
-    price: "Trade",
+    price: "Community",
     location: "Mandaluyong",
-    type: "Trade",
+    type: "Community",
     category: "Rare",
     image: plantPhotos.anthurium,
     seller: "Maria Dela Cruz",
     rating: "4.9",
-    stock: "wishlist trade",
+    stock: "wishlist post",
   },
   {
     name: "Calathea Orbifolia Division",
-    price: "Trade",
+    price: "Community",
     location: "Quezon City",
-    type: "Trade",
+    type: "Community",
     category: "Indoor",
     image: plantPhotos.calathea,
     seller: "Laarne Ramos",
@@ -532,9 +532,9 @@ const marketPlants = [
   },
   {
     name: "Onion and Pechay Bundle",
-    price: "Trade",
+    price: "Community",
     location: "Caloocan",
-    type: "Trade",
+    type: "Community",
     category: "Veggies",
     image: plantPhotos.onion,
     seller: "Mang Lito Santos",
@@ -554,9 +554,9 @@ const marketPlants = [
   },
   {
     name: "Calamansi Backyard Pair",
-    price: "Trade",
+    price: "Community",
     location: "Caloocan",
-    type: "Trade",
+    type: "Community",
     category: "Fruit Trees",
     image: plantPhotos.calamansi,
     seller: "Mang Lito Santos",
@@ -576,9 +576,9 @@ const marketPlants = [
   },
   {
     name: "Balcony Herb Cuttings",
-    price: "Trade",
+    price: "Community",
     location: "Taguig",
-    type: "Trade",
+    type: "Community",
     category: "Herbs",
     image: plantPhotos.herb,
     seller: "Aling Nena",
@@ -657,10 +657,107 @@ const photoOptions = [
   ["Calamansi", plantPhotos.calamansi],
 ];
 
-const trades = [
-  ["Maria Dela Cruz", "Wants Golden Pothos cuttings", "Offering: Hoya carnosa rooted cutting", "92% match"],
-  ["Miguel Bautista", "Asked about Monstera nodes", "Offering: Snake Plant pup plus soil mix", "78% match"],
-  ["Ana Santos", "Wishlist match found", "Offering: Philodendron micans", "85% match"],
+const messageThreads = [
+  {
+    name: "Maria Dela Cruz",
+    avatar: "/avatars/pinoy-maria.svg",
+    context: "Silver Sword Philodendron",
+    preview: "Available pa. I can reserve it until tonight.",
+    time: "2m",
+    unread: 2,
+    messages: [
+      ["Maria Dela Cruz", "Hi Laarne, available pa yung Silver Sword."],
+      ["You", "Nice. Pwede meetup this weekend?"],
+      ["Maria Dela Cruz", "Yes, Mandaluyong or Cubao is okay."],
+    ],
+  },
+  {
+    name: "Miguel Bautista",
+    avatar: "/avatars/pinoy-miguel.svg",
+    context: "Bonsai Courtyard",
+    preview: "I uploaded new root photos for the bonsai.",
+    time: "18m",
+    unread: 1,
+    messages: [
+      ["Miguel Bautista", "I uploaded the root photos."],
+      ["You", "Thanks. I will check the update."],
+    ],
+  },
+  {
+    name: "Aling Nena",
+    avatar: "/avatars/pinoy-lito.svg",
+    context: "Balcony Herb Cuttings",
+    preview: "Basil and mint are ready for pickup.",
+    time: "1h",
+    unread: 0,
+    messages: [
+      ["Aling Nena", "Basil and mint are ready for pickup."],
+      ["You", "Thank you po. I’ll message before going."],
+    ],
+  },
+  {
+    name: "Mang Lito Santos",
+    avatar: "/avatars/pinoy-lito.svg",
+    context: "Calamansi Seedling",
+    preview: "Seven seedlings are still available.",
+    time: "3h",
+    unread: 0,
+    messages: [
+      ["You", "Available pa po yung calamansi?"],
+      ["Mang Lito Santos", "Yes, seven seedlings are still available."],
+    ],
+  },
+];
+
+const feedPosts = [
+  {
+    id: "feed-maria-leaf",
+    author: "Maria Dela Cruz",
+    avatar: sellerAvatars["Maria Dela Cruz"],
+    type: "Garden update",
+    title: "New leaf on the balcony shelf",
+    text: "My Calathea bounced back after moving it away from afternoon sun.",
+    image: plantPhotos.calathea,
+    meta: "Mandaluyong - 2h",
+    likes: 128,
+    comments: 14,
+  },
+  {
+    id: "feed-laarne-ai",
+    author: "Laarne Ramos",
+    avatar: "/laarne-profile.png",
+    type: "Leafy AI tip",
+    title: "Leafy AI says bright indirect light",
+    text: "Testing the new plant diagnosis flow on Luna before I add another update.",
+    image: plantPhotos.anthurium,
+    meta: "Quezon City - 4h",
+    likes: 96,
+    comments: 9,
+  },
+  {
+    id: "feed-nena-harvest",
+    author: "Aling Nena",
+    avatar: sellerAvatars["Aling Nena"],
+    type: "Harvest",
+    title: "Weekend herbs are ready",
+    text: "Basil, pechay, and chili are growing nicely after the rain.",
+    image: plantPhotos.herb,
+    meta: "Taguig - 6h",
+    likes: 211,
+    comments: 22,
+  },
+  {
+    id: "feed-miguel-bonsai",
+    author: "Miguel Bautista",
+    avatar: sellerAvatars["Miguel Bautista"],
+    type: "Care question",
+    title: "Should I prune this bonsai branch?",
+    text: "Trying to keep the courtyard bonsai compact without stressing it.",
+    image: plantPhotos.bonsai,
+    meta: "Pasig - 1d",
+    likes: 74,
+    comments: 18,
+  },
 ];
 
 const communityGardens = [
@@ -677,7 +774,7 @@ const communityGardens = [
     followers: "1.4k",
     rank: "#1",
     bio: "Rare foliage and balcony updates.",
-    badges: ["Most admired", "Rare collector", "Top trader"],
+    badges: ["Most admired", "Rare collector", "Top seller"],
     plants: [
       { name: "Philodendron Gloriosum", image: plantPhotos.fern, tag: "Rare" },
       { name: "Calathea Orbifolia", image: plantPhotos.calathea, tag: "Humidity" },
@@ -705,7 +802,7 @@ const communityGardens = [
       { name: "Siling Labuyo", image: plantPhotos.chili, tag: "Spicy" },
       { name: "Pechay", image: plantPhotos.pechay, tag: "Leafy" },
       { name: "Mini Cactus Trio", image: plantPhotos.cactus, tag: "Sunny" },
-      { name: "Golden Pothos", image: plantPhotos.pothos, tag: "Trade" },
+      { name: "Golden Pothos", image: plantPhotos.pothos, tag: "Propagation" },
     ],
   },
   {
@@ -720,8 +817,8 @@ const communityGardens = [
     score: "8.4k",
     followers: "812",
     rank: "#5",
-    bio: "Bonsai updates and local swaps.",
-    badges: ["Trusted trader", "Care streak", "Slow grower"],
+    bio: "Bonsai updates and slow-grow care logs.",
+    badges: ["Trusted seller", "Care streak", "Slow grower"],
     plants: [
       { name: "Juniper Bonsai", image: plantPhotos.bonsai, tag: "Showcase" },
       { name: "Snake Plant", image: plantPhotos.snake, tag: "Low light" },
@@ -760,10 +857,10 @@ const leaderboard = {
     ["Laarne Ramos", "Aroid Shelf Lab", 9120, "38 updates"],
     ["Aling Nena", "Herb Roof", 8730, "21 harvests"],
   ],
-  Traders: [
-    ["Miguel Bautista", "Trusted Trader", 7620, "54 clean trades"],
+  Sellers: [
+    ["Miguel Bautista", "Trusted Seller", 7620, "54 clean sales"],
     ["Maria Dela Cruz", "Cutting Queen", 7210, "4.9 rating"],
-    ["Paolo Reyes", "Weekend Swapper", 6840, "fast replies"],
+    ["Paolo Reyes", "Weekend Seller", 6840, "fast replies"],
   ],
   Helpers: [
     ["Ana Santos", "Plant Doctor", 6420, "89 care answers"],
@@ -831,32 +928,25 @@ const achievements = {
       ].filter(Boolean).length,
       goal: 4,
     },
-    { title: "Trade Explorer", detail: "3 trade categories", progress: 2, goal: 3 },
+    { title: "Market Explorer", detail: "3 market categories", progress: 2, goal: 3 },
   ],
 };
 
-const leafyCapabilities = [
-  "AI Check",
-  "No cash",
-  "Proof Photos",
-  "Agreement",
-];
-
-const tradeProofRequirements = ["Full plant", "Leaf close-up", "Root/stem", "Recent photo"];
-
-const tradePolicyCards = [
-  ["Plant swaps only", "Cash prices and selling posts are not allowed here."],
-  ["Free trade limit", "Free users get 3 active posts and 3 completed trades monthly."],
-  ["Secure agreement", "Both users confirm items, condition, proof photos, and delivery/meetup details."],
-  ["Trade protection", "Optional PHP 15-30 protection for disputes, proof records, and trust score safety."],
-];
-
 const tabs = [
   [ShoppingBag, "Market"],
-  [Send, "Trade"],
+  [MessageCircle, "Feed"],
   [Leaf, "Garden"],
   [Trophy, "Rankings"],
   [UserRound, "Profile"],
+];
+
+const feedProofRequirements = ["Full plant", "Leaf close-up", "Growth update", "Recent photo"];
+
+const feedPolicyCards = [
+  ["Real plant content", "Use your own garden photos, plant questions, care notes, or harvest updates."],
+  ["Market stays separate", "Cash prices and selling posts belong in the Market section."],
+  ["Leafy AI help", "Use Leafy AI for identification, care tips, and plant problem checks."],
+  ["Community safety", "Reports help remove spam, fake photos, and harmful advice."],
 ];
 
 function cn(...classes) {
@@ -1000,13 +1090,13 @@ function SellerListingCheck({ notify }) {
   const [selectedCategory, setSelectedCategory] = useState("Indoor");
   const [scanResult, setScanResult] = useState(aiScanResults[0]);
   const [listedPlants, setListedPlants] = useState([]);
-  const [showTradeRules, setShowTradeRules] = useState(false);
+  const [showFeedRules, setShowFeedRules] = useState(false);
   const ScanIcon = scanResult.icon;
   const safetyChecks =
     scanResult.status === "Allowed"
       ? [
           ["Plant identified", `${scanResult.commonName} - ${scanResult.confidence} match`, Check],
-          ["Listing rule", "Safe to trade", ShieldCheck],
+          ["Posting rule", "Safe to post", ShieldCheck],
           ["Protected species", "No flag", Check],
           ["Proof photos", "4 required photos saved", Camera],
         ]
@@ -1015,13 +1105,13 @@ function SellerListingCheck({ notify }) {
             ["Plant identified", `${scanResult.commonName} - ${scanResult.confidence} match`, Check],
             ["Listing rule", "Needs proof", AlertTriangle],
             ["Protected species", "Review required", AlertTriangle],
-            ["Proof photos", "Add complete trade proof", Camera],
+            ["Proof photos", "Add complete post proof", Camera],
           ]
         : [
             ["Plant identified", `${scanResult.commonName} - ${scanResult.confidence} match`, AlertTriangle],
             ["Listing rule", "Blocked", Ban],
             ["Protected species", "Protected risk", Ban],
-            ["Proof photos", "Trade posting disabled", Ban],
+            ["Proof photos", "Posting disabled", Ban],
           ];
 
   const handleScanPhoto = () => {
@@ -1037,17 +1127,17 @@ function SellerListingCheck({ notify }) {
       return;
     }
 
-    const listingType = "Trade";
+    const listingType = "Feed";
     const listingId = `${scanResult.id}-${listingType}-${selectedCategory}`;
     setListedPlants((items) => {
       if (items.some((item) => item.listingId === listingId)) return items;
       return [{ ...scanResult, listingId, listingType, category: selectedCategory }, ...items];
     });
     notify(
-      scanResult.status === "Review" ? "Sent to moderation" : "Trade post created",
+      scanResult.status === "Review" ? "Sent to moderation" : "Feed post created",
       scanResult.status === "Review"
         ? "Needs moderator review first."
-        : `${scanResult.commonName} is ready for plant-to-plant swap offers.`
+        : `${scanResult.commonName} is ready for community feedback.`
     );
   };
 
@@ -1058,7 +1148,7 @@ function SellerListingCheck({ notify }) {
           <p className="inline-flex items-center gap-2 rounded-full bg-[#edf7dc] px-3 py-1 text-xs font-black text-[#315d37]">
             <ScanLine size={14} /> Leafy AI
           </p>
-          <h2 className="mt-3 text-xl font-black leading-tight text-[#203522]">Check your trade before posting</h2>
+          <h2 className="mt-3 text-xl font-black leading-tight text-[#203522]">Check your post before sharing</h2>
         </div>
         <span
           className={cn(
@@ -1070,28 +1160,28 @@ function SellerListingCheck({ notify }) {
                 : "bg-emerald-50 text-emerald-700 ring-emerald-100"
           )}
         >
-          <ScanIcon size={15} /> {scanResult.status === "Allowed" ? "Safe to trade" : scanResult.status}
+          <ScanIcon size={15} /> {scanResult.status === "Allowed" ? "Safe to post" : scanResult.status}
         </span>
       </div>
 
       <div className="mt-4 rounded-[1.4rem] border border-[#dfe8d7] bg-[#fbfdf7] p-3">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="font-black text-[#203522]">Trade safely with GrowMate</p>
+            <p className="font-black text-[#203522]">Post safely with GrowMate</p>
             <p className="mt-1 text-xs font-semibold leading-5 text-[#63705e]">
-              Plant swaps only - proof photos required - secure agreement available
+              Real plant photos required - selling posts belong in Market
             </p>
           </div>
           <button
-            onClick={() => setShowTradeRules((value) => !value)}
+            onClick={() => setShowFeedRules((value) => !value)}
             className="gm-tap min-w-max rounded-full bg-white px-3 py-2 text-xs font-black text-[#315d37] ring-1 ring-[#dfe8d7]"
           >
-            {showTradeRules ? "Hide rules" : "View rules"}
+            {showFeedRules ? "Hide rules" : "View rules"}
           </button>
         </div>
-        {showTradeRules && (
+        {showFeedRules && (
           <div className="mt-3 grid gap-2 md:grid-cols-2">
-            {tradePolicyCards.map(([title, detail]) => (
+            {feedPolicyCards.map(([title, detail]) => (
               <div key={title} className="rounded-[1.2rem] bg-white p-3 ring-1 ring-[#edf1e8]">
                 <p className="text-sm font-black text-[#203522]">{title}</p>
                 <p className="mt-1 text-xs font-semibold leading-5 text-[#63705e]">{detail}</p>
@@ -1114,7 +1204,7 @@ function SellerListingCheck({ notify }) {
       <div className="mt-4">
         <p className="mb-2 text-sm font-black text-[#203522]">Required proof photos</p>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-          {tradeProofRequirements.map((item) => (
+          {feedProofRequirements.map((item) => (
             <div key={item} className="flex items-center gap-2 rounded-2xl bg-[#fbfdf7] px-3 py-2 ring-1 ring-[#edf1e8]">
               <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#edf7dc] text-[#315d37]">
                 <Check size={13} />
@@ -1184,7 +1274,7 @@ function SellerListingCheck({ notify }) {
             scanResult.status === "Blocked" ? "bg-[#f0f4e8] text-[#9aa690]" : "bg-[#203522] text-white"
           )}
         >
-          {scanResult.status === "Review" ? "Send to review" : "Create trade post"}
+          {scanResult.status === "Review" ? "Send to review" : "Create feed post"}
         </button>
       </div>
 
@@ -1196,10 +1286,10 @@ function SellerListingCheck({ notify }) {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-black text-[#203522]">{plant.commonName}</p>
                 <p className="text-xs font-bold text-[#7a8572]">
-                  {plant.status === "Review" ? "Waiting for moderation" : `${plant.category} - plant swap draft`}
+                  {plant.status === "Review" ? "Waiting for moderation" : `${plant.category} - community post draft`}
                 </p>
               </div>
-              <StatusPill tone="blue">Trade</StatusPill>
+              <StatusPill tone="blue">Feed</StatusPill>
             </div>
           ))}
         </div>
@@ -1208,8 +1298,7 @@ function SellerListingCheck({ notify }) {
   );
 }
 
-function MarketPlantDetail({ plant, onClose, notify }) {
-  const isTrade = plant.type === "Trade";
+function MarketPlantDetail({ plant, onClose, notify, openMessages }) {
   const sellerAvatar = sellerAvatars[plant.seller] ?? "/avatars/pinoy-maria.svg";
   const condition = plant.category === "Cuttings" ? "Rooted and healthy" : "Healthy";
   const plantType = plant.category === "Cuttings" ? "Cutting (Rooted)" : plant.category;
@@ -1279,7 +1368,7 @@ function MarketPlantDetail({ plant, onClose, notify }) {
           </div>
 
           <div className="mt-3 flex flex-wrap gap-2">
-            <StatusPill tone={isTrade ? "blue" : "green"}>{isTrade ? "Trade" : "For sale"}</StatusPill>
+            <StatusPill tone="green">For sale</StatusPill>
             <StatusPill>
               <span className="inline-flex items-center gap-1">
                 <ShieldCheck size={12} /> AI checked
@@ -1300,7 +1389,7 @@ function MarketPlantDetail({ plant, onClose, notify }) {
               </div>
             </div>
             <button
-              onClick={() => notify("Message opened", `Chat with ${plant.seller} about ${plant.name}.`)}
+              onClick={() => openMessages(plant.seller)}
               className="gm-tap rounded-xl border border-[#dfe8d7] px-4 py-3 text-xs font-black text-[#203522]"
             >
               Message
@@ -1311,7 +1400,7 @@ function MarketPlantDetail({ plant, onClose, notify }) {
             {[
               [MapPin, "Location", `${plant.location} - ${distance}`],
               [ShoppingBag, "Stock", plant.stock],
-              [Send, "Delivery", isTrade ? "Meetup for swaps" : "Pickup / Meetup / Delivery"],
+              [Send, "Delivery", "Pickup / Meetup / Delivery"],
               [Leaf, "Category", plant.category],
               [ShieldCheck, "Condition", condition],
               [ShoppingBag, "Type", plantType],
@@ -1350,10 +1439,10 @@ function MarketPlantDetail({ plant, onClose, notify }) {
 
         <div className="grid shrink-0 grid-cols-2 gap-3 border-t border-[#edf1e8] bg-white px-5 pb-5 pt-3">
           <button
-            onClick={() => notify(isTrade ? "Trade offer started" : "Checkout started", `${plant.name} from ${plant.seller} is now in progress.`)}
+            onClick={() => notify("Checkout started", `${plant.name} from ${plant.seller} is now in progress.`)}
             className="gm-tap rounded-xl bg-[#203522] px-4 py-4 text-sm font-black text-white"
           >
-            {isTrade ? "Offer Trade" : `Buy Now - ${plant.price}`}
+            Buy Now - {plant.price}
           </button>
           <button
             onClick={() => notify("Offer started", `Make an offer for ${plant.name}.`)}
@@ -1367,16 +1456,180 @@ function MarketPlantDetail({ plant, onClose, notify }) {
   );
 }
 
+function MarketListingCreator({ onCreate, onCancel, notify }) {
+  const [scanResult, setScanResult] = useState(aiScanResults[0]);
+  const [category, setCategory] = useState("Indoor");
+  const [price, setPrice] = useState("PHP 180");
+  const [stock, setStock] = useState("1 pot");
+  const [delivery, setDelivery] = useState("Pickup / Meetup / Delivery");
+  const [description, setDescription] = useState("Healthy, beginner-friendly plant ready for a new home.");
+  const ScanIcon = scanResult.icon;
+  const isBlocked = scanResult.status === "Blocked";
+  const isReview = scanResult.status === "Review";
+  const safetyRows = isBlocked
+    ? [
+        ["Plant identified", `${scanResult.commonName} - ${scanResult.confidence} match`, AlertTriangle],
+        ["Sale rule", "Blocked from Market", Ban],
+        ["Protected species", "Protected risk found", Ban],
+      ]
+    : isReview
+      ? [
+          ["Plant identified", `${scanResult.commonName} - ${scanResult.confidence} match`, Check],
+          ["Sale rule", "Needs moderator review", AlertTriangle],
+          ["Protected species", "Needs proof/source check", AlertTriangle],
+        ]
+      : [
+          ["Plant identified", `${scanResult.commonName} - ${scanResult.confidence} match`, Check],
+          ["Sale rule", "Safe to sell", ShieldCheck],
+          ["Protected species", "No restricted-species flag", Check],
+        ];
+
+  const scanNext = () => {
+    const currentIndex = aiScanResults.findIndex((result) => result.id === scanResult.id);
+    const nextResult = aiScanResults[(currentIndex + 1) % aiScanResults.length];
+    setScanResult(nextResult);
+    setCategory(nextResult.suggestedCategory ?? category);
+    setDescription(`${nextResult.commonName} identified by Leafy AI. Add price, stock, delivery, and care notes before posting.`);
+    notify("Leafy AI scanned", `${nextResult.commonName} checked for Market listing.`);
+  };
+
+  const createListing = () => {
+    if (isBlocked) {
+      notify("Market listing blocked", "Leafy AI found a protected-species risk. This item cannot be sold.");
+      return;
+    }
+
+    onCreate({
+      name: scanResult.commonName,
+      price,
+      location: "Quezon City",
+      type: "Buy",
+      category,
+      image: scanResult.image,
+      seller: "Laarne Ramos",
+      rating: "4.9",
+      stock,
+      delivery,
+      about: description,
+    });
+    notify(isReview ? "Sent to review" : "Market listing created", isReview ? "A moderator should approve this before it appears publicly." : `${scanResult.commonName} was added to your Market listings.`);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-center bg-[#203522]/40 sm:items-center sm:py-6">
+      <section className="gm-sheet-in mt-auto flex h-[88dvh] w-full max-w-[430px] flex-col overflow-hidden rounded-t-[2rem] bg-white shadow-2xl sm:mt-0 sm:h-[880px] sm:rounded-[2rem] md:max-w-[680px]">
+      <div className="flex items-start justify-between gap-3 border-b border-[#edf1e8] px-5 py-4">
+        <div>
+          <p className="inline-flex items-center gap-2 rounded-full bg-[#edf7dc] px-3 py-1 text-xs font-black text-[#315d37]">
+            <ScanLine size={14} /> Leafy AI market check
+          </p>
+          <h2 className="mt-3 text-xl font-black leading-tight text-[#203522]">Create Market listing</h2>
+          <p className="mt-1 text-sm font-semibold leading-5 text-[#52604d]">For cash sales only. Community updates belong in Feed.</p>
+        </div>
+        <button onClick={onCancel} className="gm-tap rounded-full bg-[#f0f4e8] px-3 py-2 text-xs font-black text-[#52604d]">
+          Close
+        </button>
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5">
+      <div className="mt-4 flex gap-3 rounded-[1.4rem] bg-[#f7faf1] p-3">
+        <PlantImage src={scanResult.image} alt={scanResult.commonName} className="h-20 w-20 shrink-0 rounded-3xl object-cover" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-black uppercase tracking-[0.12em] text-[#7a8572]">AI identified</p>
+            <span
+              className={cn(
+                "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[10px] font-black",
+                isBlocked ? "bg-rose-50 text-rose-700" : isReview ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"
+              )}
+            >
+              <ScanIcon size={12} /> {isBlocked ? "Blocked" : isReview ? "Review" : "Safe to sell"}
+            </span>
+          </div>
+          <h3 className="mt-1 text-lg font-black leading-tight text-[#203522]">{scanResult.commonName}</h3>
+          <p className="mt-1 text-xs font-bold italic text-[#7a8572]">{scanResult.scientificName}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-2 md:grid-cols-3">
+        {safetyRows.map(([title, detail, Icon]) => (
+          <div key={title} className="flex items-start gap-2 rounded-2xl bg-[#fbfdf7] p-3 ring-1 ring-[#edf1e8]">
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#edf7dc] text-[#315d37]">
+              <Icon size={14} />
+            </span>
+            <div>
+              <p className="text-xs font-black text-[#203522]">{title}</p>
+              <p className="mt-1 text-xs font-semibold leading-4 text-[#52604d]">{detail}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <label className="text-xs font-black text-[#52604d]">
+          Price
+          <input value={price} onChange={(event) => setPrice(event.target.value)} className="mt-1 w-full rounded-2xl bg-[#f7faf1] px-4 py-3 text-sm font-black text-[#203522] outline-none" />
+        </label>
+        <label className="text-xs font-black text-[#52604d]">
+          Stock / quantity
+          <input value={stock} onChange={(event) => setStock(event.target.value)} className="mt-1 w-full rounded-2xl bg-[#f7faf1] px-4 py-3 text-sm font-black text-[#203522] outline-none" />
+        </label>
+        <label className="text-xs font-black text-[#52604d]">
+          Category
+          <select value={category} onChange={(event) => setCategory(event.target.value)} className="mt-1 w-full rounded-2xl bg-[#f7faf1] px-4 py-3 text-sm font-black text-[#203522] outline-none">
+            {PLANT_CATEGORIES.map((item) => (
+              <option key={item}>{item}</option>
+            ))}
+          </select>
+        </label>
+        <label className="text-xs font-black text-[#52604d]">
+          Delivery / meetup
+          <input value={delivery} onChange={(event) => setDelivery(event.target.value)} className="mt-1 w-full rounded-2xl bg-[#f7faf1] px-4 py-3 text-sm font-black text-[#203522] outline-none" />
+        </label>
+      </div>
+
+      <label className="mt-3 block text-xs font-black text-[#52604d]">
+        Listing description
+        <textarea value={description} onChange={(event) => setDescription(event.target.value)} className="mt-1 min-h-24 w-full rounded-2xl bg-[#f7faf1] px-4 py-3 text-sm font-semibold leading-5 text-[#203522] outline-none" />
+      </label>
+
+      <div className="mt-4 flex items-start justify-between gap-3 rounded-[1.4rem] border border-[#dfe8d7] bg-[#fbfdf7] p-4">
+        <div className="min-w-0">
+          <p className="font-black text-[#203522]">Marketplace fee</p>
+          <p className="mt-1 text-xs font-semibold leading-5 text-[#52604d]">No upfront listing fee. GrowMate charges only after the item is sold.</p>
+        </div>
+        <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-black text-[#315d37]">10% sold</span>
+      </div>
+
+      <div className="mt-4 grid grid-cols-[auto_1fr] gap-2">
+        <button onClick={scanNext} className="gm-tap grid h-12 w-12 place-items-center rounded-full bg-[#edf7dc] text-[#315d37]" aria-label="Scan another market plant">
+          <Camera size={18} />
+        </button>
+        <button
+          onClick={createListing}
+          className={cn("gm-tap rounded-full px-4 py-3 text-sm font-black", isBlocked ? "bg-[#f0f4e8] text-[#9aa690]" : "bg-[#203522] text-white")}
+        >
+          {isReview ? "Send to review" : "Post to Market"}
+        </button>
+      </div>
+      </div>
+    </section>
+    </div>
+  );
+}
+
 function MarketView({ notify, openListing }) {
   const [category, setCategory] = useState("All");
   const [query, setQuery] = useState("");
-  const [showMoreFilters, setShowMoreFilters] = useState(false);
   const [sortBy, setSortBy] = useState("Nearest");
+  const [showMarketCreator, setShowMarketCreator] = useState(false);
+  const [showMoreFilters, setShowMoreFilters] = useState(false);
+  const [myMarketListings, setMyMarketListings] = useState([]);
   const normalizedQuery = query.trim().toLowerCase();
-  const saleListings = marketPlants.filter((item) => item.type === "Buy");
+  const saleListings = [...myMarketListings, ...marketPlants.filter((item) => item.type === "Buy")];
   const saleCategories = PLANT_CATEGORIES.filter((item) => saleListings.some((listing) => listing.category === item));
   const categories = ["All", ...saleCategories];
-  const primaryCategories = categories.slice(0, 5);
+  const primaryCategories = ["All", "Indoor", "Outdoor", "Rare", "Flowering"].filter((item) => categories.includes(item));
   const filtersExpanded = showMoreFilters || !primaryCategories.includes(category);
   const visibleCategories = filtersExpanded ? categories : primaryCategories;
   const priceValue = (item) => Number(item.price.replace(/[^\d]/g, "")) || 0;
@@ -1386,7 +1639,7 @@ function MarketView({ notify, openListing }) {
     .sort((a, b) => {
       if (sortBy === "Price") return priceValue(a) - priceValue(b);
       if (sortBy === "Rating") return Number(b.rating) - Number(a.rating);
-      if (sortBy === "Newest") return b.name.localeCompare(a.name);
+      if (sortBy === "Newest") return (b.createdAt ?? 0) - (a.createdAt ?? 0);
       return a.location.localeCompare(b.location);
     });
   const featured = shown[0] ?? saleListings[0];
@@ -1403,7 +1656,7 @@ function MarketView({ notify, openListing }) {
             placeholder="Search plants, seeds, pots, supplies..."
           />
         </div>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="gm-x-scroll -mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1">
           {visibleCategories.map((item) => (
             <button
               key={item}
@@ -1425,9 +1678,9 @@ function MarketView({ notify, openListing }) {
               }
               setShowMoreFilters(true);
             }}
-            className="gm-tap rounded-full bg-white px-3 py-2 text-xs font-black text-[#315d37] ring-1 ring-[#e4ecd8]"
+            className="gm-tap min-w-max rounded-full bg-white px-3 py-2 text-xs font-black text-[#315d37] ring-1 ring-[#e4ecd8]"
           >
-            {filtersExpanded ? "Less" : "More filters"}
+            {filtersExpanded ? "Less" : "More"}
           </button>
         </div>
         <div className="mt-3 flex min-h-11 items-center justify-between gap-3 rounded-2xl bg-white px-3 py-2 shadow-sm">
@@ -1444,6 +1697,30 @@ function MarketView({ notify, openListing }) {
           </select>
         </div>
       </div>
+      <div className="-mx-5 bg-[#f5f8ef] px-5 pb-3 pt-1">
+        <button
+          onClick={() => setShowMarketCreator((value) => !value)}
+          className="gm-tap mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#203522] px-4 py-3 text-sm font-black text-white shadow-sm"
+        >
+          <Plus size={17} /> Sell Plant
+        </button>
+        <p className="mt-2 text-center text-xs font-bold text-[#52604d]">Selling only. For updates or questions, use Feed.</p>
+      </div>
+
+      {showMarketCreator && (
+        <MarketListingCreator
+          notify={notify}
+          onCancel={() => setShowMarketCreator(false)}
+          onCreate={(listing) => {
+            const listingId = `${listing.name}-${Date.now()}`;
+            setMyMarketListings((items) => [{ ...listing, listingId, createdAt: Date.now() }, ...items]);
+            setShowMarketCreator(false);
+            setCategory("All");
+            setSortBy("Newest");
+            setShowMoreFilters(false);
+          }}
+        />
+      )}
 
       <section className="gm-card-in gm-tap mt-4 overflow-hidden rounded-[2rem] bg-white shadow-sm">
         <button onClick={() => openListing(featured)} className="block w-full text-left" aria-label={`Open ${featured.name}`}>
@@ -1489,7 +1766,7 @@ function MarketView({ notify, openListing }) {
       <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
         {shown.map((item) => (
           <article
-            key={item.name}
+            key={item.listingId ?? item.name}
             onClick={() => openListing(item)}
             className="gm-card-in gm-tap overflow-hidden rounded-[1.6rem] bg-white text-left shadow-sm"
           >
@@ -1584,21 +1861,131 @@ function GardenPhotoControls({ photos, currentIndex, setCurrentIndex }) {
   );
 }
 
-function VisitGardensView({ selectedGarden, setSelectedGarden, notify }) {
+function PublicGardenPlantDetail({ plant, garden, onClose }) {
+  const photos = plant.photos ?? [
+    plant.image,
+    garden.cover,
+    ...(garden.coverPhotos ?? []).filter((photo) => photo !== plant.image).slice(0, 3),
+  ];
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const currentPhoto = photos[photoIndex % photos.length];
+  const plantAge = plant.tag === "Veggies" ? "2 months" : plant.tag === "Cuttings" ? "6 weeks" : "9 months";
+  const status = plant.tag === "Veggies" ? "Harvesting" : plant.tag === "Cuttings" ? "Propagating" : "Thriving";
+  const care =
+    plant.tag === "Veggies"
+      ? ["Morning sun", "Water daily", "Compost monthly"]
+      : plant.tag === "Cuttings"
+        ? ["Bright shade", "Keep humid", "Root check weekly"]
+        : ["Bright indirect light", "Water when top soil dries", "Rotate weekly"];
+  const updates =
+    plant.tag === "Veggies"
+      ? ["New flowers spotted", "Organic compost added", "Shared harvest update"]
+      : plant.tag === "Cuttings"
+        ? ["Root growth checked", "Humidity dome opened", "New leaf emerging"]
+        : ["New leaf unfurled", "Moved closer to morning light", "Leaf cleaned and checked"];
+
+  return (
+    <div className="fixed inset-0 z-[55] flex justify-center bg-[#203522]/45 sm:items-center sm:py-6">
+      <section className="gm-sheet-in flex h-full w-full max-w-[430px] flex-col overflow-hidden bg-white shadow-2xl sm:h-[880px] sm:rounded-[2rem] md:max-w-[620px]">
+        <div className="relative h-[34dvh] min-h-[260px] max-h-[340px] shrink-0 bg-[#203522]">
+          <PlantImage src={currentPhoto} alt={plant.name} className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/35" />
+          <button onClick={onClose} className="gm-tap absolute left-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white text-[#203522] shadow-sm" aria-label="Close plant details">
+            <ArrowLeft size={18} />
+          </button>
+          <span className="absolute bottom-4 right-4 rounded-full bg-black/55 px-3 py-1 text-xs font-black text-white">{photoIndex + 1}/{photos.length}</span>
+          {photos.length > 1 && (
+            <>
+              <button onClick={() => setPhotoIndex((index) => (index - 1 + photos.length) % photos.length)} className="gm-tap absolute left-4 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-[#203522]" aria-label="Previous plant photo">
+                <ArrowLeft size={16} />
+              </button>
+              <button onClick={() => setPhotoIndex((index) => (index + 1) % photos.length)} className="gm-tap absolute right-4 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-[#203522]" aria-label="Next plant photo">
+                <ChevronRight size={18} />
+              </button>
+            </>
+          )}
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-6 pt-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-black uppercase tracking-[0.12em] text-[#8bc34a]">{garden.owner}'s plant</p>
+              <h2 className="mt-1 text-2xl font-black leading-tight text-[#203522]">{plant.name}</h2>
+              <p className="mt-1 text-sm font-semibold text-[#52604d]">{garden.name} - {garden.location}</p>
+            </div>
+            <StatusPill tone={plant.tag === "Veggies" ? "green" : plant.tag === "Cuttings" ? "blue" : "amber"}>{plant.tag}</StatusPill>
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 divide-x-2 divide-[#dfe8d7] rounded-[1.5rem] bg-[#f7faf1] p-3 text-center">
+            {[
+              [status, "Status"],
+              [plantAge, "Age"],
+              [photos.length, "Photos"],
+            ].map(([value, label]) => (
+              <div key={label}>
+                <p className="text-sm font-black text-[#203522]">{value}</p>
+                <p className="text-xs font-bold text-[#52604d]">{label}</p>
+              </div>
+            ))}
+          </div>
+
+          <section className="mt-5">
+            <h3 className="text-sm font-black text-[#203522]">Photos</h3>
+            <div className="gm-x-scroll mt-3 flex gap-2 overflow-x-auto pb-1">
+              {photos.map((photo, index) => (
+                <button
+                  key={`${photo}-${index}`}
+                  onClick={() => setPhotoIndex(index)}
+                  className={cn("gm-tap h-20 w-20 shrink-0 overflow-hidden rounded-2xl ring-2", photoIndex === index ? "ring-[#8bc34a]" : "ring-transparent")}
+                >
+                  <PlantImage src={photo} alt={`${plant.name} ${index + 1}`} className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-5">
+            <h3 className="text-sm font-black text-[#203522]">Care details</h3>
+            <div className="mt-3 grid gap-2 md:grid-cols-3">
+              {care.map((item) => (
+                <div key={item} className="rounded-2xl bg-[#f7faf1] px-3 py-3 text-xs font-black text-[#315d37]">{item}</div>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-5">
+            <h3 className="text-sm font-black text-[#203522]">Recent updates</h3>
+            <div className="mt-3 space-y-2">
+              {updates.map((update, index) => (
+                <div key={update} className="flex items-center gap-3 rounded-2xl bg-[#fbfdf7] p-3 ring-1 ring-[#edf1e8]">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#edf7dc] text-xs font-black text-[#315d37]">{index + 1}</span>
+                  <p className="text-sm font-semibold text-[#52604d]">{update}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function VisitGardensView({ selectedGarden, setSelectedGarden, notify, openMessages }) {
   const [followedGardens, setFollowedGardens] = useState([]);
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [selectedPublicPlant, setSelectedPublicPlant] = useState(null);
   const [coverIndex, setCoverIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
 
   useEffect(() => {
     setCoverIndex(0);
+    setSelectedPublicPlant(null);
   }, [selectedGarden?.id]);
 
   if (selectedGarden) {
     const isFollowing = followedGardens.includes(selectedGarden.id);
     const gardenListings = marketPlants.filter((item) => item.seller === selectedGarden.owner);
     const marketplaceListings = gardenListings.filter((item) => item.type === "Buy");
-    const tradeOfferings = gardenListings.filter((item) => item.type === "Trade");
     const coverPhotos = selectedGarden.coverPhotos ?? [selectedGarden.cover];
     const currentCoverIndex = Math.min(coverIndex, coverPhotos.length - 1);
     const currentCover = coverPhotos[currentCoverIndex];
@@ -1622,21 +2009,18 @@ function VisitGardensView({ selectedGarden, setSelectedGarden, notify }) {
               <PlantImage src={item.image} alt={item.name} className="h-28 w-full object-cover" />
               <div className="p-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <StatusPill tone={item.type === "Trade" ? "blue" : "green"}>{item.type === "Trade" ? "Trade" : item.price}</StatusPill>
+                  <StatusPill tone="green">{item.price}</StatusPill>
                   <p className="text-xs font-black text-[#7a8572]">{item.stock}</p>
                 </div>
                 <h4 className="mt-2 min-h-10 text-sm font-black leading-tight text-[#203522]">{item.name}</h4>
                 <p className="mt-1 text-xs font-bold text-[#7a8572]">{item.category}</p>
                 <button
                   onClick={() =>
-                    notify(
-                      item.type === "Trade" ? "Trade offer started" : "Marketplace listing opened",
-                      `${item.name} from ${selectedGarden.owner} is available in ${item.location}.`
-                    )
+                    notify("Marketplace listing opened", `${item.name} from ${selectedGarden.owner} is available in ${item.location}.`)
                   }
                   className="gm-tap mt-3 min-h-10 w-full rounded-full bg-[#203522] px-3 py-2 text-xs font-black text-white"
                 >
-                  {item.type === "Trade" ? "Offer trade" : "View listing"}
+                  View listing
                 </button>
               </div>
             </article>
@@ -1733,7 +2117,7 @@ function VisitGardensView({ selectedGarden, setSelectedGarden, notify }) {
                 {isFollowing ? "Following" : "Follow garden"}
               </button>
               <button
-                onClick={() => notify("Message started", `Chat with ${selectedGarden.owner}.`)}
+                onClick={() => openMessages(selectedGarden.owner)}
                 className="gm-tap rounded-full bg-[#edf7dc] px-4 py-3 text-sm font-black text-[#315d37]"
               >
                 Message
@@ -1768,20 +2152,12 @@ function VisitGardensView({ selectedGarden, setSelectedGarden, notify }) {
           {renderListingCards(marketplaceListings, `${selectedGarden.owner} has no marketplace listings right now.`)}
         </section>
 
-        <section className="mt-5">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-lg font-black text-[#203522]">Open trades</h3>
-            <StatusPill tone="blue">{tradeOfferings.length} open</StatusPill>
-          </div>
-          {renderListingCards(tradeOfferings, `${selectedGarden.owner} has no open trade offers right now.`)}
-        </section>
-
         <h3 className="mt-5 text-lg font-black text-[#203522]">Garden plants</h3>
         <div className="mt-3 grid grid-cols-3 gap-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {selectedGarden.plants.map((plant) => (
             <button
               key={plant.name}
-              onClick={() => openPhoto(plant.name, `${plant.tag} in ${selectedGarden.owner}'s garden.`, plant.image)}
+              onClick={() => setSelectedPublicPlant(plant)}
               className="group gm-tap overflow-hidden rounded-[1.3rem] bg-white text-left shadow-sm transition hover:shadow-[0_12px_28px_rgba(37,61,41,0.16)]"
             >
               <div className="relative">
@@ -1794,6 +2170,9 @@ function VisitGardensView({ selectedGarden, setSelectedGarden, notify }) {
             </button>
           ))}
         </div>
+        {selectedPublicPlant && (
+          <PublicGardenPlantDetail plant={selectedPublicPlant} garden={selectedGarden} onClose={() => setSelectedPublicPlant(null)} />
+        )}
       </div>
     );
   }
@@ -1842,7 +2221,7 @@ function VisitGardensView({ selectedGarden, setSelectedGarden, notify }) {
   );
 }
 
-function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSelectedGarden }) {
+function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSelectedGarden, openMessages }) {
   const initialGardenPlants = useMemo(() => collection.map(withPhotoGallery), []);
   const [gardenPlants, setGardenPlants] = useState(initialGardenPlants);
   const [selectedPlant, setSelectedPlant] = useState(null);
@@ -1935,7 +2314,7 @@ function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSele
     return (
       <>
         {!selectedGarden && <GardenModeSwitch gardenMode={gardenMode} setGardenMode={setGardenMode} setSelectedGarden={setSelectedGarden} />}
-        <VisitGardensView selectedGarden={selectedGarden} setSelectedGarden={setSelectedGarden} notify={notify} />
+        <VisitGardensView selectedGarden={selectedGarden} setSelectedGarden={setSelectedGarden} notify={notify} openMessages={openMessages} />
       </>
     );
   }
@@ -1975,7 +2354,7 @@ function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSele
           <GardenPhotoControls photos={gardenCovers} currentIndex={currentGardenCoverIndex} setCurrentIndex={setGardenCoverIndex} />
           <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-black/30 p-3 text-white backdrop-blur-[1px]">
             <p className="text-2xl font-black">Laarne Ramos' Aroid Shelf Lab</p>
-            <p className="mt-1 text-sm font-semibold text-white/85">42 plants - 6 open to trade - Rank #2</p>
+            <p className="mt-1 text-sm font-semibold text-white/85">42 plants - 38 updates - Rank #2</p>
           </div>
         </div>
         <div className="grid grid-cols-3 divide-x-2 divide-[#c8d4c0] p-4 text-center">
@@ -2012,7 +2391,7 @@ function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSele
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="gm-x-scroll -mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1">
         {MARKET_CATEGORY_FILTERS.map((category) => (
           <button
             key={category}
@@ -2233,180 +2612,133 @@ function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSele
   );
 }
 
-function TradeView({ notify }) {
-  const [tradeMode, setTradeMode] = useState("Post Trade");
-  const tradeListings = marketPlants.filter((plant) => plant.type === "Trade");
+function FeedView({ notify, openMessages, openGarden }) {
+  const [feedFilter, setFeedFilter] = useState("All");
+  const filters = ["All", "Updates", "Questions", "Harvests", "Tips"];
+  const visiblePosts = feedPosts.filter((post) => {
+    if (feedFilter === "All") return true;
+    if (feedFilter === "Updates") return post.type.includes("update");
+    if (feedFilter === "Questions") return post.type.includes("question");
+    if (feedFilter === "Harvests") return post.type.includes("Harvest");
+    return post.type.includes("tip") || post.type.includes("Leafy");
+  });
 
   return (
     <div className="space-y-4 px-5 pb-52">
-      <div className="grid grid-cols-2 gap-2 rounded-[1.3rem] bg-white p-1 shadow-sm">
-        {["Post Trade", "Browse Trades"].map((mode) => (
+      <section className="gm-card-in rounded-[1.7rem] bg-white p-4 shadow-sm">
+        <div className="flex items-center gap-3">
+          <AvatarImage src="/laarne-profile.png" alt="Laarne Ramos profile" className="h-12 w-12 rounded-2xl object-cover" />
           <button
-            key={mode}
-            onClick={() => setTradeMode(mode)}
+            onClick={() => notify("Create post", "Share a garden update, question, or care tip.")}
+            className="gm-tap min-h-12 flex-1 rounded-full bg-[#f7faf1] px-4 text-left text-sm font-bold text-[#63705e] ring-1 ring-[#edf1e8]"
+          >
+            Share with the plant community...
+          </button>
+        </div>
+        <div className="mt-3 grid grid-cols-4 gap-2">
+          {[
+            [Camera, "Photo"],
+            [MessageCircle, "Question"],
+            [ScanLine, "Ask Leafy"],
+            [Leaf, "Update"],
+          ].map(([Icon, label]) => (
+            <button
+              key={label}
+              onClick={() => notify(label, `${label} post composer opened.`)}
+              className="gm-tap flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#edf7dc] px-3 py-2 text-xs font-black text-[#315d37]"
+            >
+              <Icon size={15} /> {label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <div className="gm-x-scroll flex gap-2 overflow-x-auto pb-1">
+        {filters.map((filter) => (
+          <button
+            key={filter}
+            onClick={() => setFeedFilter(filter)}
             className={cn(
-              "gm-tap rounded-full px-3 py-3 text-sm font-black transition",
-              tradeMode === mode ? "bg-[#203522] text-white" : "text-[#63705e]"
+              "gm-tap min-w-max rounded-full px-4 py-2 text-sm font-bold transition",
+              feedFilter === filter ? "bg-[#203522] text-white" : "bg-white text-[#63705e]"
             )}
           >
-            {mode}
+            {filter}
           </button>
         ))}
       </div>
 
-      <section className="gm-card-in rounded-[1.5rem] border border-[#dfe8d7] bg-white p-4 shadow-sm">
+      <section className="gm-card-in rounded-[1.6rem] border border-[#dfe8d7] bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={18} className="text-[#315d37]" />
-            <p className="font-black text-[#203522]">Trade trust</p>
+          <div>
+            <p className="text-sm font-black text-[#203522]">Community feed</p>
+            <p className="mt-1 text-xs font-semibold text-[#63705e]">Garden updates, plant questions, harvests, and Leafy AI tips.</p>
           </div>
-          <span className="rounded-full bg-[#edf7dc] px-3 py-1 text-lg font-black text-[#315d37]">4.9</span>
-        </div>
-        <p className="mt-2 text-sm font-semibold text-[#52604d]">18 clean trades</p>
-      </section>
-
-      <section className="gm-card-in flex items-start gap-3 rounded-[1.4rem] border border-[#f3d7a7] bg-[#fff8e8] p-4 shadow-sm">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-white text-[#b45309]">
-          <AlertTriangle size={18} />
-        </span>
-        <div>
-          <p className="text-sm font-black text-[#203522]">Trade inside GrowMate</p>
-          <p className="mt-1 text-xs font-semibold leading-5 text-[#52604d]">Avoid cash offers and off-app deals. GrowMate protection only works when the swap stays in the app.</p>
+          <StatusPill tone="green">{feedPosts.length} posts</StatusPill>
         </div>
       </section>
 
-      {tradeMode === "Post Trade" ? (
-        <>
-          <SellerListingCheck notify={notify} />
-
-          <section className="gm-card-in rounded-[1.7rem] bg-white p-4 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-black uppercase tracking-[0.12em] text-[#8bc34a]">Secure Trade</p>
-                <h2 className="mt-1 text-lg font-black text-[#203522]">Agreement and protection</h2>
-                <p className="mt-1 text-xs font-bold text-[#7a8572]">Optional after a trade offer is accepted</p>
+      <div className="space-y-4">
+        {visiblePosts.map((post) => (
+          <article key={post.id} className="gm-card-in overflow-hidden rounded-[1.8rem] bg-white shadow-sm">
+            <div className="flex items-center gap-3 p-4">
+              <AvatarImage src={post.avatar} alt={`${post.author} profile`} className="h-12 w-12 rounded-2xl object-cover" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-black text-[#203522]">{post.author}</p>
+                <p className="text-xs font-bold text-[#7a8572]">{post.meta}</p>
               </div>
-              <StatusPill tone="amber">PHP 15-30</StatusPill>
+              {post.author !== "Laarne Ramos" && (
+                <button
+                  onClick={() => notify("Garden followed", `${post.author}'s garden is now in your followed gardens.`)}
+                  className="gm-tap min-h-9 rounded-full bg-[#edf7dc] px-3 text-xs font-black text-[#315d37]"
+                >
+                  Follow
+                </button>
+              )}
+              <StatusPill tone={post.type.includes("Leafy") ? "blue" : "green"}>{post.type}</StatusPill>
             </div>
-            <div className="mt-4 grid gap-2 md:grid-cols-2">
-              {[
-                ["Trade agreement", "Shows both plants, condition, proof photos, and meetup or delivery."],
-                ["Two-sided confirmation", "Trade completes only after both users confirm the correct item."],
-                ["Ratings and history", "Completed trades update rating, success rate, and verified trader status."],
-                ["Reports and disputes", "Report wrong plant, unhealthy item, fake photo, no-show, scam, or harassment."],
-              ].map(([title, detail]) => (
-                <div key={title} className="rounded-[1.2rem] bg-[#f7faf1] p-3">
-                  <p className="text-sm font-black text-[#203522]">{title}</p>
-                  <p className="mt-1 text-xs font-semibold leading-5 text-[#63705e]">{detail}</p>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => notify("Protection details", "Trade protection becomes available after both users agree to a swap.")}
-              className="gm-tap mt-4 w-full rounded-full bg-[#203522] px-4 py-3 text-sm font-black text-white"
-            >
-              View protection details
-            </button>
-          </section>
-        </>
-      ) : (
-        <>
-          <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {[
-              ["My offers", "3 pending"],
-              ["Wishlist matches", "5 found"],
-            ].map(([title, detail]) => (
-              <button
-                key={title}
-                onClick={() => notify(title, `${detail} in your trade queue.`)}
-                className="gm-card-in gm-tap rounded-[1.4rem] border border-[#dfe8d7] bg-white p-4 text-left shadow-sm"
-              >
-                <p className="text-sm font-black text-[#203522]">{title}</p>
-                <p className="mt-1 text-xs font-bold text-[#7a8572]">{detail}</p>
-              </button>
-            ))}
-          </section>
-
-          <section>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-lg font-black text-[#203522]">Available trades</h2>
-              <StatusPill tone="blue">{tradeListings.length} open</StatusPill>
-            </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
-              {tradeListings.map((plant) => (
-                <article key={plant.name} className="gm-card-in gm-tap overflow-hidden rounded-[1.6rem] bg-white shadow-sm">
-                  <div className="relative h-32">
-                    <PlantImage src={plant.image} alt={plant.name} className="h-full w-full object-cover" />
-                    <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-xs font-black text-[#203522]">
-                      Trade
-                    </span>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="min-h-10 text-base font-black leading-tight text-[#203522]">{plant.name}</h3>
-                    <div className="mt-2 flex items-center justify-between gap-2">
-                      <p className="truncate text-xs font-black text-[#7a8572]">{plant.stock}</p>
-                      <p className="truncate text-xs font-black text-[#315d37]">{plant.category}</p>
-                    </div>
-                    <div className="mt-2 flex items-center justify-between gap-2">
-                      <p className="min-w-0 truncate text-sm font-bold text-[#63705e]">{plant.seller}</p>
-                      <span className="shrink-0 rounded-full bg-[#fff4db] px-2 py-0.5 text-xs font-black text-[#b45309]">{plant.rating}</span>
-                    </div>
-                    <div className="mt-4 grid grid-cols-2 gap-2">
-                      <button
-                        onClick={() => notify("Trade listing opened", `${plant.name} from ${plant.seller} is open for trade.`)}
-                        className="gm-tap min-h-11 rounded-full border border-[#cfd9c7] bg-white px-2 py-3 text-xs font-black text-[#315d37]"
-                      >
-                        Details
-                      </button>
-                      <button
-                        onClick={() => notify("Trade offer started", `Choose one of your plants to offer for ${plant.name}.`)}
-                        className="gm-tap min-h-11 rounded-full bg-[#203522] px-2 py-3 text-xs font-black text-white"
-                      >
-                        Make Offer
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <h2 className="text-lg font-black text-[#203522]">Trade requests</h2>
-          {trades.map(([name, title, detail, match]) => (
-            <article key={title} className="gm-card-in rounded-[1.6rem] bg-white p-4 shadow-sm">
-              <div className="flex items-start gap-3">
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#edf7dc] text-[#315d37]">
-                  <UserRound size={20} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="font-black text-[#203522]">{name}</p>
-                      <p className="mt-1 text-sm font-black text-[#315d37]">{title}</p>
-                    </div>
-                    <StatusPill tone="blue">{match}</StatusPill>
-                  </div>
-                  <p className="mt-2 text-sm font-semibold text-[#52604d]">{detail}</p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <button
-                      onClick={() => notify("Offer opened", `${name}'s trade offer details are ready to review.`)}
-                      className="gm-tap min-h-11 rounded-full bg-[#203522] px-5 py-3 text-xs font-bold text-white"
-                    >
-                      View offer
-                    </button>
-                    <button
-                      onClick={() => notify("Message opened", `Chat with ${name}.`)}
-                      className="gm-tap min-h-11 rounded-full border border-[#cfd9c7] bg-white px-5 py-3 text-xs font-bold text-[#52604d]"
-                    >
-                      Message
-                    </button>
-                  </div>
-                </div>
+            <PlantImage src={post.image} alt={post.title} className="h-56 w-full object-cover" />
+            <div className="p-4">
+              <h2 className="text-lg font-black leading-tight text-[#203522]">{post.title}</h2>
+              <p className="mt-2 text-sm font-semibold leading-6 text-[#63705e]">{post.text}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  onClick={() => (post.author === "Laarne Ramos" ? notify("Plant opened", "Luna's care details opened.") : openGarden?.(post.author))}
+                  className="gm-tap min-h-10 rounded-full border border-[#cfd9c7] bg-white px-4 text-xs font-black text-[#315d37]"
+                >
+                  {post.author === "Laarne Ramos" ? "View plant" : "Visit garden"}
+                </button>
+                <button
+                  onClick={() => notify("Market matches", `Similar plants to ${post.title} are shown in Market.`)}
+                  className="gm-tap min-h-10 rounded-full border border-[#cfd9c7] bg-white px-4 text-xs font-black text-[#315d37]"
+                >
+                  Buy similar
+                </button>
               </div>
-            </article>
-          ))}
-        </>
-      )}
+              <div className="mt-4 flex items-center justify-between border-t border-[#edf1e8] pt-3">
+                <button
+                  onClick={() => notify("Liked", `${post.title} was added to your liked posts.`)}
+                  className="gm-tap flex items-center gap-1 rounded-full px-2 py-2 text-xs font-black text-[#315d37]"
+                >
+                  <Heart size={15} /> {post.likes}
+                </button>
+                <button
+                  onClick={() => notify("Comments", `${post.comments} comments opened.`)}
+                  className="gm-tap flex items-center gap-1 rounded-full px-2 py-2 text-xs font-black text-[#315d37]"
+                >
+                  <MessageCircle size={15} /> {post.comments}
+                </button>
+                <button
+                  onClick={() => openMessages(post.author)}
+                  className="gm-tap flex min-h-10 items-center justify-center gap-2 rounded-full bg-[#203522] px-4 text-xs font-black text-white"
+                >
+                  <Send size={15} /> Message
+                </button>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
     </div>
   );
 }
@@ -2426,7 +2758,7 @@ function RankView({ notify, openGarden }) {
   };
   const ownRank = {
     Growers: ["#12", "2,430 pts", "320 pts away from Top 10"],
-    Traders: ["#8", "2,960 pts", "140 pts away from Top 5"],
+    Sellers: ["#8", "2,960 pts", "140 pts away from Top 5"],
     Helpers: ["#15", "1,880 pts", "6 care answers away from Top 10"],
   }[board];
 
@@ -2583,9 +2915,30 @@ function RankView({ notify, openGarden }) {
 
 function ProfileView({ setActiveTab, notify }) {
   const featuredPlants = collection.slice(0, 3);
+  const myMarketListings = marketPlants.filter((item) => item.seller === "Laarne Ramos" && item.type === "Buy");
+  const myFeedPosts = feedPosts.filter((item) => item.author === "Laarne Ramos");
   const [editing, setEditing] = useState(false);
   const [profileName, setProfileName] = useState("Laarne Ramos");
   const [profileBio, setProfileBio] = useState("Aroid shelf lab and rooted cuttings.");
+  const renderProfileListing = (item) => (
+    <article key={item.name} className="gm-card-in gm-tap flex items-center gap-3 rounded-[1.5rem] bg-white p-3 shadow-sm">
+      <PlantImage src={item.image} alt={item.name} className="h-16 w-16 shrink-0 rounded-2xl object-cover" />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <StatusPill tone="green">{item.price}</StatusPill>
+          <p className="truncate text-xs font-black text-[#7a8572]">{item.stock}</p>
+        </div>
+        <p className="mt-2 truncate font-black text-[#203522]">{item.name}</p>
+        <p className="mt-1 truncate text-xs font-bold text-[#52604d]">{item.location} - {item.category}</p>
+      </div>
+      <button
+        onClick={() => notify("Market listing", `${item.name} is active.`)}
+        className="gm-tap shrink-0 rounded-full bg-[#f0f4e8] px-3 py-2 text-xs font-black text-[#315d37]"
+      >
+        Manage
+      </button>
+    </article>
+  );
 
   return (
     <div className="px-5 pb-44">
@@ -2638,7 +2991,7 @@ function ProfileView({ setActiveTab, notify }) {
           <div className="mt-4 grid grid-cols-4 divide-x-2 divide-[#c8d4c0] rounded-[1.5rem] bg-[#f7faf1] p-3 text-center">
             {[
               ["42", "Plants"],
-              ["18", "Trades"],
+              ["18", "Posts"],
               ["9.1k", "Score"],
               ["624", "Followers"],
             ].map(([value, label]) => (
@@ -2667,12 +3020,53 @@ function ProfileView({ setActiveTab, notify }) {
 
       <section className="mt-5">
         <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-black text-[#203522]">My Market Listings</h3>
+            <p className="text-xs font-bold text-[#52604d]">Cash sales with 10% fee only when sold</p>
+          </div>
+          <StatusPill tone="green">{myMarketListings.length} active</StatusPill>
+        </div>
+        <div className="space-y-3">
+          {myMarketListings.map(renderProfileListing)}
+        </div>
+      </section>
+
+      <section className="mt-5">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-black text-[#203522]">My Feed Posts</h3>
+            <p className="text-xs font-bold text-[#52604d]">Community updates and Leafy AI notes</p>
+          </div>
+          <StatusPill tone="blue">{myFeedPosts.length} post</StatusPill>
+        </div>
+        <div className="space-y-3">
+          {myFeedPosts.map((post) => (
+            <article key={post.id} className="gm-card-in gm-tap flex items-center gap-3 rounded-[1.5rem] bg-white p-3 shadow-sm">
+              <PlantImage src={post.image} alt={post.title} className="h-16 w-16 shrink-0 rounded-2xl object-cover" />
+              <div className="min-w-0 flex-1">
+                <StatusPill tone="blue">{post.type}</StatusPill>
+                <p className="mt-2 truncate font-black text-[#203522]">{post.title}</p>
+                <p className="mt-1 truncate text-xs font-bold text-[#52604d]">{post.likes} likes - {post.comments} comments</p>
+              </div>
+              <button
+                onClick={() => notify("Feed post", `${post.title} is active in Feed.`)}
+                className="gm-tap shrink-0 rounded-full bg-[#f0f4e8] px-3 py-2 text-xs font-black text-[#315d37]"
+              >
+                Manage
+              </button>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-5">
+        <div className="mb-3 flex items-center justify-between">
           <h3 className="text-lg font-black text-[#203522]">Profile badges</h3>
           <button className="gm-tap rounded-full px-2 py-1 text-sm font-black text-[#315d37]">View all</button>
         </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
           {[
-            ["Trusted trader", "18 clean swaps", ShieldCheck],
+            ["Trusted seller", "18 clean sales", ShieldCheck],
             ["Rare collector", "12 rare plants", Leaf],
             ["Propagation pro", "31 rooted cuts", Sprout],
             ["Top garden", "Rank #2 this month", Trophy],
@@ -2746,13 +3140,259 @@ function BottomNav({ activeTab, setActiveTab }) {
   );
 }
 
+function MessagesPanel({ targetName, onClose }) {
+  const inboxFilters = ["All", "Friends", "Market", "Garden", "Requests"];
+  const getThreadType = (thread) => {
+    if (thread.type) return thread.type;
+    if (thread.name === "Miguel Bautista") return "Garden";
+    if (thread.name === "Maria Dela Cruz" || thread.name === "Mang Lito Santos") return "Market";
+    if (thread.name === "Mika Santos") return "Requests";
+    return "Friends";
+  };
+  const getThreadMeta = (thread) => {
+    if (thread.meta) return thread.meta;
+    const type = getThreadType(thread);
+    if (type === "Market") return `Market - ${thread.context}`;
+    if (type === "Garden") return `Garden - ${thread.context}`;
+    if (type === "Requests") return "Message request";
+    return thread.context;
+  };
+  const extraThreads = [
+    {
+      name: "Ana Santos",
+      avatar: "/avatars/pinoy-ana.svg",
+      type: "Garden",
+      context: "Laarne Ramos' Aroid Shelf Lab",
+      meta: "Garden visitor",
+      preview: "I followed your garden!",
+      time: "1d",
+      unread: 0,
+      messages: [
+        ["Ana Santos", "I followed your garden!"],
+        ["You", "Thank you! I will check yours too."],
+      ],
+    },
+    {
+      name: "Mika Santos",
+      avatar: "/avatars/pinoy-maria.svg",
+      type: "Requests",
+      context: "Calathea question",
+      meta: "Message request",
+      preview: "Asked about your Calathea.",
+      time: "2d",
+      unread: 0,
+      messages: [["Mika Santos", "Hi, can I ask about your Calathea care routine?"]],
+    },
+  ];
+  const availableThreads = [...messageThreads, ...extraThreads];
+  const fallbackThread =
+    targetName && targetName !== "__inbox" && !availableThreads.some((thread) => thread.name === targetName)
+      ? {
+          name: targetName,
+          avatar: sellerAvatars[targetName] ?? "/avatars/pinoy-maria.svg",
+          type: "Friends",
+          context: "GrowMate chat",
+          meta: "Friend",
+          preview: "Start a conversation about plants, listings, or garden updates.",
+          time: "now",
+          unread: 0,
+          messages: [
+            [targetName, "Hi Laarne, how can I help?"],
+            ["You", "I wanted to ask about your plants."],
+          ],
+        }
+      : null;
+  const threads = fallbackThread ? [fallbackThread, ...availableThreads] : availableThreads;
+  const [selectedName, setSelectedName] = useState(targetName && targetName !== "__inbox" ? targetName : threads[0]?.name);
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [draft, setDraft] = useState("");
+  const [sentMessages, setSentMessages] = useState([]);
+
+  useEffect(() => {
+    if (targetName && targetName !== "__inbox") setSelectedName(targetName);
+  }, [targetName]);
+
+  const selectedThread = threads.find((thread) => thread.name === selectedName) ?? threads[0];
+  const selectedMessages = [...selectedThread.messages, ...sentMessages.filter((item) => item.to === selectedThread.name).map((item) => ["You", item.text])];
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const filteredThreads = threads.filter((thread) => {
+    const type = getThreadType(thread);
+    const matchesFilter = activeFilter === "All" || type === activeFilter || (activeFilter === "Friends" && type === "Friend");
+    const matchesSearch = [thread.name, thread.preview, thread.context, getThreadMeta(thread)].join(" ").toLowerCase().includes(normalizedSearch);
+    return matchesFilter && matchesSearch;
+  });
+  const selectedType = getThreadType(selectedThread);
+  const selectedMeta = getThreadMeta(selectedThread);
+  const contextTitle =
+    selectedType === "Market"
+      ? "Product inquiry"
+      : selectedType === "Requests"
+          ? "Message request"
+          : selectedType === "Garden"
+            ? "Garden chat"
+            : "Friend chat";
+  const sendMessage = () => {
+    const text = draft.trim();
+    if (!text) return;
+    setSentMessages((items) => [...items, { to: selectedThread.name, text }]);
+    setDraft("");
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex justify-center bg-[#203522]/40 sm:items-center sm:py-6">
+      <section className="gm-sheet-in flex h-full w-full max-w-[430px] flex-col overflow-hidden bg-[#f5f8ef] shadow-2xl sm:h-[880px] sm:rounded-[2rem] md:max-w-[760px]">
+        <div className="border-b border-[#dfe8d7] bg-white px-5 py-4">
+          <div className="flex items-center justify-between gap-3">
+          <button onClick={onClose} className="gm-tap grid h-10 w-10 place-items-center rounded-2xl bg-[#f0f4e8] text-[#203522]" aria-label="Close messages">
+            <ArrowLeft size={18} />
+          </button>
+          <div className="min-w-0 flex-1">
+            <p className="text-lg font-black text-[#203522]">Messages</p>
+            <p className="text-xs font-bold text-[#52604d]">Friends, buyers, sellers, and garden visitors</p>
+          </div>
+            <button className="gm-tap grid h-10 w-10 place-items-center rounded-2xl bg-[#f0f4e8] text-[#203522]" aria-label="Search messages">
+              <Search size={18} />
+            </button>
+            <button className="gm-tap grid h-10 w-10 place-items-center rounded-2xl bg-[#203522] text-white" aria-label="New message">
+              <Plus size={18} />
+            </button>
+          </div>
+          <div className="mt-4 flex items-center gap-2 rounded-2xl bg-[#f7faf1] px-3 py-2">
+            <Search size={16} className="text-[#7a8572]" />
+            <input
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              className="w-full bg-transparent text-sm font-semibold text-[#203522] outline-none placeholder:text-[#8b967f]"
+              placeholder="Search messages..."
+            />
+          </div>
+          <div className="gm-x-scroll -mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1">
+            {inboxFilters.map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={cn(
+                  "gm-tap min-w-max rounded-full px-4 py-2 text-xs font-black transition",
+                  activeFilter === filter ? "bg-[#203522] text-white" : "bg-[#f0f4e8] text-[#52604d]"
+                )}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 md:grid md:grid-cols-[260px_1fr] md:gap-4">
+          <section className="space-y-2">
+            <p className="px-1 text-xs font-black uppercase tracking-[0.12em] text-[#8bc34a]">Today</p>
+            {filteredThreads.map((thread) => {
+              const type = getThreadType(thread);
+              return (
+              <button
+                key={thread.name}
+                onClick={() => setSelectedName(thread.name)}
+                className={cn(
+                  "gm-tap flex w-full items-center gap-3 rounded-[1.4rem] p-3 text-left shadow-sm transition",
+                  selectedThread.name === thread.name ? "bg-[#203522] text-white" : "bg-white text-[#203522]"
+                )}
+              >
+                <AvatarImage src={thread.avatar} alt={`${thread.name} profile`} className="h-12 w-12 shrink-0 rounded-2xl object-cover" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="truncate text-sm font-black">{thread.name}</p>
+                    <span className={cn("text-[10px] font-black", selectedThread.name === thread.name ? "text-white/75" : "text-[#7a8572]")}>{thread.time}</span>
+                  </div>
+                  <p className={cn("mt-1 truncate text-xs font-semibold", selectedThread.name === thread.name ? "text-white/70" : "text-[#52604d]")}>{thread.preview}</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-black", selectedThread.name === thread.name ? "bg-white/15 text-white" : "bg-[#edf7dc] text-[#315d37]")}>{type === "Friends" ? "Friend" : type}</span>
+                    <span className={cn("truncate text-[10px] font-bold", selectedThread.name === thread.name ? "text-white/70" : "text-[#7a8572]")}>{thread.context}</span>
+                  </div>
+                </div>
+                {thread.unread > 0 && <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#d9f99d] text-xs font-black text-[#203522]">{thread.unread}</span>}
+              </button>
+              );
+            })}
+            {filteredThreads.length === 0 && (
+              <div className="rounded-[1.4rem] bg-white p-4 text-sm font-semibold text-[#52604d] shadow-sm">No messages found.</div>
+            )}
+          </section>
+
+          <section className="mt-4 flex min-h-[420px] flex-col rounded-[1.7rem] bg-white shadow-sm md:mt-0">
+            <div className="flex items-center gap-3 border-b border-[#edf1e8] p-4">
+              <AvatarImage src={selectedThread.avatar} alt={`${selectedThread.name} profile`} className="h-12 w-12 rounded-2xl object-cover" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-black text-[#203522]">{selectedThread.name}</p>
+                <p className="truncate text-xs font-bold text-[#52604d]">{selectedType === "Friends" ? selectedMeta : `${selectedType} - ${selectedThread.context}`}</p>
+              </div>
+              <StatusPill tone="green">Online</StatusPill>
+            </div>
+
+            <div className="mx-4 mt-4 rounded-[1.4rem] border border-[#dfe8d7] bg-[#f7faf1] p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs font-black uppercase tracking-[0.12em] text-[#8bc34a]">{contextTitle}</p>
+                  <p className="mt-1 truncate font-black text-[#203522]">{selectedThread.context}</p>
+                  <p className="mt-1 text-xs font-semibold text-[#52604d]">{selectedMeta}</p>
+                </div>
+                <button className="gm-tap shrink-0 rounded-full bg-white px-3 py-2 text-xs font-black text-[#315d37] shadow-sm">
+                  {selectedType === "Market" ? "View listing" : "View"}
+                </button>
+              </div>
+              {selectedType === "Requests" && (
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button className="gm-tap rounded-full bg-[#203522] px-4 py-2 text-xs font-black text-white">Accept</button>
+                  <button className="gm-tap rounded-full border border-[#ead7c0] bg-white px-4 py-2 text-xs font-black text-[#9a3412]">Delete</button>
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 space-y-3 overflow-y-auto p-4">
+              {selectedMessages.map(([sender, text], index) => {
+                const isMine = sender === "You";
+                return (
+                  <div key={`${sender}-${index}-${text}`} className={cn("flex", isMine ? "justify-end" : "justify-start")}>
+                    <div className={cn("max-w-[78%] rounded-[1.2rem] px-4 py-3 text-sm font-semibold leading-5", isMine ? "bg-[#203522] text-white" : "bg-[#f0f4e8] text-[#203522]")}>
+                      {text}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="grid grid-cols-[1fr_auto] gap-2 border-t border-[#edf1e8] p-3">
+              <input
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") sendMessage();
+                }}
+                className="min-h-11 rounded-full bg-[#f7faf1] px-4 text-sm font-semibold text-[#203522] outline-none placeholder:text-[#8b967f]"
+                placeholder={`Message ${selectedThread.name.split(" ")[0]}...`}
+              />
+              <button onClick={sendMessage} className="gm-tap grid h-11 w-11 place-items-center rounded-full bg-[#203522] text-white" aria-label="Send message">
+                <Send size={17} />
+              </button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export default function ProductApp() {
   const [activeTab, setActiveTab] = useState("Garden");
   const [notice, setNotice] = useState(null);
   const [gardenMode, setGardenMode] = useState("Mine");
   const [selectedGarden, setSelectedGarden] = useState(null);
   const [marketListing, setMarketListing] = useState(null);
+  const [messageTarget, setMessageTarget] = useState(null);
   const notify = (title, detail) => setNotice({ title, detail });
+  const openMessages = (target = "__inbox") => {
+    setNotice(null);
+    setMessageTarget(target);
+  };
   const openCommunityGarden = (ownerName) => {
     setNotice(null);
 
@@ -2794,9 +3434,10 @@ export default function ProductApp() {
         setGardenMode={setGardenMode}
         selectedGarden={selectedGarden}
         setSelectedGarden={setSelectedGarden}
+        openMessages={openMessages}
       />
     ),
-    Trade: <TradeView notify={notify} />,
+    Feed: <FeedView notify={notify} openMessages={openMessages} openGarden={openCommunityGarden} />,
     Rankings: <RankView notify={notify} openGarden={openCommunityGarden} />,
     Profile: <ProfileView setActiveTab={setActiveTab} notify={notify} />,
   }[activeTab];
@@ -2807,27 +3448,23 @@ export default function ProductApp() {
         <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="relative mb-4 flex items-center justify-center px-5 pt-5">
             <h1 className="max-w-[270px] truncate text-center text-xl font-black tracking-tight text-[#203522] md:max-w-[560px]">{title}</h1>
-            {activeTab !== "Market" && (
             <div className="absolute right-5 flex items-center gap-2">
               <button
-                onClick={() => {
-                  setActiveTab("Trade");
-                  notify("Messages opened", "Trade chats and requests are grouped inside the Trade tab.");
-                }}
+                onClick={() => openMessages()}
                 className="gm-tap grid h-10 w-10 place-items-center rounded-2xl bg-white text-[#203522] shadow-sm"
                 aria-label="Open messages"
               >
                 <MessageCircle size={18} />
               </button>
             </div>
-            )}
           </div>
           <ActionNotice notice={notice} onClear={() => setNotice(null)} />
           <div key={activeTab} className="gm-screen-in">{view}</div>
         </div>
         <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
       </PhoneShell>
-      {marketListing && <MarketPlantDetail plant={marketListing} onClose={() => setMarketListing(null)} notify={notify} />}
+      {marketListing && <MarketPlantDetail plant={marketListing} onClose={() => setMarketListing(null)} notify={notify} openMessages={openMessages} />}
+      {messageTarget && <MessagesPanel targetName={messageTarget} onClose={() => setMessageTarget(null)} />}
     </main>
   );
 }

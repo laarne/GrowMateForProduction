@@ -157,6 +157,12 @@ button {
   .gm-x-scroll {
     padding-right: 2rem;
     scroll-padding-inline: 1.25rem;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .gm-x-scroll::-webkit-scrollbar {
+    display: none;
   }
 
   @media (hover: hover) {
