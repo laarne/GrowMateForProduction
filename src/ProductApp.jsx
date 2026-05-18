@@ -8,6 +8,7 @@ import {
   Check,
   ChevronRight,
   Heart,
+  Info,
   Leaf,
   MapPin,
   MessageCircle,
@@ -714,7 +715,7 @@ const feedPosts = [
     id: "feed-maria-leaf",
     author: "Maria Dela Cruz",
     avatar: sellerAvatars["Maria Dela Cruz"],
-    type: "Garden update",
+    type: "Updates",
     title: "New leaf on the balcony shelf",
     text: "My Calathea bounced back after moving it away from afternoon sun.",
     image: plantPhotos.calathea,
@@ -726,7 +727,7 @@ const feedPosts = [
     id: "feed-laarne-ai",
     author: "Laarne Ramos",
     avatar: "/laarne-profile.png",
-    type: "Leafy AI tip",
+    type: "Tips",
     title: "Leafy AI says bright indirect light",
     text: "Testing the new plant diagnosis flow on Luna before I add another update.",
     image: plantPhotos.anthurium,
@@ -738,7 +739,7 @@ const feedPosts = [
     id: "feed-nena-harvest",
     author: "Aling Nena",
     avatar: sellerAvatars["Aling Nena"],
-    type: "Harvest",
+    type: "Harvests",
     title: "Weekend herbs are ready",
     text: "Basil, pechay, and chili are growing nicely after the rain.",
     image: plantPhotos.herb,
@@ -750,7 +751,7 @@ const feedPosts = [
     id: "feed-miguel-bonsai",
     author: "Miguel Bautista",
     avatar: sellerAvatars["Miguel Bautista"],
-    type: "Care question",
+    type: "Questions",
     title: "Should I prune this bonsai branch?",
     text: "Trying to keep the courtyard bonsai compact without stressing it.",
     image: plantPhotos.bonsai,
@@ -963,6 +964,19 @@ function StatusPill({ children, tone = "green" }) {
   };
 
   return <span className={cn("rounded-full px-3 py-1 text-xs font-bold ring-1", tones[tone])}>{children}</span>;
+}
+
+function InfoButton({ title, detail, notify }) {
+  return (
+    <button
+      onClick={() => notify(title, detail)}
+      className="gm-tap grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-[#315d37] shadow-sm ring-1 ring-[#dfe8d7]"
+      aria-label={title}
+      title={detail}
+    >
+      <Info size={16} />
+    </button>
+  );
 }
 
 function PlantImage({ src, alt = "", className = "" }) {
@@ -1364,6 +1378,9 @@ function MarketPlantDetail({ plant, onClose, notify, openMessages }) {
         <div className="min-h-0 flex-1 overflow-y-auto rounded-t-[1.5rem] bg-white px-5 pb-6 pt-6 shadow-[0_-12px_28px_rgba(32,53,34,0.08)]">
           <div>
             <h2 className="text-2xl font-black leading-tight text-[#203522]">{plant.name}</h2>
+            {plant.aiName && plant.aiName !== plant.name && (
+              <p className="mt-1 text-xs font-bold text-[#7a8572]">Leafy AI: {plant.aiName}</p>
+            )}
             <p className="mt-1 text-xl font-black text-[#203522]">{plant.price}</p>
           </div>
 
@@ -1458,9 +1475,11 @@ function MarketPlantDetail({ plant, onClose, notify, openMessages }) {
 
 function MarketListingCreator({ onCreate, onCancel, notify }) {
   const [scanResult, setScanResult] = useState(aiScanResults[0]);
+  const [localName, setLocalName] = useState("");
   const [category, setCategory] = useState("Indoor");
   const [price, setPrice] = useState("PHP 180");
-  const [stock, setStock] = useState("1 pot");
+  const [stockQty, setStockQty] = useState("1");
+  const [stockUnit, setStockUnit] = useState("Pot");
   const [delivery, setDelivery] = useState("Pickup / Meetup / Delivery");
   const [description, setDescription] = useState("Healthy, beginner-friendly plant ready for a new home.");
   const ScanIcon = scanResult.icon;
@@ -1469,25 +1488,26 @@ function MarketListingCreator({ onCreate, onCancel, notify }) {
   const safetyRows = isBlocked
     ? [
         ["Plant identified", `${scanResult.commonName} - ${scanResult.confidence} match`, AlertTriangle],
-        ["Sale rule", "Blocked from Market", Ban],
-        ["Protected species", "Protected risk found", Ban],
+        ["Selling Status", "Blocked from Marketplace", Ban],
+        ["Protected Species Check", "Protected risk found", Ban],
       ]
     : isReview
       ? [
           ["Plant identified", `${scanResult.commonName} - ${scanResult.confidence} match`, Check],
-          ["Sale rule", "Needs moderator review", AlertTriangle],
-          ["Protected species", "Needs proof/source check", AlertTriangle],
+          ["Selling Status", "Needs human review", AlertTriangle],
+          ["Protected Species Check", "Needs CITES / DENR source check", AlertTriangle],
         ]
       : [
           ["Plant identified", `${scanResult.commonName} - ${scanResult.confidence} match`, Check],
-          ["Sale rule", "Safe to sell", ShieldCheck],
-          ["Protected species", "No restricted-species flag", Check],
+          ["Selling Status", "Approved for Marketplace", ShieldCheck],
+          ["Protected Species Check", "No CITES / DENR restriction detected", Check],
         ];
 
   const scanNext = () => {
     const currentIndex = aiScanResults.findIndex((result) => result.id === scanResult.id);
     const nextResult = aiScanResults[(currentIndex + 1) % aiScanResults.length];
     setScanResult(nextResult);
+    setLocalName("");
     setCategory(nextResult.suggestedCategory ?? category);
     setDescription(`${nextResult.commonName} identified by Leafy AI. Add price, stock, delivery, and care notes before posting.`);
     notify("Leafy AI scanned", `${nextResult.commonName} checked for Market listing.`);
@@ -1499,8 +1519,14 @@ function MarketListingCreator({ onCreate, onCancel, notify }) {
       return;
     }
 
+    const listingName = localName.trim() || scanResult.commonName;
+    const normalizedQty = Math.max(1, Number(stockQty) || 1);
+    const stock = `${normalizedQty} ${stockUnit}${normalizedQty > 1 ? "s" : ""}`;
     onCreate({
-      name: scanResult.commonName,
+      name: listingName,
+      localName: localName.trim(),
+      aiName: scanResult.commonName,
+      scientificName: scanResult.scientificName,
       price,
       location: "Quezon City",
       type: "Buy",
@@ -1512,31 +1538,45 @@ function MarketListingCreator({ onCreate, onCancel, notify }) {
       delivery,
       about: description,
     });
-    notify(isReview ? "Sent to review" : "Market listing created", isReview ? "A moderator should approve this before it appears publicly." : `${scanResult.commonName} was added to your Market listings.`);
+    notify(isReview ? "Sent to review" : "Market listing created", isReview ? "A moderator should approve this before it appears publicly." : `${listingName} was added to your Market listings.`);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-center bg-[#203522]/40 sm:items-center sm:py-6">
-      <section className="gm-sheet-in mt-auto flex h-[88dvh] w-full max-w-[430px] flex-col overflow-hidden rounded-t-[2rem] bg-white shadow-2xl sm:mt-0 sm:h-[880px] sm:rounded-[2rem] md:max-w-[680px]">
-      <div className="flex items-start justify-between gap-3 border-b border-[#edf1e8] px-5 py-4">
+    <div className="px-5 pb-44">
+      <button
+        onClick={onCancel}
+        className="gm-tap mb-3 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-[#63705e] shadow-sm"
+      >
+        <ArrowLeft size={16} /> Back to Market
+      </button>
+      <section className="gm-screen-in overflow-hidden rounded-[2rem] bg-white shadow-sm">
+      <div className="border-b border-[#edf1e8] px-5 py-4">
+        <div className="flex items-start justify-between gap-3">
         <div>
           <p className="inline-flex items-center gap-2 rounded-full bg-[#edf7dc] px-3 py-1 text-xs font-black text-[#315d37]">
             <ScanLine size={14} /> Leafy AI market check
           </p>
-          <h2 className="mt-3 text-xl font-black leading-tight text-[#203522]">Create Market listing</h2>
-          <p className="mt-1 text-sm font-semibold leading-5 text-[#52604d]">For cash sales only. Community updates belong in Feed.</p>
+          <h2 className="mt-3 text-xl font-black leading-tight text-[#203522]">Create Market Listing</h2>
+          <p className="mt-1 text-sm font-semibold leading-5 text-[#52604d]">Use AI verification to safely sell plants in the marketplace.</p>
         </div>
-        <button onClick={onCancel} className="gm-tap rounded-full bg-[#f0f4e8] px-3 py-2 text-xs font-black text-[#52604d]">
-          Close
-        </button>
+        <StatusPill tone="green">Step 1 of 3</StatusPill>
+        </div>
+        <p className="mt-3 text-sm font-black text-[#315d37]">Verify Plant</p>
+        <div className="mt-4 flex items-center gap-2">
+          {["AI check", "Details", "Review"].map((step, index) => (
+            <div key={step} className="flex flex-1 items-center gap-2">
+              <span className={cn("h-2 flex-1 rounded-full", index === 0 ? "bg-[#8bc34a]" : "bg-[#e5eddc]")} />
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5">
-      <div className="mt-4 flex gap-3 rounded-[1.4rem] bg-[#f7faf1] p-3">
+      <div className="px-5 pb-5">
+      <div className={cn("mt-4 flex gap-3 rounded-[1.4rem] p-3", isBlocked ? "bg-rose-50" : isReview ? "bg-amber-50" : "bg-[#f0f9eb]")}>
         <PlantImage src={scanResult.image} alt={scanResult.commonName} className="h-20 w-20 shrink-0 rounded-3xl object-cover" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-black uppercase tracking-[0.12em] text-[#7a8572]">AI identified</p>
+            <p className="text-xs font-black uppercase tracking-[0.12em] text-[#315d37]">AI Result</p>
             <span
               className={cn(
                 "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[10px] font-black",
@@ -1548,6 +1588,8 @@ function MarketListingCreator({ onCreate, onCancel, notify }) {
           </div>
           <h3 className="mt-1 text-lg font-black leading-tight text-[#203522]">{scanResult.commonName}</h3>
           <p className="mt-1 text-xs font-bold italic text-[#7a8572]">{scanResult.scientificName}</p>
+          <p className="mt-1 text-xs font-black text-[#315d37]">{scanResult.confidence} match</p>
+          <p className="mt-2 text-xs font-semibold leading-4 text-[#52604d]">Add a local name below if buyers know it by another name.</p>
         </div>
       </div>
 
@@ -1567,16 +1609,52 @@ function MarketListingCreator({ onCreate, onCancel, notify }) {
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <label className="text-xs font-black text-[#52604d]">
-          Price
-          <input value={price} onChange={(event) => setPrice(event.target.value)} className="mt-1 w-full rounded-2xl bg-[#f7faf1] px-4 py-3 text-sm font-black text-[#203522] outline-none" />
+          Local name / Filipino name
+          <input
+            value={localName}
+            onChange={(event) => setLocalName(event.target.value)}
+            placeholder="Example: Dapo, San Francisco, Calamansi"
+            className="mt-1 w-full rounded-2xl border border-[#dfe8d7] bg-white px-4 py-3 text-sm font-black text-[#203522] outline-none placeholder:text-[#9aa690] focus:border-[#8bc34a]"
+          />
         </label>
         <label className="text-xs font-black text-[#52604d]">
-          Stock / quantity
-          <input value={stock} onChange={(event) => setStock(event.target.value)} className="mt-1 w-full rounded-2xl bg-[#f7faf1] px-4 py-3 text-sm font-black text-[#203522] outline-none" />
+          Leafy AI name
+          <input
+            value={scanResult.commonName}
+            readOnly
+            className="mt-1 w-full rounded-2xl border border-[#dfe8d7] bg-[#fbfdf7] px-4 py-3 text-sm font-black text-[#52604d] outline-none"
+          />
+        </label>
+        <label className="text-xs font-black text-[#52604d]">
+          Price
+          <input value={price} onChange={(event) => setPrice(event.target.value)} className="mt-1 w-full rounded-2xl border border-[#dfe8d7] bg-white px-4 py-3 text-sm font-black text-[#203522] outline-none focus:border-[#8bc34a]" />
+        </label>
+        <label className="text-xs font-black text-[#52604d]">
+          Quantity
+          <div className="mt-1 grid grid-cols-[0.8fr_1.2fr] gap-2">
+            <input
+              value={stockQty}
+              onChange={(event) => setStockQty(event.target.value.replace(/[^\d]/g, ""))}
+              inputMode="numeric"
+              className="w-full rounded-2xl border border-[#dfe8d7] bg-white px-4 py-3 text-sm font-black text-[#203522] outline-none focus:border-[#8bc34a]"
+            />
+            <div className="relative">
+              <select
+                value={stockUnit}
+                onChange={(event) => setStockUnit(event.target.value)}
+                className="w-full appearance-none rounded-2xl border border-[#dfe8d7] bg-white px-4 py-3 pr-9 text-sm font-black text-[#203522] outline-none focus:border-[#8bc34a]"
+              >
+                {["Pot", "Cutting", "Seedling", "Node", "Pack"].map((unit) => (
+                  <option key={unit}>{unit}</option>
+                ))}
+              </select>
+              <ChevronRight size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-[#63705e]" />
+            </div>
+          </div>
         </label>
         <label className="text-xs font-black text-[#52604d]">
           Category
-          <select value={category} onChange={(event) => setCategory(event.target.value)} className="mt-1 w-full rounded-2xl bg-[#f7faf1] px-4 py-3 text-sm font-black text-[#203522] outline-none">
+          <select value={category} onChange={(event) => setCategory(event.target.value)} className="mt-1 w-full rounded-2xl border border-[#dfe8d7] bg-white px-4 py-3 text-sm font-black text-[#203522] outline-none focus:border-[#8bc34a]">
             {PLANT_CATEGORIES.map((item) => (
               <option key={item}>{item}</option>
             ))}
@@ -1584,21 +1662,35 @@ function MarketListingCreator({ onCreate, onCancel, notify }) {
         </label>
         <label className="text-xs font-black text-[#52604d]">
           Delivery / meetup
-          <input value={delivery} onChange={(event) => setDelivery(event.target.value)} className="mt-1 w-full rounded-2xl bg-[#f7faf1] px-4 py-3 text-sm font-black text-[#203522] outline-none" />
+          <div className="relative mt-1">
+            <select
+              value={delivery}
+              onChange={(event) => setDelivery(event.target.value)}
+              className="w-full appearance-none rounded-2xl border border-[#dfe8d7] bg-white px-4 py-3 pr-10 text-sm font-black text-[#203522] outline-none focus:border-[#8bc34a]"
+            >
+              {["Pickup / Meetup / Delivery", "Pickup only", "Meetup only", "Delivery available"].map((item) => (
+                <option key={item}>{item}</option>
+              ))}
+            </select>
+            <ChevronRight size={17} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-[#63705e]" />
+          </div>
         </label>
       </div>
 
       <label className="mt-3 block text-xs font-black text-[#52604d]">
         Listing description
-        <textarea value={description} onChange={(event) => setDescription(event.target.value)} className="mt-1 min-h-24 w-full rounded-2xl bg-[#f7faf1] px-4 py-3 text-sm font-semibold leading-5 text-[#203522] outline-none" />
+        <textarea value={description} onChange={(event) => setDescription(event.target.value)} className="mt-1 min-h-24 w-full rounded-2xl border border-[#dfe8d7] bg-white px-4 py-3 text-sm font-semibold leading-5 text-[#203522] outline-none focus:border-[#8bc34a]" />
       </label>
 
       <div className="mt-4 flex items-start justify-between gap-3 rounded-[1.4rem] border border-[#dfe8d7] bg-[#fbfdf7] p-4">
         <div className="min-w-0">
           <p className="font-black text-[#203522]">Marketplace fee</p>
-          <p className="mt-1 text-xs font-semibold leading-5 text-[#52604d]">No upfront listing fee. GrowMate charges only after the item is sold.</p>
+          <p className="mt-1 text-sm font-semibold leading-5 text-[#52604d]">No upfront fee. GrowMate only earns 10% after a successful sale.</p>
         </div>
-        <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-black text-[#315d37]">10% sold</span>
+        <div className="flex shrink-0 items-center gap-2">
+          <InfoButton title="Marketplace fee" detail="GrowMate charges 10% only after the item is sold." notify={notify} />
+          <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-[#315d37]">10% sold</span>
+        </div>
       </div>
 
       <div className="mt-4 grid grid-cols-[auto_1fr] gap-2">
@@ -1612,19 +1704,32 @@ function MarketListingCreator({ onCreate, onCancel, notify }) {
           {isReview ? "Send to review" : "Post to Market"}
         </button>
       </div>
+
+      <div className="mt-4 rounded-[1.4rem] bg-[#f0f9eb] p-4 ring-1 ring-[#dfe8d7]">
+        <p className="font-black text-[#203522]">Before posting</p>
+        <div className="mt-3 space-y-2">
+          {[
+            "Plant verified by Leafy AI",
+            isReview ? "Human review required before publishing" : "Approved for Marketplace",
+            "10% fee applies only after sale",
+          ].map((item) => (
+            <div key={item} className="flex items-center gap-2 text-sm font-semibold text-[#52604d]">
+              <Check size={15} className="text-[#315d37]" /> {item}
+            </div>
+          ))}
+        </div>
+      </div>
       </div>
     </section>
     </div>
   );
 }
 
-function MarketView({ notify, openListing }) {
+function MarketView({ notify, openListing, myMarketListings, onOpenCreator }) {
   const [category, setCategory] = useState("All");
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState("Nearest");
-  const [showMarketCreator, setShowMarketCreator] = useState(false);
   const [showMoreFilters, setShowMoreFilters] = useState(false);
-  const [myMarketListings, setMyMarketListings] = useState([]);
   const normalizedQuery = query.trim().toLowerCase();
   const saleListings = [...myMarketListings, ...marketPlants.filter((item) => item.type === "Buy")];
   const saleCategories = PLANT_CATEGORIES.filter((item) => saleListings.some((listing) => listing.category === item));
@@ -1698,29 +1803,20 @@ function MarketView({ notify, openListing }) {
         </div>
       </div>
       <div className="-mx-5 bg-[#f5f8ef] px-5 pb-3 pt-1">
-        <button
-          onClick={() => setShowMarketCreator((value) => !value)}
-          className="gm-tap mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#203522] px-4 py-3 text-sm font-black text-white shadow-sm"
-        >
-          <Plus size={17} /> Sell Plant
-        </button>
-        <p className="mt-2 text-center text-xs font-bold text-[#52604d]">Selling only. For updates or questions, use Feed.</p>
+        <div className="mt-3 flex items-center gap-2">
+          <button
+            onClick={() => onOpenCreator({ onListed: () => {
+              setCategory("All");
+              setSortBy("Newest");
+              setShowMoreFilters(false);
+            } })}
+            className="gm-tap flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full bg-[#203522] px-4 py-3 text-sm font-black text-white shadow-sm"
+          >
+            <Plus size={17} /> Sell Plant
+          </button>
+          <InfoButton title="Market rule" detail="Market is for cash sales. Use Feed for plant updates, questions, and care posts." notify={notify} />
+        </div>
       </div>
-
-      {showMarketCreator && (
-        <MarketListingCreator
-          notify={notify}
-          onCancel={() => setShowMarketCreator(false)}
-          onCreate={(listing) => {
-            const listingId = `${listing.name}-${Date.now()}`;
-            setMyMarketListings((items) => [{ ...listing, listingId, createdAt: Date.now() }, ...items]);
-            setShowMarketCreator(false);
-            setCategory("All");
-            setSortBy("Newest");
-            setShowMoreFilters(false);
-          }}
-        />
-      )}
 
       <section className="gm-card-in gm-tap mt-4 overflow-hidden rounded-[2rem] bg-white shadow-sm">
         <button onClick={() => openListing(featured)} className="block w-full text-left" aria-label={`Open ${featured.name}`}>
@@ -1778,6 +1874,9 @@ function MarketView({ notify, openListing }) {
             </div>
             <div className="p-3">
               <h3 className="min-h-10 text-sm font-black leading-tight text-[#203522]">{item.name}</h3>
+              {item.aiName && item.aiName !== item.name && (
+                <p className="mt-1 truncate text-xs font-bold text-[#7a8572]">AI: {item.aiName}</p>
+              )}
               <p className="mt-2 text-lg font-black text-[#315d37]">{item.price}</p>
               <p className="mt-1 truncate text-xs font-bold text-[#52604d]">
                 {item.location} - {item.rating} trust
@@ -2383,12 +2482,6 @@ function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSele
 
       <div className="mt-5 flex items-center justify-between">
         <h2 className="text-lg font-black text-[#203522]">Plant collection</h2>
-        <button
-          onClick={() => setShowAddPlant((value) => !value)}
-          className="gm-tap inline-flex min-h-11 items-center gap-2 rounded-full bg-[#203522] px-5 py-3 text-sm font-black text-white shadow-sm"
-        >
-          <Plus size={16} /> Add plant
-        </button>
       </div>
 
       <div className="gm-x-scroll -mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1">
@@ -2405,6 +2498,13 @@ function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSele
           </button>
         ))}
       </div>
+
+      <button
+        onClick={() => setShowAddPlant((value) => !value)}
+        className="gm-tap mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#edf7dc] px-5 py-3 text-sm font-black text-[#315d37] shadow-sm"
+      >
+        <Plus size={16} /> Add plant
+      </button>
 
       {showAddPlant && (
         <section className="gm-sheet-in mt-3 rounded-[1.6rem] bg-white p-4 shadow-sm">
@@ -2614,14 +2714,34 @@ function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSele
 
 function FeedView({ notify, openMessages, openGarden }) {
   const [feedFilter, setFeedFilter] = useState("All");
+  const [likedPosts, setLikedPosts] = useState({});
+  const [activeComments, setActiveComments] = useState(null);
+  const [commentDraft, setCommentDraft] = useState("");
+  const [postComments, setPostComments] = useState(() =>
+    feedPosts.reduce((items, post) => {
+      items[post.id] = [];
+      return items;
+    }, {})
+  );
   const filters = ["All", "Updates", "Questions", "Harvests", "Tips"];
   const visiblePosts = feedPosts.filter((post) => {
     if (feedFilter === "All") return true;
-    if (feedFilter === "Updates") return post.type.includes("update");
-    if (feedFilter === "Questions") return post.type.includes("question");
-    if (feedFilter === "Harvests") return post.type.includes("Harvest");
-    return post.type.includes("tip") || post.type.includes("Leafy");
+    return post.type === feedFilter;
   });
+  const getLikeCount = (post) => post.likes + (likedPosts[post.id] ? 1 : 0);
+  const getCommentCount = (post) => post.comments + (postComments[post.id]?.length ?? 0);
+  const toggleLike = (post) => {
+    setLikedPosts((items) => ({ ...items, [post.id]: !items[post.id] }));
+  };
+  const submitComment = (post) => {
+    const text = commentDraft.trim();
+    if (!text) return;
+    setPostComments((items) => ({
+      ...items,
+      [post.id]: [...(items[post.id] ?? []), text],
+    }));
+    setCommentDraft("");
+  };
 
   return (
     <div className="space-y-4 px-5 pb-52">
@@ -2663,30 +2783,30 @@ function FeedView({ notify, openMessages, openGarden }) {
               feedFilter === filter ? "bg-[#203522] text-white" : "bg-white text-[#63705e]"
             )}
           >
-            {filter}
+            {filter === "All" ? `All - ${feedPosts.length}` : filter}
           </button>
         ))}
       </div>
-
-      <section className="gm-card-in rounded-[1.6rem] border border-[#dfe8d7] bg-white p-4 shadow-sm">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-black text-[#203522]">Community feed</p>
-            <p className="mt-1 text-xs font-semibold text-[#63705e]">Garden updates, plant questions, harvests, and Leafy AI tips.</p>
-          </div>
-          <StatusPill tone="green">{feedPosts.length} posts</StatusPill>
-        </div>
-      </section>
 
       <div className="space-y-4">
         {visiblePosts.map((post) => (
           <article key={post.id} className="gm-card-in overflow-hidden rounded-[1.8rem] bg-white shadow-sm">
             <div className="flex items-center gap-3 p-4">
-              <AvatarImage src={post.avatar} alt={`${post.author} profile`} className="h-12 w-12 rounded-2xl object-cover" />
-              <div className="min-w-0 flex-1">
+              <button
+                onClick={() => openGarden?.(post.author)}
+                className="gm-tap h-12 w-12 shrink-0 overflow-hidden rounded-2xl"
+                aria-label={`Visit ${post.author}'s garden`}
+              >
+                <AvatarImage src={post.avatar} alt={`${post.author} profile`} className="h-full w-full object-cover" />
+              </button>
+              <button
+                onClick={() => openGarden?.(post.author)}
+                className="gm-tap min-w-0 flex-1 text-left"
+                aria-label={`Visit ${post.author}'s garden`}
+              >
                 <p className="truncate font-black text-[#203522]">{post.author}</p>
                 <p className="text-xs font-bold text-[#7a8572]">{post.meta}</p>
-              </div>
+              </button>
               {post.author !== "Laarne Ramos" && (
                 <button
                   onClick={() => notify("Garden followed", `${post.author}'s garden is now in your followed gardens.`)}
@@ -2715,19 +2835,30 @@ function FeedView({ notify, openMessages, openGarden }) {
                   Buy similar
                 </button>
               </div>
-              <div className="mt-4 flex items-center justify-between border-t border-[#edf1e8] pt-3">
-                <button
-                  onClick={() => notify("Liked", `${post.title} was added to your liked posts.`)}
-                  className="gm-tap flex items-center gap-1 rounded-full px-2 py-2 text-xs font-black text-[#315d37]"
-                >
-                  <Heart size={15} /> {post.likes}
-                </button>
-                <button
-                  onClick={() => notify("Comments", `${post.comments} comments opened.`)}
-                  className="gm-tap flex items-center gap-1 rounded-full px-2 py-2 text-xs font-black text-[#315d37]"
-                >
-                  <MessageCircle size={15} /> {post.comments}
-                </button>
+              <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#edf1e8] pt-3">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => toggleLike(post)}
+                    className={cn(
+                      "gm-tap flex items-center gap-1 rounded-full px-1 py-2 text-xs font-black",
+                      likedPosts[post.id] ? "text-rose-600" : "text-[#315d37]"
+                    )}
+                  >
+                    <Heart size={15} fill={likedPosts[post.id] ? "currentColor" : "none"} /> {getLikeCount(post)}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveComments((current) => (current === post.id ? null : post.id));
+                      setCommentDraft("");
+                    }}
+                    className={cn(
+                      "gm-tap flex items-center gap-1 rounded-full px-1 py-2 text-xs font-black",
+                      activeComments === post.id ? "text-[#203522]" : "text-[#315d37]"
+                    )}
+                  >
+                    <MessageCircle size={15} /> {getCommentCount(post)}
+                  </button>
+                </div>
                 <button
                   onClick={() => openMessages(post.author)}
                   className="gm-tap flex min-h-10 items-center justify-center gap-2 rounded-full bg-[#203522] px-4 text-xs font-black text-white"
@@ -2735,6 +2866,34 @@ function FeedView({ notify, openMessages, openGarden }) {
                   <Send size={15} /> Message
                 </button>
               </div>
+              {activeComments === post.id && (
+                <section className="gm-sheet-in mt-3 rounded-[1.3rem] bg-[#f7faf1] p-3 ring-1 ring-[#edf1e8]">
+                  <div className="space-y-2">
+                    {["Looks healthy!", "Nice growth update.", ...(postComments[post.id] ?? [])].map((comment, index) => (
+                      <div key={`${post.id}-${index}-${comment}`} className="rounded-2xl bg-white px-3 py-2 text-xs font-semibold text-[#52604d]">
+                        {comment}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
+                    <input
+                      value={commentDraft}
+                      onChange={(event) => setCommentDraft(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") submitComment(post);
+                      }}
+                      className="min-h-10 rounded-full bg-white px-3 text-xs font-semibold text-[#203522] outline-none placeholder:text-[#8b967f]"
+                      placeholder="Write a comment..."
+                    />
+                    <button
+                      onClick={() => submitComment(post)}
+                      className="gm-tap rounded-full bg-[#203522] px-4 text-xs font-black text-white"
+                    >
+                      Post
+                    </button>
+                  </div>
+                </section>
+              )}
             </div>
           </article>
         ))}
@@ -2802,7 +2961,10 @@ function RankView({ notify, openGarden }) {
               }
               notify("Leaderboard profile", `${name} is #${index + 1}.`);
             }}
-            className="gm-card-in gm-tap flex w-full items-center gap-3 rounded-[1.6rem] bg-white p-4 text-left shadow-sm"
+            className={cn(
+              "gm-card-in gm-tap flex w-full items-center gap-3 rounded-[1.6rem] p-4 text-left shadow-sm",
+              index === 0 ? "bg-[#EAF3DE] ring-1 ring-[#c7d9b5]" : "bg-white"
+            )}
           >
             <span className={cn("grid h-11 w-11 shrink-0 place-items-center rounded-2xl font-black", rankStyles[index] ?? "bg-[#edf7dc] text-[#315d37]")}>
               #{index + 1}
@@ -2810,7 +2972,7 @@ function RankView({ notify, openGarden }) {
             <AvatarImage
               src={sellerAvatars[name] ?? fallbackAvatars[name] ?? "/laarne-profile.png"}
               alt={`${name} profile`}
-              className="h-12 w-12 shrink-0 rounded-2xl object-cover"
+              className={cn("shrink-0 rounded-2xl object-cover", index === 0 ? "h-14 w-14" : "h-12 w-12")}
             />
             <div className="min-w-0 flex-1">
               <p className="font-black text-[#203522]">{name}</p>
@@ -3002,7 +3164,7 @@ function ProfileView({ setActiveTab, notify }) {
             ))}
           </div>
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <button onClick={() => setActiveTab("Garden")} className="gm-tap rounded-full bg-[#203522] px-4 py-3 text-sm font-black text-white">
+            <button onClick={() => setActiveTab("Garden")} className="gm-tap rounded-full bg-[#203522] px-4 py-4 text-sm font-black text-white">
               View my garden
             </button>
             <button
@@ -3010,7 +3172,7 @@ function ProfileView({ setActiveTab, notify }) {
                 if (editing) notify("Profile saved", "Your public profile details were updated.");
                 setEditing((value) => !value);
               }}
-              className="gm-tap rounded-full bg-[#edf7dc] px-4 py-3 text-sm font-black text-[#315d37]"
+              className="gm-tap rounded-full bg-[#edf7dc] px-4 py-4 text-sm font-black text-[#315d37]"
             >
               {editing ? "Save profile" : "Edit profile"}
             </button>
@@ -3022,9 +3184,11 @@ function ProfileView({ setActiveTab, notify }) {
         <div className="mb-3 flex items-center justify-between">
           <div>
             <h3 className="text-lg font-black text-[#203522]">My Market Listings</h3>
-            <p className="text-xs font-bold text-[#52604d]">Cash sales with 10% fee only when sold</p>
           </div>
-          <StatusPill tone="green">{myMarketListings.length} active</StatusPill>
+          <div className="flex items-center gap-2">
+            <InfoButton title="Marketplace fee" detail="GrowMate charges 10% only after an item is sold." notify={notify} />
+            <StatusPill tone="green">{myMarketListings.length} active</StatusPill>
+          </div>
         </div>
         <div className="space-y-3">
           {myMarketListings.map(renderProfileListing)}
@@ -3046,7 +3210,8 @@ function ProfileView({ setActiveTab, notify }) {
               <div className="min-w-0 flex-1">
                 <StatusPill tone="blue">{post.type}</StatusPill>
                 <p className="mt-2 truncate font-black text-[#203522]">{post.title}</p>
-                <p className="mt-1 truncate text-xs font-bold text-[#52604d]">{post.likes} likes - {post.comments} comments</p>
+                <p className="mt-1 line-clamp-2 text-xs font-semibold leading-4 text-[#52604d]">{post.text}</p>
+                <p className="mt-2 truncate text-xs font-bold text-[#52604d]">{post.likes} likes - {post.comments} comments</p>
               </div>
               <button
                 onClick={() => notify("Feed post", `${post.title} is active in Feed.`)}
@@ -3388,6 +3553,8 @@ export default function ProductApp() {
   const [selectedGarden, setSelectedGarden] = useState(null);
   const [marketListing, setMarketListing] = useState(null);
   const [messageTarget, setMessageTarget] = useState(null);
+  const [myMarketListings, setMyMarketListings] = useState([]);
+  const [marketCreator, setMarketCreator] = useState(null);
   const notify = (title, detail) => setNotice({ title, detail });
   const openMessages = (target = "__inbox") => {
     setNotice(null);
@@ -3415,6 +3582,7 @@ export default function ProductApp() {
   };
 
   const title = useMemo(() => {
+    if (activeTab === "Market" && marketCreator) return "Create Listing";
     if (activeTab === "Garden") {
       if (gardenMode === "Visit" && selectedGarden) return `${selectedGarden.owner}'s Garden`;
       if (gardenMode === "Visit") return "Visit Gardens";
@@ -3423,10 +3591,28 @@ export default function ProductApp() {
     if (activeTab === "Rankings") return "Rankings";
     if (activeTab === "Profile") return "Profile";
     return activeTab;
-  }, [activeTab, gardenMode, selectedGarden]);
+  }, [activeTab, gardenMode, selectedGarden, marketCreator]);
 
   const view = {
-    Market: <MarketView notify={notify} openListing={setMarketListing} />,
+    Market: marketCreator ? (
+      <MarketListingCreator
+        notify={notify}
+        onCancel={() => setMarketCreator(null)}
+        onCreate={(listing) => {
+          const listingId = `${listing.name}-${Date.now()}`;
+          setMyMarketListings((items) => [{ ...listing, listingId, createdAt: Date.now() }, ...items]);
+          marketCreator.onListed?.();
+          setMarketCreator(null);
+        }}
+      />
+    ) : (
+      <MarketView
+        notify={notify}
+        openListing={setMarketListing}
+        myMarketListings={myMarketListings}
+        onOpenCreator={setMarketCreator}
+      />
+    ),
     Garden: (
       <GardenView
         notify={notify}
