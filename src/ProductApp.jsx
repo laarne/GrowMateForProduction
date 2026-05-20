@@ -1874,14 +1874,13 @@ function MarketListingCreator({ onCreate, onCancel, notify }) {
     const file = event.target.files?.[0];
     if (!file) return;
     setIsScanning(true);
-    const plantIdKey = import.meta.env.VITE_PLANT_ID_API_KEY;
     try {
-      const result = await scanPlantWithPlantId(file, plantIdKey);
+      const result = await scanPlantWithPlantId(file);
       applyScanResult(result);
       notify(result.source === "plant.id" ? "Plant.id scan complete" : "Demo scan complete", `${result.commonName} checked for Market listing.`);
     } catch (error) {
       setScanResult(null);
-      notify("Plant.id scan failed", "Please capture a clearer real plant photo and try again.");
+      notify("Plant.id scan failed", error.message || "Please capture a clearer real plant photo and try again.");
     } finally {
       setIsScanning(false);
       event.target.value = "";

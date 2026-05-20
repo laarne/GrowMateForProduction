@@ -1,4 +1,4 @@
-const PLANT_ID_ENDPOINT = "https://plant.id/api/v3/identification";
+const PLANT_ID_ENDPOINT = "/api/plant-id-scan";
 
 const protectedPlantNames = [
   "vanda sanderiana",
@@ -79,18 +79,13 @@ function statusMeta(status) {
   };
 }
 
-export async function scanPlantWithPlantId(file, apiKey) {
-  if (!apiKey) {
-    throw new Error("Plant.id API key is missing");
-  }
-
+export async function scanPlantWithPlantId(file) {
   const imageUrl = URL.createObjectURL(file);
   const imageBase64 = await fileToBase64(file);
-  const response = await fetch(`${PLANT_ID_ENDPOINT}?classification_level=species`, {
+  const response = await fetch(PLANT_ID_ENDPOINT, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Api-Key": apiKey,
     },
     body: JSON.stringify({
       images: [imageBase64],
@@ -98,7 +93,14 @@ export async function scanPlantWithPlantId(file, apiKey) {
   });
 
   if (!response.ok) {
-    throw new Error(`Plant.id scan failed: ${response.status}`);
+    let detail = "";
+    try {
+      const payload = await response.json();
+      detail = payload?.error ? ` - ${payload.error}` : "";
+    } catch {
+      detail = "";
+    }
+    throw new Error(`Plant.id scan failed: ${response.status}${detail}`);
   }
 
   const payload = await response.json();
