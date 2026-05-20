@@ -1,8 +1,23 @@
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Content-Type": "application/json",
+};
+
 exports.handler = async (event) => {
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 204,
+      headers: corsHeaders,
+      body: "",
+    };
+  }
+
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      headers: { "Content-Type": "application/json" },
+      headers: corsHeaders,
       body: JSON.stringify({ error: "Method not allowed" }),
     };
   }
@@ -15,7 +30,7 @@ exports.handler = async (event) => {
     if (!Array.isArray(body.images) || body.images.length === 0) {
       return {
         statusCode: 400,
-        headers: { "Content-Type": "application/json" },
+        headers: corsHeaders,
         body: JSON.stringify({ error: "Please send one captured plant photo." }),
       };
     }
@@ -35,14 +50,14 @@ exports.handler = async (event) => {
     const text = await response.text();
     return {
       statusCode: response.status,
-      headers: { "Content-Type": "application/json" },
+      headers: corsHeaders,
       body: text,
     };
   } catch (error) {
     const isTimeout = error?.name === "AbortError";
     return {
       statusCode: isTimeout ? 504 : 500,
-      headers: { "Content-Type": "application/json" },
+      headers: corsHeaders,
       body: JSON.stringify({
         error: isTimeout ? "Plant.id took too long. Try a clearer, closer plant photo." : error.message || "Plant.id scan failed",
       }),
