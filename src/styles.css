@@ -107,6 +107,15 @@ button {
   }
 }
 
+@keyframes gm-skeleton-shimmer {
+  0% {
+    background-position: 180% 0;
+  }
+  100% {
+    background-position: -180% 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -626,6 +635,13 @@ button {
 
   .gm-spark {
     animation: gm-spark 2.6s ease-in-out infinite;
+  }
+
+  .gm-skeleton {
+    background: linear-gradient(90deg, #edf4e8 0%, #dfead7 38%, #f8fbf3 52%, #edf4e8 72%);
+    background-size: 240% 100%;
+    animation: gm-skeleton-shimmer 1.25s ease-in-out infinite;
+    box-shadow: inset 0 0 0 1px rgba(216, 229, 204, 0.72);
   }
 
   .gm-tap {

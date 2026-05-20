@@ -12,89 +12,103 @@
     <style>
       .gm-boot {
         min-height: 100vh;
-        display: grid;
-        place-items: center;
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
         background: #e8f0df;
         color: #203522;
         font-family: Inter, Arial, sans-serif;
+        padding: 0;
+      }
+
+      .gm-boot-phone {
+        display: flex;
+        width: min(100%, 430px);
+        min-height: 100vh;
+        flex-direction: column;
+        background: #f5f8ef;
+      }
+
+      .gm-boot-header,
+      .gm-boot-card,
+      .gm-boot-nav {
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 8px 24px rgba(37, 61, 41, 0.08);
+      }
+
+      .gm-boot-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        justify-content: space-between;
+        margin: 16px;
+        border-radius: 26px;
+        padding: 12px;
+      }
+
+      .gm-boot-content {
+        flex: 1;
+        overflow: hidden;
+        padding: 0 16px 20px;
+      }
+
+      .gm-boot-row,
+      .gm-boot-chips,
+      .gm-boot-grid,
+      .gm-boot-nav {
+        display: grid;
+        gap: 10px;
+      }
+
+      .gm-boot-row {
+        grid-template-columns: 48px 1fr 40px;
+        align-items: center;
+      }
+
+      .gm-boot-chips {
+        grid-template-columns: 44px 64px 74px 56px 86px;
+        margin-top: 12px;
+        overflow: hidden;
       }
 
       .gm-boot-card {
+        margin-top: 16px;
+        overflow: hidden;
+        border-radius: 28px;
+      }
+
+      .gm-boot-card-body {
         display: grid;
-        justify-items: center;
-        gap: 16px;
+        gap: 10px;
+        padding: 16px;
       }
 
-      .gm-boot-logo-wrap {
-        position: relative;
-        display: grid;
-        height: 124px;
-        width: 124px;
-        place-items: center;
+      .gm-boot-grid {
+        grid-template-columns: 1fr 1fr;
+        margin-top: 18px;
       }
 
-      .gm-boot-logo-wrap::before {
-        position: absolute;
-        inset: 0;
-        border: 4px solid rgba(32, 53, 34, 0.1);
-        border-top-color: #8bc34a;
-        border-radius: 32px;
-        content: "";
-        animation: gm-boot-spin 1.2s linear infinite;
+      .gm-boot-nav {
+        grid-template-columns: repeat(5, 1fr);
+        border-top: 1px solid #e3eadb;
+        padding: 8px 12px 10px;
       }
 
-      .gm-boot-logo {
-        height: 96px;
-        width: 96px;
-        border-radius: 26px;
-        box-shadow: 0 20px 54px rgba(37, 61, 41, 0.16);
-      }
-
-      .gm-boot-text {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        min-height: 48px;
-        border-radius: 24px;
-        background: white;
-        padding: 0 22px;
-        box-shadow: 0 20px 60px rgba(37, 61, 41, 0.12);
-        font-size: 14px;
-        font-weight: 900;
-      }
-
-      .gm-boot-dot {
-        height: 5px;
-        width: 5px;
+      .gm-skeleton {
+        display: block;
         border-radius: 999px;
-        background: #8bc34a;
-        animation: gm-boot-dot 1s ease-in-out infinite;
+        background: linear-gradient(90deg, #edf4e8 0%, #dfead7 38%, #f8fbf3 52%, #edf4e8 72%);
+        background-size: 240% 100%;
+        box-shadow: inset 0 0 0 1px rgba(216, 229, 204, 0.72);
+        animation: gm-boot-shimmer 1.25s ease-in-out infinite;
       }
 
-      .gm-boot-dot:nth-child(2) {
-        animation-delay: 0.15s;
-      }
-
-      .gm-boot-dot:nth-child(3) {
-        animation-delay: 0.3s;
-      }
-
-      @keyframes gm-boot-spin {
-        to {
-          transform: rotate(360deg);
+      @keyframes gm-boot-shimmer {
+        0% {
+          background-position: 180% 0;
         }
-      }
-
-      @keyframes gm-boot-dot {
-        0%,
         100% {
-          opacity: 0.35;
-          transform: translateY(0);
-        }
-
-        50% {
-          opacity: 1;
-          transform: translateY(-4px);
+          background-position: -180% 0;
         }
       }
     </style>
@@ -102,15 +116,46 @@
   <body>
     <div id="root">
       <div class="gm-boot" role="status" aria-live="polite" aria-label="Loading GrowMate">
-        <div class="gm-boot-card">
-          <div class="gm-boot-logo-wrap">
-            <img class="gm-boot-logo" src="/growmate-logo.png" alt="GrowMate logo" />
+        <div class="gm-boot-phone">
+          <div class="gm-boot-header">
+            <div class="gm-boot-row" style="width: 100%">
+              <span class="gm-skeleton" style="height: 44px; border-radius: 18px"></span>
+              <span>
+                <span class="gm-skeleton" style="height: 10px; width: 96px; margin-bottom: 9px"></span>
+                <span class="gm-skeleton" style="height: 20px; width: 140px"></span>
+              </span>
+              <span class="gm-skeleton" style="height: 40px; border-radius: 16px"></span>
+            </div>
           </div>
-          <div class="gm-boot-text">
-            <span>Loading GrowMate</span>
-            <span class="gm-boot-dot"></span>
-            <span class="gm-boot-dot"></span>
-            <span class="gm-boot-dot"></span>
+          <div class="gm-boot-content">
+            <span class="gm-skeleton" style="height: 44px; width: 100%"></span>
+            <div class="gm-boot-chips">
+              <span class="gm-skeleton" style="height: 32px"></span>
+              <span class="gm-skeleton" style="height: 32px"></span>
+              <span class="gm-skeleton" style="height: 32px"></span>
+              <span class="gm-skeleton" style="height: 32px"></span>
+              <span class="gm-skeleton" style="height: 32px"></span>
+            </div>
+            <div class="gm-boot-card">
+              <span class="gm-skeleton" style="height: 176px; width: 100%; border-radius: 0"></span>
+              <div class="gm-boot-card-body">
+                <span class="gm-skeleton" style="height: 12px; width: 30%"></span>
+                <span class="gm-skeleton" style="height: 24px; width: 80%"></span>
+                <span class="gm-skeleton" style="height: 16px; width: 55%"></span>
+                <span class="gm-skeleton" style="height: 44px; width: 100%"></span>
+              </div>
+            </div>
+            <div class="gm-boot-grid">
+              <span class="gm-skeleton" style="height: 220px; border-radius: 24px"></span>
+              <span class="gm-skeleton" style="height: 220px; border-radius: 24px"></span>
+            </div>
+          </div>
+          <div class="gm-boot-nav">
+            <span class="gm-skeleton" style="height: 42px"></span>
+            <span class="gm-skeleton" style="height: 42px"></span>
+            <span class="gm-skeleton" style="height: 42px"></span>
+            <span class="gm-skeleton" style="height: 42px"></span>
+            <span class="gm-skeleton" style="height: 42px"></span>
           </div>
         </div>
       </div>

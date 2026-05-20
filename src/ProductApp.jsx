@@ -54,6 +54,7 @@ const plantPhotos = {
 
 const PLANT_CATEGORIES = ["Indoor", "Outdoor", "Rare", "Flowering", "Succulents", "Herbs", "Veggies", "Fruit Trees", "Cuttings", "Trees"];
 const MARKET_CATEGORY_FILTERS = ["All", ...PLANT_CATEGORIES];
+const leafyLogo = "/leafy-ai-logo.png";
 
 const collection = [
   {
@@ -1241,6 +1242,164 @@ function PhoneShell({ children }) {
         <span className="h-1.5 w-20 rounded-full bg-white/25" />
       </div>
       {children}
+    </div>
+  );
+}
+
+function SkeletonBlock({ className = "" }) {
+  return <span className={cn("gm-skeleton block rounded-full", className)} />;
+}
+
+function GrowMateLoadingSkeleton() {
+  const chips = ["w-12", "w-16", "w-20", "w-14", "w-24"];
+  const cards = ["h-48", "h-48", "h-44", "h-44"];
+
+  return (
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(217,249,157,0.34),transparent_28%),linear-gradient(135deg,#e8f0df,#f7faf1_45%,#dbe8d1)] font-sans text-[#203522] sm:px-4 lg:px-8">
+      <PhoneShell>
+        <div className="min-h-0 flex-1 overflow-y-auto" role="status" aria-live="polite" aria-busy="true" aria-label="Loading GrowMate">
+          <header className="mx-4 mb-4 mt-4 rounded-[1.6rem] bg-white/90 p-3 shadow-sm ring-1 ring-[#e4ecd8]">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <SkeletonBlock className="h-11 w-11 rounded-2xl" />
+                <div className="min-w-0 space-y-2">
+                  <SkeletonBlock className="h-2.5 w-24" />
+                  <SkeletonBlock className="h-5 w-32" />
+                </div>
+              </div>
+              <SkeletonBlock className="h-10 w-10 rounded-2xl" />
+            </div>
+          </header>
+
+          <div className="px-4 pb-6">
+            <SkeletonBlock className="h-11 w-full rounded-2xl" />
+            <div className="gm-x-scroll mt-3 flex gap-2 overflow-x-auto pb-1">
+              {chips.map((width, index) => (
+                <SkeletonBlock key={`${width}-${index}`} className={cn("h-8 shrink-0", width)} />
+              ))}
+            </div>
+            <section className="mt-4 overflow-hidden rounded-[1.8rem] bg-white shadow-sm">
+              <SkeletonBlock className="h-44 w-full rounded-none" />
+              <div className="space-y-3 p-4">
+                <SkeletonBlock className="h-3 w-24" />
+                <SkeletonBlock className="h-6 w-3/4" />
+                <SkeletonBlock className="h-4 w-1/2" />
+                <SkeletonBlock className="h-11 w-full" />
+              </div>
+            </section>
+            <div className="mt-5 flex items-center justify-between">
+              <SkeletonBlock className="h-6 w-24" />
+              <SkeletonBlock className="h-4 w-16" />
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              {cards.map((height, index) => (
+                <article key={`${height}-${index}`} className="overflow-hidden rounded-[1.5rem] bg-white shadow-sm">
+                  <SkeletonBlock className={cn("w-full rounded-none", height)} />
+                  <div className="space-y-2 p-3">
+                    <SkeletonBlock className="h-3 w-16" />
+                    <SkeletonBlock className="h-4 w-full" />
+                    <SkeletonBlock className="h-5 w-20" />
+                    <SkeletonBlock className="h-9 w-full" />
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <nav className="z-30 mx-auto grid w-full max-w-[430px] shrink-0 grid-cols-5 gap-1 border-t border-[#e3eadb] bg-white/95 px-2 pb-2 pt-1.5 backdrop-blur">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div key={index} className="flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-2xl px-1">
+              <SkeletonBlock className="h-8 w-8 rounded-xl" />
+              <SkeletonBlock className="h-2 w-9" />
+            </div>
+          ))}
+        </nav>
+      </PhoneShell>
+    </main>
+  );
+}
+
+function SectionLoadingSkeleton({ activeTab = "Market" }) {
+  const cardCount = activeTab === "Profile" ? 3 : 4;
+  const isFeed = activeTab === "Feed";
+  const isRankings = activeTab === "Rankings";
+
+  if (isRankings) {
+    return (
+      <div className="px-4 pb-6">
+        <SkeletonBlock className="h-10 w-40" />
+        <div className="mt-4 space-y-3">
+          {[0, 1, 2].map((item) => (
+            <article key={item} className="rounded-[1.6rem] bg-white p-4 shadow-sm">
+              <div className="grid grid-cols-[48px_1fr_68px] items-center gap-3">
+                <SkeletonBlock className="h-12 w-12 rounded-2xl" />
+                <div className="space-y-2">
+                  <SkeletonBlock className="h-4 w-36" />
+                  <SkeletonBlock className="h-3 w-24" />
+                </div>
+                <SkeletonBlock className="h-8 w-full" />
+              </div>
+            </article>
+          ))}
+        </div>
+        <SkeletonBlock className="mt-5 h-36 w-full rounded-[1.7rem]" />
+      </div>
+    );
+  }
+
+  if (isFeed) {
+    return (
+      <div className="px-4 pb-6">
+        <section className="rounded-[1.8rem] bg-white p-4 shadow-sm">
+          <div className="grid grid-cols-[56px_1fr] items-center gap-3">
+            <SkeletonBlock className="h-14 w-14 rounded-2xl" />
+            <SkeletonBlock className="h-12 w-full rounded-2xl" />
+          </div>
+          <div className="mt-4 grid grid-cols-4 gap-2">
+            {[0, 1, 2, 3].map((item) => (
+              <SkeletonBlock key={item} className="h-10 w-full" />
+            ))}
+          </div>
+        </section>
+        <div className="gm-x-scroll mt-4 flex gap-2 overflow-x-auto pb-1">
+          {["w-16", "w-24", "w-28", "w-24"].map((width, index) => (
+            <SkeletonBlock key={`${width}-${index}`} className={cn("h-10 shrink-0", width)} />
+          ))}
+        </div>
+        <SkeletonBlock className="mt-4 h-72 w-full rounded-[1.8rem]" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-4 pb-6">
+      <SkeletonBlock className="h-11 w-full rounded-2xl" />
+      <div className="gm-x-scroll mt-3 flex gap-2 overflow-x-auto pb-1">
+        {["w-12", "w-16", "w-20", "w-14", "w-24"].map((width, index) => (
+          <SkeletonBlock key={`${width}-${index}`} className={cn("h-8 shrink-0", width)} />
+        ))}
+      </div>
+      <section className="mt-4 overflow-hidden rounded-[1.8rem] bg-white shadow-sm">
+        <SkeletonBlock className="h-40 w-full rounded-none" />
+        <div className="space-y-3 p-4">
+          <SkeletonBlock className="h-3 w-24" />
+          <SkeletonBlock className="h-6 w-3/4" />
+          <SkeletonBlock className="h-4 w-1/2" />
+        </div>
+      </section>
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        {Array.from({ length: cardCount }).map((_, index) => (
+          <article key={index} className="overflow-hidden rounded-[1.5rem] bg-white shadow-sm">
+            <SkeletonBlock className="h-36 w-full rounded-none" />
+            <div className="space-y-2 p-3">
+              <SkeletonBlock className="h-3 w-16" />
+              <SkeletonBlock className="h-4 w-full" />
+              <SkeletonBlock className="h-5 w-20" />
+            </div>
+          </article>
+        ))}
+      </div>
     </div>
   );
 }
@@ -3023,7 +3182,7 @@ function GardenView({ notify, gardenMode, setGardenMode, selectedGarden, setSele
   );
 }
 
-function FeedView({ notify, openMessages, openGarden }) {
+function FeedView({ notify, openMessages, openGarden, openLeafy }) {
   const [feedFilter, setFeedFilter] = useState("All");
   const [userPosts, setUserPosts] = useState([]);
   const [showComposer, setShowComposer] = useState(false);
@@ -3113,15 +3272,26 @@ function FeedView({ notify, openMessages, openGarden }) {
           {[
             [Camera, "Photo", "Updates", plantPhotos.monstera],
             [MessageCircle, "Question", "Questions", plantPhotos.calathea],
-            [ScanLine, "Ask Leafy", "Tips", plantPhotos.anthurium],
+            [null, "Ask Leafy", "Tips", plantPhotos.anthurium],
             [Leaf, "Update", "Updates", plantPhotos.fern],
           ].map(([Icon, label]) => (
             <button
               key={label}
-              onClick={() => openComposer(label === "Photo" ? "Updates" : label === "Ask Leafy" ? "Tips" : label === "Question" ? "Questions" : "Updates")}
+              onClick={() => {
+                if (label === "Ask Leafy") {
+                  openLeafy?.("My plant has yellow leaves. What should I check first?");
+                  return;
+                }
+                openComposer(label === "Photo" ? "Updates" : label === "Question" ? "Questions" : "Updates");
+              }}
               className="gm-tap flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#edf7dc] px-3 py-2 text-xs font-black text-[#315d37]"
             >
-              <Icon size={15} /> {label}
+              {label === "Ask Leafy" ? (
+                <img src={leafyLogo} alt="" className="h-5 w-5 rounded-full object-cover" />
+              ) : (
+                <Icon size={15} />
+              )}
+              {label}
             </button>
           ))}
         </div>
@@ -4103,21 +4273,206 @@ function MessagesPanel({ targetName, collapsed, onCollapse, onExpand, onClose })
   );
 }
 
+function LeafyAssistantPanel({ initialPrompt = "", onClose }) {
+  const quickPrompts = [
+    "Identify this plant from a photo",
+    "Can I sell this plant safely?",
+    "Why are my leaves yellow?",
+    "Write a market listing",
+    "Give care tips for orchids",
+  ];
+  const [messages, setMessages] = useState([
+    {
+      from: "Leafy",
+      text: "Hi Laarne. I can help identify plants, check if they are safe to sell, diagnose care problems, write listings, and suggest plant categories.",
+    },
+  ]);
+  const [draft, setDraft] = useState(initialPrompt);
+  const [typing, setTyping] = useState(false);
+  const imageInputRef = useRef(null);
+
+  const getLeafyReply = (text) => {
+    const normalized = text.toLowerCase();
+    if (normalized.includes("sell") || normalized.includes("safe") || normalized.includes("market")) {
+      return "For Market posts, scan a real plant photo first. I will identify the plant, suggest a category, check protected-species risk, and mark it as Safe to sell, For review, or Blocked.";
+    }
+    if (normalized.includes("yellow") || normalized.includes("problem") || normalized.includes("diagnose")) {
+      return "Yellow leaves usually mean overwatering, low light, old leaf shedding, or nutrient stress. Check soil moisture first, then roots, drainage, and recent light changes.";
+    }
+    if (normalized.includes("listing") || normalized.includes("description")) {
+      return "Listing draft: Healthy beginner-friendly plant, locally grown in Butuan City. Includes recent scan, clear condition, quantity, care notes, and meetup or delivery option.";
+    }
+    if (normalized.includes("orchid")) {
+      return "For orchids, use bright indirect light, airy bark mix, and water when roots turn silvery. Avoid standing water around the crown.";
+    }
+    if (normalized.includes("identify") || normalized.includes("photo") || normalized.includes("scan")) {
+      return "Use Scan Plant so I can compare leaf shape, growth habit, flowers, and stems. For better verification, capture the full plant, close-up leaf, stem/base, and a recent photo.";
+    }
+    return "Good question. My recommendation is to scan the plant first, then I can suggest the name, category, care tips, safety status, and a marketplace-ready description.";
+  };
+
+  const sendQuestion = (text = draft) => {
+    const question = text.trim();
+    if (!question) return;
+    setMessages((items) => [...items, { from: "You", text: question }]);
+    setDraft("");
+    setTyping(true);
+    window.setTimeout(() => {
+      setMessages((items) => [...items, { from: "Leafy", text: getLeafyReply(question) }]);
+      setTyping(false);
+    }, 520);
+  };
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const imageUrl = URL.createObjectURL(file);
+    setMessages((items) => [
+      ...items,
+      {
+        from: "You",
+        text: `Uploaded plant photo: ${file.name}`,
+        image: imageUrl,
+      },
+    ]);
+    setTyping(true);
+    window.setTimeout(() => {
+      setMessages((items) => [
+        ...items,
+        {
+          from: "Leafy",
+          text: "Photo received. I would scan leaf shape, color, stem/base, pests, and overall condition. Mock result: likely healthy indoor plant, safe for care advice. For marketplace posting, use the Market scan flow for protected-species checking.",
+        },
+      ]);
+      setTyping(false);
+    }, 650);
+    event.target.value = "";
+  };
+
+  return (
+    <div className="pointer-events-none fixed inset-y-0 right-0 z-[75] flex justify-end p-0 sm:p-4">
+      <section className="gm-sheet-in pointer-events-auto flex h-full w-full max-w-[430px] flex-col overflow-hidden bg-[#f5f8ef] shadow-2xl ring-1 ring-[#dfe8d7] sm:rounded-[2rem]">
+        <div className="border-b border-[#dfe8d7] bg-white px-5 py-4">
+          <div className="flex items-center justify-between gap-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[#edf7dc]">
+              <img src={leafyLogo} alt="Leafy AI" className="h-10 w-10 object-cover" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-lg font-black text-[#203522]">Leafy AI</p>
+              <p className="text-xs font-bold text-[#52604d]">Plant assistant, safety checker, and garden coach</p>
+            </div>
+            <button onClick={onClose} className="gm-tap rounded-full bg-[#f0f4e8] px-3 py-2 text-xs font-black text-[#52604d]">
+              Close
+            </button>
+          </div>
+          <div className="gm-x-scroll mt-4 flex gap-2 overflow-x-auto pb-1">
+            {quickPrompts.map((prompt) => (
+              <button
+                key={prompt}
+                onClick={() => sendQuestion(prompt)}
+                className="gm-tap min-w-max rounded-full bg-[#edf7dc] px-3 py-2 text-xs font-black text-[#315d37]"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+          <div className="rounded-[1.4rem] bg-[#f0f9eb] p-4 ring-1 ring-[#d5ebc8]">
+            <p className="text-xs font-black uppercase tracking-[0.12em] text-[#6d9f44]">What Leafy can do</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-[#52604d]">
+              Identify plants, check sale safety, warn about protected species, diagnose care issues, write listings, and suggest categories.
+            </p>
+          </div>
+
+          {messages.map((message, index) => {
+            const mine = message.from === "You";
+            return (
+              <div key={`${message.from}-${index}-${message.text}`} className={cn("flex", mine ? "justify-end" : "justify-start")}>
+                <div className={cn("max-w-[82%] rounded-[1.2rem] px-4 py-3 text-sm font-semibold leading-6", mine ? "bg-[#203522] text-white" : "bg-white text-[#203522] shadow-sm")}>
+                  {!mine && <p className="mb-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#8bc34a]">Leafy</p>}
+                  {message.image && <img src={message.image} alt="Uploaded plant" className="mb-2 max-h-44 w-full rounded-2xl object-cover" />}
+                  {message.text}
+                </div>
+              </div>
+            );
+          })}
+          {typing && (
+            <div className="flex justify-start">
+              <div className="rounded-[1.2rem] bg-white px-4 py-3 text-sm font-black text-[#52604d] shadow-sm">
+                Leafy is checking...
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-[auto_1fr_auto] gap-2 border-t border-[#dfe8d7] bg-white p-3">
+          <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+          <button
+            onClick={() => imageInputRef.current?.click()}
+            className="gm-tap grid h-11 w-11 place-items-center rounded-full bg-[#edf7dc] text-[#315d37]"
+            aria-label="Upload plant image for Leafy"
+            title="Upload plant image"
+          >
+            <Camera size={17} />
+          </button>
+          <input
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") sendQuestion();
+            }}
+            className="min-h-11 rounded-full bg-[#f7faf1] px-4 text-sm font-semibold text-[#203522] outline-none placeholder:text-[#8b967f]"
+            placeholder="Ask Leafy about a plant..."
+          />
+          <button onClick={() => sendQuestion()} className="gm-tap grid h-11 w-11 place-items-center rounded-full bg-[#203522] text-white" aria-label="Send Leafy question">
+            <Send size={17} />
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export default function ProductApp() {
+  const [isAppLoading, setIsAppLoading] = useState(true);
+  const [sectionLoading, setSectionLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("Garden");
   const [gardenMode, setGardenMode] = useState("Mine");
   const [selectedGarden, setSelectedGarden] = useState(null);
   const [marketListing, setMarketListing] = useState(null);
   const [messageTarget, setMessageTarget] = useState(null);
   const [messageCollapsed, setMessageCollapsed] = useState(false);
+  const [leafyPrompt, setLeafyPrompt] = useState(null);
   const [actionPanel, setActionPanel] = useState(null);
   const [myMarketListings, setMyMarketListings] = useState([]);
   const [marketCreator, setMarketCreator] = useState(null);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsAppLoading(false), 950);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (isAppLoading) return undefined;
+    setSectionLoading(true);
+    const timer = window.setTimeout(() => setSectionLoading(false), 420);
+    return () => window.clearTimeout(timer);
+  }, [activeTab, gardenMode, selectedGarden, marketCreator, isAppLoading]);
+
   const notify = (title, detail) => setActionPanel({ title, detail });
   const openMessages = (target = "__inbox") => {
     setActionPanel(null);
+    setLeafyPrompt(null);
     setMessageTarget(target);
     setMessageCollapsed(false);
+  };
+  const openLeafy = (prompt = "") => {
+    setActionPanel(null);
+    setMessageTarget(null);
+    setMessageCollapsed(false);
+    setLeafyPrompt(prompt);
   };
   const openCommunityGarden = (ownerName) => {
     if (ownerName === "Laarne Ramos") {
@@ -4192,10 +4547,14 @@ export default function ProductApp() {
         openMessages={openMessages}
       />
     ),
-    Feed: <FeedView notify={notify} openMessages={openMessages} openGarden={openCommunityGarden} />,
+    Feed: <FeedView notify={notify} openMessages={openMessages} openGarden={openCommunityGarden} openLeafy={openLeafy} />,
     Rankings: <RankView notify={notify} openGarden={openCommunityGarden} />,
     Profile: <ProfileView setActiveTab={setActiveTab} notify={notify} myMarketListings={myMarketListings} />,
   }[activeTab];
+
+  if (isAppLoading) {
+    return <GrowMateLoadingSkeleton />;
+  }
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(217,249,157,0.34),transparent_28%),linear-gradient(135deg,#e8f0df,#f7faf1_45%,#dbe8d1)] font-sans text-[#203522] sm:px-4 lg:px-8">
@@ -4221,7 +4580,9 @@ export default function ProductApp() {
               </button>
             </div>
           </header>
-          <div key={activeTab} className="gm-screen-in">{view}</div>
+          <div key={`${activeTab}-${sectionLoading ? "loading" : "ready"}`} className="gm-screen-in">
+            {sectionLoading ? <SectionLoadingSkeleton activeTab={activeTab} /> : view}
+          </div>
         </div>
         <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
       </PhoneShell>
@@ -4238,6 +4599,7 @@ export default function ProductApp() {
           }}
         />
       )}
+      {leafyPrompt !== null && <LeafyAssistantPanel initialPrompt={leafyPrompt} onClose={() => setLeafyPrompt(null)} />}
       <ActionPanel action={actionPanel} onClose={() => setActionPanel(null)} />
     </main>
   );
