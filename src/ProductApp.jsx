@@ -706,6 +706,33 @@ const messageThreads = [
   },
 ];
 
+const defaultLeafyMessages = [
+  {
+    from: "Leafy",
+    text: "Hi Laarne. I can help identify plants, check if they are safe to sell, diagnose care problems, write listings, and suggest plant categories.",
+  },
+];
+
+const getLeafyReply = (text) => {
+  const normalized = text.toLowerCase();
+  if (normalized.includes("sell") || normalized.includes("safe") || normalized.includes("market")) {
+    return "For Market posts, scan a real plant photo first. I will identify the plant, suggest a category, check protected-species risk, and mark it as Safe to sell, For review, or Blocked.";
+  }
+  if (normalized.includes("yellow") || normalized.includes("problem") || normalized.includes("diagnose")) {
+    return "Yellow leaves usually mean overwatering, low light, old leaf shedding, or nutrient stress. Check soil moisture first, then roots, drainage, and recent light changes.";
+  }
+  if (normalized.includes("listing") || normalized.includes("description")) {
+    return "Listing draft: Healthy beginner-friendly plant, locally grown in Butuan City. Includes recent scan, clear condition, quantity, care notes, and meetup or delivery option.";
+  }
+  if (normalized.includes("orchid")) {
+    return "For orchids, use bright indirect light, airy bark mix, and water when roots turn silvery. Avoid standing water around the crown.";
+  }
+  if (normalized.includes("identify") || normalized.includes("photo") || normalized.includes("scan")) {
+    return "Use Scan Plant so I can compare leaf shape, growth habit, flowers, and stems. For better verification, capture the full plant, close-up leaf, stem/base, and a recent photo.";
+  }
+  return "Good question. My recommendation is to scan the plant first, then I can suggest the name, category, care tips, safety status, and a marketplace-ready description.";
+};
+
 const feedPosts = [
   {
     id: "feed-maria-leaf",
@@ -4017,10 +4044,11 @@ function BottomNav({ activeTab, setActiveTab }) {
   );
 }
 
-function MessagesPanel({ targetName, collapsed, onCollapse, onExpand, onClose }) {
-  const inboxFilters = ["All", "Friends", "Market", "Garden", "Requests"];
+function MessagesPanel({ targetName, collapsed, onCollapse, onExpand, onClose, leafyMessages, setLeafyMessages }) {
+  const inboxFilters = ["All", "Leafy", "Friends", "Market", "Garden", "Requests"];
   const getThreadType = (thread) => {
     if (thread.type) return thread.type;
+    if (thread.name === "Leafy AI") return "Leafy";
     if (thread.name === "Miguel Bautista") return "Garden";
     if (thread.name === "Maria Dela Cruz" || thread.name === "Mang Lito Santos") return "Market";
     if (thread.name === "Mika Santos") return "Requests";
@@ -4031,8 +4059,21 @@ function MessagesPanel({ targetName, collapsed, onCollapse, onExpand, onClose })
     const type = getThreadType(thread);
     if (type === "Market") return `Market - ${thread.context}`;
     if (type === "Garden") return `Garden - ${thread.context}`;
+    if (type === "Leafy") return "AI assistant";
     if (type === "Requests") return "Message request";
     return thread.context;
+  };
+  const latestLeafyMessage = leafyMessages[leafyMessages.length - 1];
+  const leafyThread = {
+    name: "Leafy AI",
+    avatar: leafyLogo,
+    type: "Leafy",
+    context: "Plant assistant",
+    meta: "AI assistant - plant care, diagnosis, and listing help",
+    preview: latestLeafyMessage?.text ?? "Ask Leafy about a plant.",
+    time: "now",
+    unread: 0,
+    messages: leafyMessages.map((message) => [message.from, message.text, message.image]),
   };
   const extraThreads = [
     {
@@ -4061,7 +4102,7 @@ function MessagesPanel({ targetName, collapsed, onCollapse, onExpand, onClose })
       messages: [["Mika Santos", "Hi, can I ask about your Calathea care routine?"]],
     },
   ];
-  const availableThreads = [...messageThreads, ...extraThreads];
+  const availableThreads = [leafyThread, ...messageThreads, ...extraThreads];
   const fallbackThread =
     targetName && targetName !== "__inbox" && !availableThreads.some((thread) => thread.name === targetName)
       ? {
@@ -4106,12 +4147,22 @@ function MessagesPanel({ targetName, collapsed, onCollapse, onExpand, onClose })
       ? "Product inquiry"
       : selectedType === "Requests"
           ? "Message request"
+          : selectedType === "Leafy"
+            ? "Leafy AI assistant"
           : selectedType === "Garden"
             ? "Garden chat"
             : "Friend chat";
   const sendMessage = () => {
     const text = draft.trim();
     if (!text) return;
+    if (selectedThread.name === "Leafy AI") {
+      setLeafyMessages((items) => [...items, { from: "You", text }]);
+      setDraft("");
+      window.setTimeout(() => {
+        setLeafyMessages((items) => [...items, { from: "Leafy", text: getLeafyReply(text) }]);
+      }, 520);
+      return;
+    }
     setSentMessages((items) => [...items, { to: selectedThread.name, text }]);
     setDraft("");
   };
@@ -4228,7 +4279,7 @@ function MessagesPanel({ targetName, collapsed, onCollapse, onExpand, onClose })
                   <p className="mt-1 text-xs font-semibold text-[#52604d]">{selectedMeta}</p>
                 </div>
                 <button className="gm-tap shrink-0 rounded-full bg-white px-3 py-2 text-xs font-black text-[#315d37] shadow-sm">
-                  {selectedType === "Market" ? "View listing" : "View"}
+                  {selectedType === "Market" ? "View listing" : selectedType === "Leafy" ? "Ask Leafy" : "View"}
                 </button>
               </div>
               {selectedType === "Requests" && (
@@ -4240,11 +4291,12 @@ function MessagesPanel({ targetName, collapsed, onCollapse, onExpand, onClose })
             </div>
 
             <div className="flex-1 space-y-3 overflow-y-auto p-4">
-              {selectedMessages.map(([sender, text], index) => {
+              {selectedMessages.map(([sender, text, image], index) => {
                 const isMine = sender === "You";
                 return (
                   <div key={`${sender}-${index}-${text}`} className={cn("flex", isMine ? "justify-end" : "justify-start")}>
                     <div className={cn("max-w-[78%] rounded-[1.2rem] px-4 py-3 text-sm font-semibold leading-5", isMine ? "bg-[#203522] text-white" : "bg-[#f0f4e8] text-[#203522]")}>
+                      {image && <img src={image} alt="Uploaded plant" className="mb-2 max-h-40 w-full rounded-2xl object-cover" />}
                       {text}
                     </div>
                   </div>
@@ -4273,7 +4325,7 @@ function MessagesPanel({ targetName, collapsed, onCollapse, onExpand, onClose })
   );
 }
 
-function LeafyAssistantPanel({ initialPrompt = "", onClose }) {
+function LeafyAssistantPanel({ initialPrompt = "", onClose, messages, setMessages }) {
   const quickPrompts = [
     "Identify this plant from a photo",
     "Can I sell this plant safely?",
@@ -4281,35 +4333,9 @@ function LeafyAssistantPanel({ initialPrompt = "", onClose }) {
     "Write a market listing",
     "Give care tips for orchids",
   ];
-  const [messages, setMessages] = useState([
-    {
-      from: "Leafy",
-      text: "Hi Laarne. I can help identify plants, check if they are safe to sell, diagnose care problems, write listings, and suggest plant categories.",
-    },
-  ]);
   const [draft, setDraft] = useState(initialPrompt);
   const [typing, setTyping] = useState(false);
   const imageInputRef = useRef(null);
-
-  const getLeafyReply = (text) => {
-    const normalized = text.toLowerCase();
-    if (normalized.includes("sell") || normalized.includes("safe") || normalized.includes("market")) {
-      return "For Market posts, scan a real plant photo first. I will identify the plant, suggest a category, check protected-species risk, and mark it as Safe to sell, For review, or Blocked.";
-    }
-    if (normalized.includes("yellow") || normalized.includes("problem") || normalized.includes("diagnose")) {
-      return "Yellow leaves usually mean overwatering, low light, old leaf shedding, or nutrient stress. Check soil moisture first, then roots, drainage, and recent light changes.";
-    }
-    if (normalized.includes("listing") || normalized.includes("description")) {
-      return "Listing draft: Healthy beginner-friendly plant, locally grown in Butuan City. Includes recent scan, clear condition, quantity, care notes, and meetup or delivery option.";
-    }
-    if (normalized.includes("orchid")) {
-      return "For orchids, use bright indirect light, airy bark mix, and water when roots turn silvery. Avoid standing water around the crown.";
-    }
-    if (normalized.includes("identify") || normalized.includes("photo") || normalized.includes("scan")) {
-      return "Use Scan Plant so I can compare leaf shape, growth habit, flowers, and stems. For better verification, capture the full plant, close-up leaf, stem/base, and a recent photo.";
-    }
-    return "Good question. My recommendation is to scan the plant first, then I can suggest the name, category, care tips, safety status, and a marketplace-ready description.";
-  };
 
   const sendQuestion = (text = draft) => {
     const question = text.trim();
@@ -4445,6 +4471,7 @@ export default function ProductApp() {
   const [messageTarget, setMessageTarget] = useState(null);
   const [messageCollapsed, setMessageCollapsed] = useState(false);
   const [leafyPrompt, setLeafyPrompt] = useState(null);
+  const [leafyMessages, setLeafyMessages] = useState(defaultLeafyMessages);
   const [actionPanel, setActionPanel] = useState(null);
   const [myMarketListings, setMyMarketListings] = useState([]);
   const [marketCreator, setMarketCreator] = useState(null);
@@ -4591,6 +4618,8 @@ export default function ProductApp() {
         <MessagesPanel
           targetName={messageTarget}
           collapsed={messageCollapsed}
+          leafyMessages={leafyMessages}
+          setLeafyMessages={setLeafyMessages}
           onCollapse={() => setMessageCollapsed(true)}
           onExpand={() => setMessageCollapsed(false)}
           onClose={() => {
@@ -4599,7 +4628,14 @@ export default function ProductApp() {
           }}
         />
       )}
-      {leafyPrompt !== null && <LeafyAssistantPanel initialPrompt={leafyPrompt} onClose={() => setLeafyPrompt(null)} />}
+      {leafyPrompt !== null && (
+        <LeafyAssistantPanel
+          initialPrompt={leafyPrompt}
+          messages={leafyMessages}
+          setMessages={setLeafyMessages}
+          onClose={() => setLeafyPrompt(null)}
+        />
+      )}
       <ActionPanel action={actionPanel} onClose={() => setActionPanel(null)} />
     </main>
   );
