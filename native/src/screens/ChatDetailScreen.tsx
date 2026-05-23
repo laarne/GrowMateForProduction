@@ -22,6 +22,7 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLeafyTyping, setIsLeafyTyping] = useState(false);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -102,6 +103,9 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }, 50);
 
+      // Start typing indicator simulation
+      setIsLeafyTyping(true);
+
       // Generate leafy response
       setTimeout(async () => {
         let leafyResponseText = "That's a great question! Make sure your plant gets the right amount of indirect sunlight and check the soil moisture before watering. 🌿";
@@ -130,6 +134,9 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
         const finalMessages = [...updatedMessages, leafyMsg];
         setMessages(finalMessages);
         await AsyncStorage.setItem("growmate_leafy_chat_messages", JSON.stringify(finalMessages));
+        
+        // Disable typing animation and finish sending
+        setIsLeafyTyping(false);
         setIsSending(false);
         setTimeout(() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -219,7 +226,7 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }, 100);
-  }, [messages.length]);
+  }, [messages.length, isLeafyTyping]);
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.root}>
@@ -246,29 +253,41 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
           </View>
         ) : (
           <ScrollView ref={scrollViewRef} contentContainerStyle={styles.messagesList} style={styles.scroll}>
-            {messages.length === 0 ? (
+            {messages.length === 0 && !isLeafyTyping ? (
               <View style={styles.emptyWrap}>
                 <Text style={styles.emptyText}>No messages yet. Send a message to start conversing!</Text>
               </View>
             ) : (
-              messages.map((msg) => {
-                const isMe = msg.senderId === user?.id;
-                return (
-                  <View key={msg.id} style={[styles.bubbleWrap, isMe ? styles.bubbleWrapMe : styles.bubbleWrapOther]}>
-                    <View style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleOther]}>
-                      <Text style={[styles.bubbleText, isMe ? styles.bubbleTextMe : styles.bubbleTextOther]}>
-                        {msg.body}
-                      </Text>
-                      <Text style={[styles.timeText, isMe ? styles.timeTextMe : styles.timeTextOther]}>
-                        {new Date(msg.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+              <>
+                {messages.map((msg) => {
+                  const isMe = msg.senderId === user?.id;
+                  return (
+                    <View key={msg.id} style={[styles.bubbleWrap, isMe ? styles.bubbleWrapMe : styles.bubbleWrapOther]}>
+                      <View style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleOther]}>
+                        <Text style={[styles.bubbleText, isMe ? styles.bubbleTextMe : styles.bubbleTextOther]}>
+                          {msg.body}
+                        </Text>
+                        <Text style={[styles.timeText, isMe ? styles.timeTextMe : styles.timeTextOther]}>
+                          {new Date(msg.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </Text>
+                      </View>
+                    </View>
+                  );
+                })}
+                {isLeafyTyping && (
+                  <View style={[styles.bubbleWrap, styles.bubbleWrapOther]}>
+                    <View style={[styles.bubble, styles.bubbleOther, styles.typingBubble]}>
+                      <ActivityIndicator size="small" color={colors.green} style={styles.typingIndicator} />
+                      <Text style={[styles.bubbleText, styles.bubbleTextOther, styles.typingText]}>
+                        Leafy is typing...
                       </Text>
                     </View>
                   </View>
-                );
-              })
+                )}
+              </>
             )}
           </ScrollView>
         )}
@@ -416,5 +435,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "800",
     textAlign: "center",
+  },
+  typingBubble: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  typingIndicator: {
+    marginRight: 4,
+  },
+  typingText: {
+    fontStyle: "italic",
+    color: colors.greenMuted,
   },
 });
