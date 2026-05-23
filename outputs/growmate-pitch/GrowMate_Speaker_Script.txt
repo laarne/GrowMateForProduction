@@ -1,0 +1,50 @@
+Slide 1: Problem Statement
+Before we begin, who here owns a plant, collects plants, or knows a plantito or plantita?
+Many people buy and sell plants through Facebook groups, Marketplace, or local sellers. But listings are often unclear.
+Buyers may not know the exact plant name, how to care for it, if it is healthy, or if it is safe and legal to sell.
+That is the problem GrowMate wants to solve.
+
+Slide 2: Proposed Solution
+GrowMate is a mobile plant marketplace and community app for plant lovers, beginners, local sellers, and plantitos and plantitas.
+Users can buy and sell plants, showcase their garden, post updates, ask questions, and get support from Leafy AI.
+GrowMate is not just a marketplace. It is a safer plant community where users can learn, connect, and grow together.
+
+Slide 3: AI Integration and Technology Used
+Introducing Leafy AI, the main AI feature of GrowMate.
+When a seller uploads a plant photo, GrowMate can use a plant identification API, such as Plant.id, to identify the plant.
+Leafy AI can suggest the plant name, category, care tips, and marketplace description.
+It can also help diagnose plant problems and warn users about plants that may be protected, endangered, or risky to sell.
+So the AI supports safety, trust, and better plant care.
+
+Slide 4: Target Users and Beneficiaries
+Our target users are beginner plant owners, plant collectors, local sellers, backyard gardeners, urban gardeners, and people growing herbs or vegetables at home.
+Buyers get clearer and safer listings.
+Sellers can post faster with AI assistance.
+Beginners get plant identification and care guidance.
+Local communities benefit because GrowMate supports small sellers, urban gardening, and responsible plant selling.
+
+Slide 5: Prototype Demonstration
+Now, let me show how GrowMate works.
+In the Market, users can browse plants for sale.
+When a seller wants to post, they tap Sell Plant, upload a plant photo, and Leafy AI helps identify the plant and check if it may be safe to sell.
+The seller can add the price, quantity, local plant name, category, and delivery or meetup option. Then the listing can be posted to the Market.
+GrowMate also has a Feed, where users can post garden updates, ask questions, and share plant progress.
+In the Garden section, users can showcase their plant collection and visit other people's gardens for inspiration.
+There is also a Rankings section for gamification, and a Profile section that shows listings, posts, badges, and garden activity.
+So GrowMate helps users buy, sell, connect, and stay active in a plant-growing community.
+
+Slide 6: Impact
+GrowMate creates impact in three ways.
+First, it makes plant buying safer through clearer listings.
+Second, it helps beginners learn proper plant care.
+Third, it supports local plant sellers and gardening communities.
+It also promotes responsible selling because Leafy AI can help flag risky or protected plants.
+GrowMate supports SDG 11: Sustainable Cities and Communities, SDG 12: Responsible Consumption and Production, and SDG 15: Life on Land.
+
+Slide 7: Scalability and Sustainability
+To make GrowMate sustainable, the app can earn through a 10% marketplace fee only when a plant is sold.
+There is no upfront listing fee, so sellers can post more easily.
+In the future, GrowMate can add verified seller accounts, premium seller tools, promoted listings, and partnerships with gardening shops or local communities.
+It can also scale to other cities through location-based listings and regional plant communities.
+To conclude, GrowMate is an AI-powered plant marketplace and community app that helps users buy, sell, identify, and care for plants in a safer and easier way.
+Grow smart, grow safe, grow great with GrowMate. Thank you.

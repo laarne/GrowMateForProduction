@@ -1,0 +1,90 @@
+import { supabase } from "./supabase";
+
+export type Review = {
+  id: string;
+  orderId: string;
+  reviewerId: string;
+  revieweeId: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  reviewerName?: string;
+  reviewerAvatar?: string | null;
+};
+
+export async function createReview(
+  orderId: string,
+  reviewerId: string,
+  revieweeId: string,
+  rating: number,
+  comment: string | null
+): Promise<void> {
+  if (!supabase) throw new Error("Supabase is not configured.");
+
+  const { error } = await supabase.from("reviews").insert({
+    order_id: orderId,
+    reviewer_id: reviewerId,
+    reviewee_id: revieweeId,
+    rating,
+    comment,
+  });
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function getReviewsForUser(userId: string): Promise<Review[]> {
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("reviews")
+    .select(`
+      id,
+      order_id,
+      reviewer_id,
+      reviewee_id,
+      rating,
+      comment,
+      created_at,
+      reviewer:profiles!reviews_reviewer_id_fkey(display_name, avatar_url)
+    `)
+    .eq("reviewee_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map((row: any) => {
+    const reviewer = Array.isArray(row.reviewer) ? row.reviewer[0] : row.reviewer;
+    return {
+      id: row.id,
+      orderId: row.order_id,
+      reviewerId: row.reviewer_id,
+      revieweeId: row.reviewee_id,
+      rating: row.rating,
+      comment: row.comment,
+      createdAt: row.created_at,
+      reviewerName: reviewer?.display_name ?? "GrowMate User",
+      reviewerAvatar: reviewer?.avatar_url,
+    };
+  });
+}
+
+export async function getReviewForOrder(orderId: string, reviewerId: string): Promise<Review | null> {
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("reviews")
+    .select("*")
+    .eq("order_id", orderId)
+    .eq("reviewer_id", reviewerId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}

@@ -1,0 +1,265 @@
+import { supabase } from "./supabase";
+
+export type Conversation = {
+  id: string;
+  type: "friend" | "market" | "garden" | "leafy" | "support";
+  listingId: string | null;
+  gardenId: string | null;
+  title: string | null;
+  updatedAt: string;
+  otherMember: {
+    id: string;
+    displayName: string;
+    avatarUrl: string | null;
+  } | null;
+};
+
+export type Message = {
+  id: string;
+  conversationId: string;
+  senderId: string | null;
+  body: string;
+  imageUrl: string | null;
+  createdAt: string;
+};
+
+type ProfileRow = {
+  id: string;
+  display_name: string;
+  avatar_url: string | null;
+};
+
+type MemberRow = {
+  user_id: string;
+  profiles: ProfileRow | null;
+};
+
+type ConversationJoinRow = {
+  id: string;
+  type: Conversation["type"];
+  listing_id: string | null;
+  garden_id: string | null;
+  title: string | null;
+  updated_at: string;
+  conversation_members: MemberRow[];
+};
+
+type MemberQueryRow = {
+  conversation_id: string;
+  conversations: ConversationJoinRow | null;
+};
+
+export async function getConversations(userId: string): Promise<Conversation[]> {
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("conversation_members")
+    .select(`
+      conversation_id,
+      conversations (
+        id,
+        type,
+        listing_id,
+        garden_id,
+        title,
+        updated_at,
+        conversation_members (
+          user_id,
+          profiles (
+            id,
+            display_name,
+            avatar_url
+          )
+        )
+      )
+    `)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw error;
+  }
+
+  const rawRows = (data ?? []) as unknown as MemberQueryRow[];
+  const conversations: Conversation[] = [];
+
+  for (const row of rawRows) {
+    if (!row.conversations) continue;
+    const convo = row.conversations;
+
+    // Find the other member of the conversation
+    const otherMemberRow = convo.conversation_members.find((m) => m.user_id !== userId);
+    const otherProfile = otherMemberRow?.profiles;
+
+    conversations.push({
+      id: convo.id,
+      type: convo.type,
+      listingId: convo.listing_id,
+      gardenId: convo.garden_id,
+      title: convo.title,
+      updatedAt: convo.updated_at,
+      otherMember: otherProfile
+        ? {
+            id: otherProfile.id,
+            displayName: otherProfile.display_name,
+            avatarUrl: otherProfile.avatar_url,
+          }
+        : null,
+    });
+  }
+
+  // Sort by updatedAt descending
+  return conversations.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+}
+
+export async function getMessages(conversationId: string): Promise<Message[]> {
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("messages")
+    .select("id, conversation_id, sender_id, body, image_url, created_at")
+    .eq("conversation_id", conversationId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map((msg) => ({
+    id: msg.id,
+    conversationId: msg.conversation_id,
+    senderId: msg.sender_id,
+    body: msg.body,
+    imageUrl: msg.image_url,
+    createdAt: msg.created_at,
+  }));
+}
+
+export async function sendMessage(conversationId: string, senderId: string, body: string, imageUrl?: string | null): Promise<Message> {
+  if (!supabase) throw new Error("Supabase is not configured.");
+
+  const { data, error } = await supabase
+    .from("messages")
+    .insert({
+      conversation_id: conversationId,
+      sender_id: senderId,
+      body,
+      image_url: imageUrl || null,
+    })
+    .select("id, conversation_id, sender_id, body, image_url, created_at")
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  // Touch the conversation's updated_at timestamp
+  await supabase
+    .from("conversations")
+    .update({ updated_at: new Date().toISOString() })
+    .eq("id", conversationId);
+
+  return {
+    id: data.id,
+    conversationId: data.conversation_id,
+    senderId: data.sender_id,
+    body: data.body,
+    imageUrl: data.image_url,
+    createdAt: data.created_at,
+  };
+}
+
+export async function getOrCreateMarketConversation(listingId: string, buyerId: string, sellerId: string, listingName: string): Promise<string> {
+  if (!supabase) throw new Error("Supabase is not configured.");
+
+  // Check if a conversation of type 'market' exists for this listing and buyer
+  const { data: existingConvo, error: checkError } = await supabase
+    .from("conversations")
+    .select(`
+      id,
+      conversation_members!inner (
+        user_id
+      )
+    `)
+    .eq("type", "market")
+    .eq("listing_id", listingId)
+    .eq("conversation_members.user_id", buyerId)
+    .maybeSingle();
+
+  if (existingConvo) {
+    return existingConvo.id;
+  }
+
+  // Create new conversation
+  const { data: newConvo, error: createError } = await supabase
+    .from("conversations")
+    .insert({
+      type: "market",
+      listing_id: listingId,
+      title: `Inquiry: ${listingName}`,
+    })
+    .select("id")
+    .single();
+
+  if (createError) {
+    throw createError;
+  }
+
+  // Add members
+  const { error: membersError } = await supabase.from("conversation_members").insert([
+    { conversation_id: newConvo.id, user_id: buyerId },
+    { conversation_id: newConvo.id, user_id: sellerId },
+  ]);
+
+  if (membersError) {
+    throw membersError;
+  }
+
+  return newConvo.id;
+}
+
+export async function markConversationAsRead(conversationId: string, userId: string): Promise<void> {
+  if (!supabase) return;
+
+  const { error } = await supabase
+    .from("conversation_members")
+    .update({ last_read_at: new Date().toISOString() })
+    .eq("conversation_id", conversationId)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function getUnreadMessagesCount(userId: string): Promise<number> {
+  if (!supabase) return 0;
+
+  const { data: members, error: membersError } = await supabase
+    .from("conversation_members")
+    .select("conversation_id, last_read_at")
+    .eq("user_id", userId);
+
+  if (membersError) throw membersError;
+  if (!members || members.length === 0) return 0;
+
+  let totalUnread = 0;
+
+  for (const member of members) {
+    let query = supabase
+      .from("messages")
+      .select("id", { count: "exact", head: true })
+      .eq("conversation_id", member.conversation_id)
+      .neq("sender_id", userId);
+
+    if (member.last_read_at) {
+      query = query.gt("created_at", member.last_read_at);
+    }
+
+    const { count, error } = await query;
+    if (!error && count !== null) {
+      totalUnread += count;
+    }
+  }
+
+  return totalUnread;
+}

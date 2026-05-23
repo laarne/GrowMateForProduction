@@ -1,0 +1,79 @@
+# GrowMate Supabase Database
+
+Run the migration in:
+
+Supabase Dashboard -> SQL Editor -> New query
+
+Paste and run:
+
+`supabase/migrations/20260522000000_initial_growmate_schema.sql`
+
+## What This Creates
+
+### Auth-linked users
+
+- `profiles`: public profile, Google avatar, location, admin flag, seller status
+- automatic profile creation when a new Google Auth user signs up
+
+### Seller verification
+
+- `seller_applications`: buyer submits seller application
+- `seller_profiles`: created after seller approval
+- only verified sellers can create marketplace listings
+
+### Marketplace
+
+- `listings`: verified seller plant listings
+- `listing_photos`: photos for each listing
+- `orders`: buyer/seller purchase records
+- `favorites`: saved listings
+- `reviews`: completed-order ratings
+
+### Garden community
+
+- `gardens`: public/private user garden profile
+- `garden_plants`: plants inside a user garden
+- `garden_plant_photos`: plant progress photos
+- `garden_follows`: follow/visit gardens
+
+### Feed
+
+- `feed_posts`: updates, questions, harvests, and tips
+- `post_reactions`: likes
+- `post_comments`: comments
+
+### Messages
+
+- `conversations`: friend, market, garden, Leafy, and support conversations
+- `conversation_members`: users inside a conversation
+- `messages`: chat messages
+
+### Safety and rankings
+
+- `reports`: listing/post/user reports
+- `rank_events`: point events for rankings
+
+### Storage buckets
+
+- `avatars`
+- `listing-photos`
+- `garden-photos`
+- `feed-photos`
+- `verification-docs`
+
+## Storage Path Rule
+
+Upload files under a folder named with the user id:
+
+```text
+listing-photos/{user_id}/file-name.jpg
+garden-photos/{user_id}/file-name.jpg
+avatars/{user_id}/avatar.jpg
+```
+
+The RLS policies expect the first folder segment to be the logged-in user id.
+
+## Important Production Rule
+
+Keep secret API keys such as `PLANTNET_API_KEY` outside the mobile app. Put them in Netlify Functions, Supabase Edge Functions, or another backend-only environment.
+

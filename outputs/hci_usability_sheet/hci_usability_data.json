@@ -1,0 +1,2767 @@
+{
+  "source_file": "C:\\Users\\User\\Downloads\\HCI_Usability_OURSCHOOL-1-1.pdf",
+  "page_count": 60,
+  "participant_count": 30,
+  "participants": [
+    {
+      "participant": 1,
+      "platform": "MySchool",
+      "version": "Device Used Mobile",
+      "device": "Mobile",
+      "gender": "Female",
+      "duration": "00:15:17",
+      "sus_score": 40.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Login again",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Participant accidentally clicked logout button."
+        }
+      ],
+      "sus": {
+        "Use frequently": 2,
+        "System unnecessarily complex": 4,
+        "Easy to use": 2,
+        "Need technical support": 4,
+        "Functions integrated": 2,
+        "Too much inconsistency": 4,
+        "Learn quickly": 2,
+        "System cumbersome": 4,
+        "Confident using system": 2,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Login process was straightforward.",
+        "Suggested improvements": "Use larger fonts and buttons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Text is too small on mobile devices.",
+        "Design change suggestion": "Improve mobile responsiveness.",
+        "Text readability": "Too small on mobile devices.",
+        "Overall remarks": "Participant SUS score: 40/100"
+      }
+    },
+    {
+      "participant": 2,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Computer",
+      "gender": "Male",
+      "duration": "00:10:41",
+      "sus_score": 35.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Login again",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "View account information",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        }
+      ],
+      "sus": {
+        "Use frequently": 2,
+        "System unnecessarily complex": 4,
+        "Easy to use": 2,
+        "Need technical support": 4,
+        "Functions integrated": 2,
+        "Too much inconsistency": 4,
+        "Learn quickly": 2,
+        "System cumbersome": 4,
+        "Confident using system": 2,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "The system provides useful academic information.",
+        "Suggested improvements": "Use larger fonts and buttons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Text is too small on mobile devices.",
+        "Design change suggestion": "Add clearer labels and icons.",
+        "Text readability": "Too small on mobile devices.",
+        "Overall remarks": "Participant SUS score: 35/100"
+      }
+    },
+    {
+      "participant": 3,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Computer",
+      "gender": "Female",
+      "duration": "00:05:05",
+      "sus_score": 57.5,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Assist",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        }
+      ],
+      "sus": {
+        "Use frequently": 4,
+        "System unnecessarily complex": 2,
+        "Easy to use": 4,
+        "Need technical support": 2,
+        "Functions integrated": 4,
+        "Too much inconsistency": 2,
+        "Learn quickly": 4,
+        "System cumbersome": 2,
+        "Confident using system": 4,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Account information is accessible.",
+        "Suggested improvements": "Add clearer labels and icons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Interface looks outdated.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 57.5/100"
+      }
+    },
+    {
+      "participant": 4,
+      "platform": "MySchool",
+      "version": "Device Used Computer",
+      "device": "Computer",
+      "gender": "Male",
+      "duration": "00:08:14",
+      "sus_score": 57.5,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        }
+      ],
+      "sus": {
+        "Use frequently": 4,
+        "System unnecessarily complex": 2,
+        "Easy to use": 4,
+        "Need technical support": 2,
+        "Functions integrated": 4,
+        "Too much inconsistency": 2,
+        "Learn quickly": 4,
+        "System cumbersome": 2,
+        "Confident using system": 4,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "The system provides useful academic information.",
+        "Suggested improvements": "Simplify navigation menus.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Too much scrolling is required.",
+        "Design change suggestion": "Add clearer labels and icons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 57.5/100"
+      }
+    },
+    {
+      "participant": 5,
+      "platform": "MySchool",
+      "version": "Device Used Mobile",
+      "device": "Mobile",
+      "gender": "Female",
+      "duration": "00:06:05",
+      "sus_score": 52.5,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Assist",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        }
+      ],
+      "sus": {
+        "Use frequently": 3,
+        "System unnecessarily complex": 3,
+        "Easy to use": 3,
+        "Need technical support": 3,
+        "Functions integrated": 3,
+        "Too much inconsistency": 3,
+        "Learn quickly": 3,
+        "System cumbersome": 3,
+        "Confident using system": 3,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Account information is accessible.",
+        "Suggested improvements": "Improve mobile responsiveness.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Too much scrolling is required.",
+        "Design change suggestion": "Add clearer labels and icons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 52.5/100"
+      }
+    },
+    {
+      "participant": 6,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Computer",
+      "gender": "Female",
+      "duration": "00:12:39",
+      "sus_score": 45.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login again",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "View account information",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        }
+      ],
+      "sus": {
+        "Use frequently": 2,
+        "System unnecessarily complex": 4,
+        "Easy to use": 2,
+        "Need technical support": 4,
+        "Functions integrated": 2,
+        "Too much inconsistency": 4,
+        "Learn quickly": 2,
+        "System cumbersome": 4,
+        "Confident using system": 2,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Account information is accessible.",
+        "Suggested improvements": "Use larger fonts and buttons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Navigation tabs are confusing.",
+        "Design change suggestion": "Simplify navigation menus.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 45/100"
+      }
+    },
+    {
+      "participant": 7,
+      "platform": "MySchool",
+      "version": "Device Used Mobile",
+      "device": "Mobile",
+      "gender": "Male",
+      "duration": "00:13:14",
+      "sus_score": 50.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Login again",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Navigation felt confusing at first."
+        }
+      ],
+      "sus": {
+        "Use frequently": 3,
+        "System unnecessarily complex": 3,
+        "Easy to use": 3,
+        "Need technical support": 3,
+        "Functions integrated": 3,
+        "Too much inconsistency": 3,
+        "Learn quickly": 3,
+        "System cumbersome": 3,
+        "Confident using system": 3,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Account information is accessible.",
+        "Suggested improvements": "Add clearer labels and icons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Too much scrolling is required.",
+        "Design change suggestion": "Improve mobile responsiveness.",
+        "Text readability": "Too small on mobile devices.",
+        "Overall remarks": "Participant SUS score: 50/100"
+      }
+    },
+    {
+      "participant": 8,
+      "platform": "MySchool",
+      "version": "Device Used Computer",
+      "device": "Computer",
+      "gender": "Female",
+      "duration": "00:17:27",
+      "sus_score": 60.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Login again",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Navigation felt confusing at first."
+        }
+      ],
+      "sus": {
+        "Use frequently": 4,
+        "System unnecessarily complex": 2,
+        "Easy to use": 4,
+        "Need technical support": 2,
+        "Functions integrated": 4,
+        "Too much inconsistency": 2,
+        "Learn quickly": 4,
+        "System cumbersome": 2,
+        "Confident using system": 4,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "The system provides useful academic information.",
+        "Suggested improvements": "Simplify navigation menus.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Interface looks outdated.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Too small on mobile devices.",
+        "Overall remarks": "Participant SUS score: 60/100"
+      }
+    },
+    {
+      "participant": 9,
+      "platform": "MySchool",
+      "version": "Device Used Computer",
+      "device": "Computer",
+      "gender": "Male",
+      "duration": "00:05:20",
+      "sus_score": 42.5,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Login again",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "View account information",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        }
+      ],
+      "sus": {
+        "Use frequently": 2,
+        "System unnecessarily complex": 4,
+        "Easy to use": 2,
+        "Need technical support": 4,
+        "Functions integrated": 2,
+        "Too much inconsistency": 4,
+        "Learn quickly": 2,
+        "System cumbersome": 4,
+        "Confident using system": 2,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Account information is accessible.",
+        "Suggested improvements": "Use larger fonts and buttons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Too much scrolling is required.",
+        "Design change suggestion": "Add clearer labels and icons.",
+        "Text readability": "Too small on mobile devices.",
+        "Overall remarks": "Participant SUS score: 42.5/100"
+      }
+    },
+    {
+      "participant": 10,
+      "platform": "MySchool",
+      "version": "Device Used Mobile",
+      "device": "Mobile",
+      "gender": "Female",
+      "duration": "00:15:36",
+      "sus_score": 40.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Assist",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        }
+      ],
+      "sus": {
+        "Use frequently": 2,
+        "System unnecessarily complex": 4,
+        "Easy to use": 2,
+        "Need technical support": 4,
+        "Functions integrated": 2,
+        "Too much inconsistency": 4,
+        "Learn quickly": 2,
+        "System cumbersome": 4,
+        "Confident using system": 2,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "The system provides useful academic information.",
+        "Suggested improvements": "Use larger fonts and buttons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Text is too small on mobile devices.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 40/100"
+      }
+    },
+    {
+      "participant": 11,
+      "platform": "MySchool",
+      "version": "Device Used Computer",
+      "device": "Computer",
+      "gender": "Male",
+      "duration": "00:05:22",
+      "sus_score": 55.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Assist",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "View account information",
+          "result": "Assist",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        }
+      ],
+      "sus": {
+        "Use frequently": 4,
+        "System unnecessarily complex": 2,
+        "Easy to use": 4,
+        "Need technical support": 2,
+        "Functions integrated": 4,
+        "Too much inconsistency": 2,
+        "Learn quickly": 4,
+        "System cumbersome": 2,
+        "Confident using system": 4,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Account information is accessible.",
+        "Suggested improvements": "Add clearer labels and icons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Navigation tabs are confusing.",
+        "Design change suggestion": "Simplify navigation menus.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 55/100"
+      }
+    },
+    {
+      "participant": 12,
+      "platform": "MySchool",
+      "version": "Device Used Mobile",
+      "device": "Mobile",
+      "gender": "Female",
+      "duration": "00:06:30",
+      "sus_score": 60.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "View account information",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Participant accidentally clicked logout button."
+        }
+      ],
+      "sus": {
+        "Use frequently": 4,
+        "System unnecessarily complex": 2,
+        "Easy to use": 4,
+        "Need technical support": 2,
+        "Functions integrated": 4,
+        "Too much inconsistency": 2,
+        "Learn quickly": 4,
+        "System cumbersome": 2,
+        "Confident using system": 4,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Account information is accessible.",
+        "Suggested improvements": "Use larger fonts and buttons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Too much scrolling is required.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 60/100"
+      }
+    },
+    {
+      "participant": 13,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Mobile",
+      "gender": "Male",
+      "duration": "00:06:37",
+      "sus_score": 45.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "View account information",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        }
+      ],
+      "sus": {
+        "Use frequently": 2,
+        "System unnecessarily complex": 4,
+        "Easy to use": 2,
+        "Need technical support": 4,
+        "Functions integrated": 2,
+        "Too much inconsistency": 4,
+        "Learn quickly": 2,
+        "System cumbersome": 4,
+        "Confident using system": 2,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Easy access to grades and schedules.",
+        "Suggested improvements": "Simplify navigation menus.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Too much scrolling is required.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 45/100"
+      }
+    },
+    {
+      "participant": 14,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Mobile",
+      "gender": "Female",
+      "duration": "00:13:51",
+      "sus_score": 40.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        }
+      ],
+      "sus": {
+        "Use frequently": 2,
+        "System unnecessarily complex": 4,
+        "Easy to use": 2,
+        "Need technical support": 4,
+        "Functions integrated": 2,
+        "Too much inconsistency": 4,
+        "Learn quickly": 2,
+        "System cumbersome": 4,
+        "Confident using system": 2,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Easy access to grades and schedules.",
+        "Suggested improvements": "Improve mobile responsiveness.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Interface looks outdated.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 40/100"
+      }
+    },
+    {
+      "participant": 15,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Computer",
+      "gender": "Male",
+      "duration": "00:07:36",
+      "sus_score": 55.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User hesitated while locating navigation tabs."
+        }
+      ],
+      "sus": {
+        "Use frequently": 4,
+        "System unnecessarily complex": 2,
+        "Easy to use": 4,
+        "Need technical support": 2,
+        "Functions integrated": 4,
+        "Too much inconsistency": 2,
+        "Learn quickly": 4,
+        "System cumbersome": 2,
+        "Confident using system": 4,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "The system provides useful academic information.",
+        "Suggested improvements": "Improve mobile responsiveness.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Navigation tabs are confusing.",
+        "Design change suggestion": "Add clearer labels and icons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 55/100"
+      }
+    },
+    {
+      "participant": 16,
+      "platform": "MySchool",
+      "version": "Device Used Mobile",
+      "device": "Mobile",
+      "gender": "Female",
+      "duration": "00:16:09",
+      "sus_score": 47.5,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Login again",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "View account information",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Navigation felt confusing at first."
+        }
+      ],
+      "sus": {
+        "Use frequently": 3,
+        "System unnecessarily complex": 3,
+        "Easy to use": 3,
+        "Need technical support": 3,
+        "Functions integrated": 3,
+        "Too much inconsistency": 3,
+        "Learn quickly": 3,
+        "System cumbersome": 3,
+        "Confident using system": 3,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Easy access to grades and schedules.",
+        "Suggested improvements": "Improve mobile responsiveness.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Text is too small on mobile devices.",
+        "Design change suggestion": "Add clearer labels and icons.",
+        "Text readability": "Too small on mobile devices.",
+        "Overall remarks": "Participant SUS score: 47.5/100"
+      }
+    },
+    {
+      "participant": 17,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Computer",
+      "gender": "Female",
+      "duration": "00:10:05",
+      "sus_score": 55.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User relied on trial and error to proceed."
+        }
+      ],
+      "sus": {
+        "Use frequently": 4,
+        "System unnecessarily complex": 2,
+        "Easy to use": 4,
+        "Need technical support": 2,
+        "Functions integrated": 4,
+        "Too much inconsistency": 2,
+        "Learn quickly": 4,
+        "System cumbersome": 2,
+        "Confident using system": 4,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Easy access to grades and schedules.",
+        "Suggested improvements": "Simplify navigation menus.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Navigation tabs are confusing.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 55/100"
+      }
+    },
+    {
+      "participant": 18,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Computer",
+      "gender": "Female",
+      "duration": "00:13:35",
+      "sus_score": 47.5,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Login again",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        }
+      ],
+      "sus": {
+        "Use frequently": 3,
+        "System unnecessarily complex": 3,
+        "Easy to use": 3,
+        "Need technical support": 3,
+        "Functions integrated": 3,
+        "Too much inconsistency": 3,
+        "Learn quickly": 3,
+        "System cumbersome": 3,
+        "Confident using system": 3,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "The system provides useful academic information.",
+        "Suggested improvements": "Use larger fonts and buttons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Navigation tabs are confusing.",
+        "Design change suggestion": "Add clearer labels and icons.",
+        "Text readability": "Too small on mobile devices.",
+        "Overall remarks": "Participant SUS score: 47.5/100"
+      }
+    },
+    {
+      "participant": 19,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Mobile",
+      "gender": "Male",
+      "duration": "00:10:37",
+      "sus_score": 42.5,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Assist",
+          "errors": 0,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Navigation felt confusing at first."
+        }
+      ],
+      "sus": {
+        "Use frequently": 2,
+        "System unnecessarily complex": 4,
+        "Easy to use": 2,
+        "Need technical support": 4,
+        "Functions integrated": 2,
+        "Too much inconsistency": 4,
+        "Learn quickly": 2,
+        "System cumbersome": 4,
+        "Confident using system": 2,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Account information is accessible.",
+        "Suggested improvements": "Simplify navigation menus.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Navigation tabs are confusing.",
+        "Design change suggestion": "Simplify navigation menus.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 42.5/100"
+      }
+    },
+    {
+      "participant": 20,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Computer",
+      "gender": "Female",
+      "duration": "00:07:33",
+      "sus_score": 60.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "View account information",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        }
+      ],
+      "sus": {
+        "Use frequently": 4,
+        "System unnecessarily complex": 2,
+        "Easy to use": 4,
+        "Need technical support": 2,
+        "Functions integrated": 4,
+        "Too much inconsistency": 2,
+        "Learn quickly": 4,
+        "System cumbersome": 2,
+        "Confident using system": 4,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Login process was straightforward.",
+        "Suggested improvements": "Use larger fonts and buttons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Text is too small on mobile devices.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 60/100"
+      }
+    },
+    {
+      "participant": 21,
+      "platform": "MySchool",
+      "version": "Device Used Computer",
+      "device": "Computer",
+      "gender": "Male",
+      "duration": "00:17:32",
+      "sus_score": 50.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login again",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        }
+      ],
+      "sus": {
+        "Use frequently": 3,
+        "System unnecessarily complex": 3,
+        "Easy to use": 3,
+        "Need technical support": 3,
+        "Functions integrated": 3,
+        "Too much inconsistency": 3,
+        "Learn quickly": 3,
+        "System cumbersome": 3,
+        "Confident using system": 3,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Easy access to grades and schedules.",
+        "Suggested improvements": "Improve mobile responsiveness.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Text is too small on mobile devices.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Too small on mobile devices.",
+        "Overall remarks": "Participant SUS score: 50/100"
+      }
+    },
+    {
+      "participant": 22,
+      "platform": "MySchool",
+      "version": "Device Used Computer",
+      "device": "Computer",
+      "gender": "Female",
+      "duration": "00:12:36",
+      "sus_score": 42.5,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "View account information",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        }
+      ],
+      "sus": {
+        "Use frequently": 2,
+        "System unnecessarily complex": 4,
+        "Easy to use": 2,
+        "Need technical support": 4,
+        "Functions integrated": 2,
+        "Too much inconsistency": 4,
+        "Learn quickly": 2,
+        "System cumbersome": 4,
+        "Confident using system": 2,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Account information is accessible.",
+        "Suggested improvements": "Improve mobile responsiveness.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Interface looks outdated.",
+        "Design change suggestion": "Add clearer labels and icons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 42.5/100"
+      }
+    },
+    {
+      "participant": 23,
+      "platform": "MySchool",
+      "version": "Device Used Computer",
+      "device": "Computer",
+      "gender": "Female",
+      "duration": "00:17:56",
+      "sus_score": 50.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        }
+      ],
+      "sus": {
+        "Use frequently": 3,
+        "System unnecessarily complex": 3,
+        "Easy to use": 3,
+        "Need technical support": 3,
+        "Functions integrated": 3,
+        "Too much inconsistency": 3,
+        "Learn quickly": 3,
+        "System cumbersome": 3,
+        "Confident using system": 3,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Login process was straightforward.",
+        "Suggested improvements": "Simplify navigation menus.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Interface looks outdated.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 50/100"
+      }
+    },
+    {
+      "participant": 24,
+      "platform": "MySchool",
+      "version": "Device Used Computer",
+      "device": "Computer",
+      "gender": "Male",
+      "duration": "00:09:51",
+      "sus_score": 52.5,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        }
+      ],
+      "sus": {
+        "Use frequently": 3,
+        "System unnecessarily complex": 3,
+        "Easy to use": 3,
+        "Need technical support": 3,
+        "Functions integrated": 3,
+        "Too much inconsistency": 3,
+        "Learn quickly": 3,
+        "System cumbersome": 3,
+        "Confident using system": 3,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Account information is accessible.",
+        "Suggested improvements": "Simplify navigation menus.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Navigation tabs are confusing.",
+        "Design change suggestion": "Simplify navigation menus.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 52.5/100"
+      }
+    },
+    {
+      "participant": 25,
+      "platform": "MySchool",
+      "version": "Device Used Computer",
+      "device": "Computer",
+      "gender": "Female",
+      "duration": "00:15:02",
+      "sus_score": 35.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login again",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Assist",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        }
+      ],
+      "sus": {
+        "Use frequently": 2,
+        "System unnecessarily complex": 4,
+        "Easy to use": 2,
+        "Need technical support": 4,
+        "Functions integrated": 2,
+        "Too much inconsistency": 4,
+        "Learn quickly": 2,
+        "System cumbersome": 4,
+        "Confident using system": 2,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Login process was straightforward.",
+        "Suggested improvements": "Use larger fonts and buttons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Interface looks outdated.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Too small on mobile devices.",
+        "Overall remarks": "Participant SUS score: 35/100"
+      }
+    },
+    {
+      "participant": 26,
+      "platform": "MySchool",
+      "version": "Device Used Computer",
+      "device": "Computer",
+      "gender": "Female",
+      "duration": "00:17:42",
+      "sus_score": 35.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Fail",
+          "errors": 3,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "View account information",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "Navigation felt confusing at first."
+        }
+      ],
+      "sus": {
+        "Use frequently": 2,
+        "System unnecessarily complex": 4,
+        "Easy to use": 2,
+        "Need technical support": 4,
+        "Functions integrated": 2,
+        "Too much inconsistency": 4,
+        "Learn quickly": 2,
+        "System cumbersome": 4,
+        "Confident using system": 2,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Easy access to grades and schedules.",
+        "Suggested improvements": "Add clearer labels and icons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Text is too small on mobile devices.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Too small on mobile devices.",
+        "Overall remarks": "Participant SUS score: 35/100"
+      }
+    },
+    {
+      "participant": 27,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Mobile",
+      "gender": "Male",
+      "duration": "00:14:20",
+      "sus_score": 47.5,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Assist",
+          "errors": 0,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Login again",
+          "result": "Assist",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        }
+      ],
+      "sus": {
+        "Use frequently": 3,
+        "System unnecessarily complex": 3,
+        "Easy to use": 3,
+        "Need technical support": 3,
+        "Functions integrated": 3,
+        "Too much inconsistency": 3,
+        "Learn quickly": 3,
+        "System cumbersome": 3,
+        "Confident using system": 3,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Easy access to grades and schedules.",
+        "Suggested improvements": "Use larger fonts and buttons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Navigation tabs are confusing.",
+        "Design change suggestion": "Use larger fonts and buttons.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 47.5/100"
+      }
+    },
+    {
+      "participant": 28,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Computer",
+      "gender": "Male",
+      "duration": "00:07:24",
+      "sus_score": 45.0,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Login again",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Fail",
+          "errors": 1,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Participant accidentally clicked logout button."
+        }
+      ],
+      "sus": {
+        "Use frequently": 2,
+        "System unnecessarily complex": 4,
+        "Easy to use": 2,
+        "Need technical support": 4,
+        "Functions integrated": 2,
+        "Too much inconsistency": 4,
+        "Learn quickly": 2,
+        "System cumbersome": 4,
+        "Confident using system": 2,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Account information is accessible.",
+        "Suggested improvements": "Add clearer labels and icons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Interface looks outdated.",
+        "Design change suggestion": "Simplify navigation menus.",
+        "Text readability": "Too small on mobile devices.",
+        "Overall remarks": "Participant SUS score: 45/100"
+      }
+    },
+    {
+      "participant": 29,
+      "platform": "MySchool",
+      "version": "Device Used Mobile",
+      "device": "Mobile",
+      "gender": "Male",
+      "duration": "00:10:39",
+      "sus_score": 57.5,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Login again",
+          "result": "Assist",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "View account information",
+          "result": "Pass",
+          "errors": 1,
+          "observation": "Small text caused readability issues."
+        }
+      ],
+      "sus": {
+        "Use frequently": 4,
+        "System unnecessarily complex": 2,
+        "Easy to use": 4,
+        "Need technical support": 2,
+        "Functions integrated": 4,
+        "Too much inconsistency": 2,
+        "Learn quickly": 4,
+        "System cumbersome": 2,
+        "Confident using system": 4,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Easy access to grades and schedules.",
+        "Suggested improvements": "Use larger fonts and buttons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Interface looks outdated.",
+        "Design change suggestion": "Simplify navigation menus.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 57.5/100"
+      }
+    },
+    {
+      "participant": 30,
+      "platform": "MySchool",
+      "version": "Original",
+      "device": "Computer",
+      "gender": "Female",
+      "duration": "00:14:31",
+      "sus_score": 52.5,
+      "tasks": [
+        {
+          "task": "View offered subjects",
+          "result": "Assist",
+          "errors": 3,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Navigate to Home page",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Login using credentials",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Task completed smoothly after brief exploration."
+        },
+        {
+          "task": "Attempt logout",
+          "result": "Pass",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Return to login page",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "Login again",
+          "result": "Pass",
+          "errors": 0,
+          "observation": "Navigation felt confusing at first."
+        },
+        {
+          "task": "Open My Account",
+          "result": "Fail",
+          "errors": 0,
+          "observation": "User hesitated while locating navigation tabs."
+        },
+        {
+          "task": "Find Offered Subjects",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Participant accidentally clicked logout button."
+        },
+        {
+          "task": "Navigate Clearance",
+          "result": "Pass",
+          "errors": 3,
+          "observation": "User relied on trial and error to proceed."
+        },
+        {
+          "task": "View account information",
+          "result": "Fail",
+          "errors": 2,
+          "observation": "Task completed smoothly after brief exploration."
+        }
+      ],
+      "sus": {
+        "Use frequently": 3,
+        "System unnecessarily complex": 3,
+        "Easy to use": 3,
+        "Need technical support": 3,
+        "Functions integrated": 3,
+        "Too much inconsistency": 3,
+        "Learn quickly": 3,
+        "System cumbersome": 3,
+        "Confident using system": 3,
+        "Need to learn before use": null
+      },
+      "qualitative": {
+        "Most liked feature": "Login process was straightforward.",
+        "Suggested improvements": "Add clearer labels and icons.",
+        "Unnecessary feature": "Some redundant navigation tabs.",
+        "Most frustrating part": "Navigation tabs are confusing.",
+        "Design change suggestion": "Simplify navigation menus.",
+        "Text readability": "Readable enough.",
+        "Overall remarks": "Participant SUS score: 52.5/100"
+      }
+    }
+  ]
+}
