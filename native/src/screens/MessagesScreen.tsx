@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
@@ -34,6 +34,7 @@ export function MessagesScreen({ onOpenChat }: MessagesScreenProps) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   async function loadConversations() {
     if (!user) return;
@@ -67,8 +68,25 @@ export function MessagesScreen({ onOpenChat }: MessagesScreenProps) {
     loadConversations();
   }, [user?.id]);
 
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    await loadConversations();
+    setIsRefreshing(false);
+  }
+
   return (
-    <Screen sectionLabel="Inbox" title="Messages">
+    <Screen
+      sectionLabel="Inbox"
+      title="Messages"
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          tintColor={colors.green}
+          colors={[colors.green]}
+        />
+      }
+    >
       <View style={styles.headerRow}>
         <Text style={styles.title}>Inbox</Text>
         <Button variant="secondary" onPress={loadConversations}>
@@ -103,8 +121,8 @@ export function MessagesScreen({ onOpenChat }: MessagesScreenProps) {
           const chatTitle = convo.title || convo.otherMember?.displayName || "GrowMate Chat";
           const subtitle = isLeafy
             ? "Instant Plant Care & Gardening Tips"
-            : (convo as any).lastMessage
-            ? String((convo as any).lastMessage).slice(0, 48)
+            : typeof (convo as Record<string, unknown>)["lastMessage"] === "string"
+            ? String((convo as Record<string, unknown>)["lastMessage"]).slice(0, 48)
             : convo.type === "market"
             ? "Marketplace inquiry"
             : "Tap to open chat";

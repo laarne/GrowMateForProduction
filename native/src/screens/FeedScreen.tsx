@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Pressable, StyleSheet, Text, TextInput, View, Modal, ScrollView } from "react-native";
+import { ActivityIndicator, Image, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { Screen } from "../components/Screen";
@@ -35,8 +35,21 @@ export function FeedScreen() {
   const [hasMore, setHasMore] = useState(true);
 
   // Plant detail modal states
-  const [detailPlant, setDetailPlant] = useState<any>(null);
+  type DetailPlant = {
+    id?: string;
+    name: string;
+    localName?: string | null;
+    scientificName?: string | null;
+    category?: string | null;
+    condition?: string | null;
+    careNotes?: string | null;
+    photoUrl?: string | null;
+  };
+  const [detailPlant, setDetailPlant] = useState<DetailPlant | null>(null);
   const [isLoadingPlantDetail, setIsLoadingPlantDetail] = useState(false);
+
+  // Pull-to-refresh
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Comments states
   const [activePostComments, setActivePostComments] = useState<string | null>(null);
@@ -119,6 +132,12 @@ export function FeedScreen() {
   useEffect(() => {
     loadPosts();
   }, [user?.id]);
+
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    await loadPosts();
+    setIsRefreshing(false);
+  }
 
   async function handlePost() {
     if (!user || !body.trim()) return;
@@ -285,7 +304,18 @@ export function FeedScreen() {
   }
 
   return (
-    <Screen sectionLabel="Community" title="Feed">
+    <Screen
+      sectionLabel="Community"
+      title="Feed"
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          tintColor={colors.green}
+          colors={[colors.green]}
+        />
+      }
+    >
       {/* ── Stories Row ── */}
       <ScrollView
         horizontal
@@ -385,11 +415,25 @@ export function FeedScreen() {
         </View>
       )}
 
-      {/* ── Loading ── */}
+      {/* ── Loading skeleton ── */}
       {isLoading && (
-        <View style={styles.center}>
-          <ActivityIndicator color={colors.green} size="large" />
-          <Text style={styles.centerText}>Loading posts...</Text>
+        <View style={styles.skeletonWrap}>
+          {[1, 2, 3].map((i) => (
+            <View key={i} style={styles.skeletonCard}>
+              <View style={styles.skeletonHeader}>
+                <View style={styles.skeletonAvatar} />
+                <View style={{ flex: 1, gap: 6 }}>
+                  <View style={[styles.skeletonLine, { width: "55%" }]} />
+                  <View style={[styles.skeletonLine, { width: "35%", opacity: 0.5 }]} />
+                </View>
+              </View>
+              <View style={styles.skeletonImage} />
+              <View style={{ padding: 12, gap: 8 }}>
+                <View style={[styles.skeletonLine, { width: "80%" }]} />
+                <View style={[styles.skeletonLine, { width: "60%" }]} />
+              </View>
+            </View>
+          ))}
         </View>
       )}
 
@@ -1150,5 +1194,44 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: colors.textSecondary,
   },
+
+  // ── Skeleton loaders ──────────────────────────────────
+  skeletonWrap: {
+    gap: 16,
+    marginTop: 8,
+  },
+  skeletonCard: {
+    backgroundColor: colors.white,
+    borderColor: colors.line,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    marginBottom: 0,
+    overflow: "hidden",
+  },
+  skeletonHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    padding: 12,
+  },
+  skeletonAvatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: colors.surface2,
+  },
+  skeletonImage: {
+    width: "100%",
+    aspectRatio: 1,
+    backgroundColor: colors.surface2,
+    opacity: 0.6,
+  },
+  skeletonLine: {
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: colors.surface2,
+  },
 });
+
+
 

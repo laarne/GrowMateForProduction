@@ -14,6 +14,7 @@ import { ProfileScreen } from "./src/screens/ProfileScreen";
 import { ListingDetailScreen } from "./src/screens/ListingDetailScreen";
 import { RankingsScreen } from "./src/screens/RankingsScreen";
 import { colors } from "./src/theme/colors";
+import { ErrorBoundary } from "./src/components/ErrorBoundary";
 
 type TabKey = "Market" | "Feed" | "Garden" | "Messages" | "Rankings" | "Profile";
 
@@ -111,13 +112,15 @@ function AppContent() {
       {/* Screen content — flex:1 so it fills all space above the nav bar */}
       <View style={styles.screenContainer}>
         {activeTab === "Market" && (
-          <MarketScreen onOpenChat={handleOpenChat} onOpenListingDetail={handleOpenListingDetail} />
+          <ErrorBoundary>
+            <MarketScreen onOpenChat={handleOpenChat} onOpenListingDetail={handleOpenListingDetail} />
+          </ErrorBoundary>
         )}
-        {activeTab === "Feed" && <FeedScreen />}
-        {activeTab === "Garden" && <GardenScreen />}
-        {activeTab === "Messages" && <MessagesScreen onOpenChat={handleOpenChat} />}
-        {activeTab === "Rankings" && <RankingsScreen />}
-        {activeTab === "Profile" && <ProfileScreen onOpenListingDetail={handleOpenListingDetail} />}
+        {activeTab === "Feed" && <ErrorBoundary><FeedScreen /></ErrorBoundary>}
+        {activeTab === "Garden" && <ErrorBoundary><GardenScreen /></ErrorBoundary>}
+        {activeTab === "Messages" && <ErrorBoundary><MessagesScreen onOpenChat={handleOpenChat} /></ErrorBoundary>}
+        {activeTab === "Rankings" && <ErrorBoundary><RankingsScreen /></ErrorBoundary>}
+        {activeTab === "Profile" && <ErrorBoundary><ProfileScreen onOpenListingDetail={handleOpenListingDetail} /></ErrorBoundary>}
       </View>
 
       {/* Bottom nav — NOT absolutely positioned; sits as a flex child */}

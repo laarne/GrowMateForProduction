@@ -157,3 +157,50 @@ export async function createGardenPlant(
     }
   }
 }
+
+export async function updateGardenPlant(
+  plantId: string,
+  userId: string,
+  updates: {
+    name: string;
+    scientificName?: string | null;
+    category?: string | null;
+    condition?: string | null;
+    careNotes?: string | null;
+    photoPath?: string | null;
+  }
+) {
+  if (!supabase) throw new Error("Supabase is not configured.");
+
+  const { error } = await supabase
+    .from("garden_plants")
+    .update({
+      name: updates.name,
+      scientific_name: updates.scientificName ?? null,
+      category: updates.category ?? null,
+      condition: updates.condition ?? null,
+      care_notes: updates.careNotes ?? null,
+    })
+    .eq("id", plantId)
+    .eq("user_id", userId);
+
+  if (error) throw error;
+
+  if (updates.photoPath) {
+    // Replace first photo (upsert by deleting old and inserting new)
+    await supabase.from("garden_plant_photos").delete().eq("garden_plant_id", plantId);
+    const { error: photoError } = await supabase.from("garden_plant_photos").insert({
+      garden_plant_id: plantId,
+      user_id: userId,
+      storage_path: updates.photoPath,
+      sort_order: 0,
+    });
+    if (photoError) throw photoError;
+  }
+}
+
+export async function deleteGardenPlant(plantId: string): Promise<void> {
+  if (!supabase) throw new Error("Supabase is not configured.");
+  const { error } = await supabase.from("garden_plants").delete().eq("id", plantId);
+  if (error) throw error;
+}

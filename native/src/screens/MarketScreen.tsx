@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Image, Modal, ScrollView, StyleSheet, Text, TextInput, View, Pressable, Platform } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Image, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View, Platform } from "react-native";
 import { Button } from "../components/Button";
 import { Screen } from "../components/Screen";
 import { useAuth } from "../context/AuthContext";
@@ -53,6 +53,8 @@ export function MarketScreen({
   const [buyerNote, setBuyerNote] = useState("");
   const [isOrdering, setIsOrdering] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (user && listings.length > 0) {
@@ -103,6 +105,21 @@ export function MarketScreen({
   }
 
   useEffect(() => { loadListings(""); }, []);
+
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    await loadListings("", false);
+    setSearch("");
+    setIsRefreshing(false);
+  }
+
+  function handleSearchChange(text: string) {
+    setSearch(text);
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      loadListings(text, false);
+    }, 500);
+  }
 
   async function handlePickAppPhoto() {
     setSellerError(null);
@@ -218,12 +235,23 @@ export function MarketScreen({
   }, [listings, activeCategory]);
 
   return (
-    <Screen sectionLabel="Marketplace" title="Market">
+    <Screen
+      sectionLabel="Marketplace"
+      title="Market"
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          tintColor={colors.green}
+          colors={[colors.green]}
+        />
+      }
+    >
       {/* ── Search bar ── */}
       <View style={styles.searchWrap}>
         <MaterialCommunityIcons color="#8a9583" name="magnify" size={20} style={styles.searchIcon} />
         <TextInput
-          onChangeText={setSearch}
+          onChangeText={handleSearchChange}
           onSubmitEditing={() => loadListings(search)}
           placeholder="Search plants, seeds, pots, supplies..."
           placeholderTextColor="#8a9583"

@@ -8,6 +8,7 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -19,6 +20,7 @@ import { Screen } from "../components/Screen";
 import { useAuth } from "../context/AuthContext";
 import {
   createGardenPlant,
+  updateGardenPlant,
   getGardenPlants,
   getOrCreateMyGarden,
   type Garden,
@@ -74,6 +76,16 @@ export function GardenScreen() {
   const [showPlantOptions, setShowPlantOptions] = useState(false);
   const [isDeletingPlant, setIsDeletingPlant] = useState(false);
 
+  // Edit mode
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingPlantId, setEditingPlantId] = useState<string | null>(null);
+
+  // Plant detail modal
+  const [detailModalPlant, setDetailModalPlant] = useState<GardenPlant | null>(null);
+
+  // Pull-to-refresh
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   async function loadGarden() {
     if (!user) return;
     setIsLoading(true);
@@ -96,6 +108,13 @@ export function GardenScreen() {
     setPlantName(""); setCategory(""); setScientificName("");
     setCondition("Healthy"); setCareNotes(""); setPlantPhoto(null);
     setScanResult(null); setScanMessage(null);
+    setIsEditMode(false); setEditingPlantId(null);
+  }
+
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    await loadGarden();
+    setIsRefreshing(false);
   }
 
   async function handlePickPlantPhoto() {
@@ -143,22 +162,35 @@ export function GardenScreen() {
     }
   }
 
-  async function handleAddPlant() {
-    if (!user || !garden || !plantName.trim()) return;
+  async function handleSavePlant() {
+    if (!user || !plantName.trim()) return;
     setIsSaving(true); setError(null);
     try {
       const uploaded = plantPhoto
         ? await uploadPublicImage("garden-photos", user.id, "plants", plantPhoto)
         : null;
-      await createGardenPlant(
-        user.id, garden.id, plantName.trim(), uploaded?.path,
-        category.trim(), scientificName.trim(), condition.trim(), careNotes.trim()
-      );
+
+      if (isEditMode && editingPlantId) {
+        await updateGardenPlant(editingPlantId, user.id, {
+          name: plantName.trim(),
+          scientificName: scientificName.trim() || null,
+          category: category.trim() || null,
+          condition: condition.trim() || null,
+          careNotes: careNotes.trim() || null,
+          photoPath: uploaded?.path ?? null,
+        });
+      } else {
+        if (!garden) return;
+        await createGardenPlant(
+          user.id, garden.id, plantName.trim(), uploaded?.path,
+          category.trim(), scientificName.trim(), condition.trim(), careNotes.trim()
+        );
+      }
       resetForm();
       setShowAddModal(false);
       await loadGarden();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unable to add plant.");
+      setError(e instanceof Error ? e.message : isEditMode ? "Unable to update plant." : "Unable to add plant.");
     } finally { setIsSaving(false); }
   }
 
@@ -224,7 +256,18 @@ export function GardenScreen() {
       {activeTab === "discover" ? (
         <DiscoverGardensScreen />
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scroll}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              tintColor={colors.green}
+              colors={[colors.green]}
+            />
+          }
+        >
           {/* ══ Cover Carousel ══════════════════════════════ */}
           <View style={styles.coverWrap}>
             <ScrollView
@@ -364,7 +407,11 @@ export function GardenScreen() {
             {!isLoading && filtered.length > 0 && (
               <View style={styles.grid}>
                 {filtered.map((plant) => (
-                  <View key={plant.id} style={styles.plantCard}>
+                  <Pressable
+                    key={plant.id}
+                    style={styles.plantCard}
+                    onPress={() => setDetailModalPlant(plant)}
+                  >
                     {plant.photoUrl ? (
                       <Image source={{ uri: plant.photoUrl }} style={styles.plantPhoto} />
                     ) : (
@@ -376,7 +423,7 @@ export function GardenScreen() {
                       <View style={styles.plantCardRow}>
                         <Text style={styles.plantCardName} numberOfLines={1}>{plant.name}</Text>
                         <Pressable
-                          onPress={() => { setPlantOptionsTarget(plant); setShowPlantOptions(true); }}
+                          onPress={(e) => { e.stopPropagation?.(); setPlantOptionsTarget(plant); setShowPlantOptions(true); }}
                           hitSlop={6}
                           style={styles.plantCardMenuBtn}
                         >
@@ -387,7 +434,7 @@ export function GardenScreen() {
                         <Text style={styles.plantCardCat} numberOfLines={1}>{plant.category}</Text>
                       ) : null}
                     </View>
-                  </View>
+                  </Pressable>
                 ))}
                 {/* Spacer for odd count */}
                 {filtered.length % 2 !== 0 && <View style={{ width: CARD_WIDTH }} />}
@@ -419,6 +466,8 @@ export function GardenScreen() {
               onPress={() => {
                 setShowPlantOptions(false);
                 if (plantOptionsTarget) {
+                  setIsEditMode(true);
+                  setEditingPlantId(plantOptionsTarget.id);
                   setPlantName(plantOptionsTarget.name);
                   setScientificName(plantOptionsTarget.scientificName ?? "");
                   setCategory(plantOptionsTarget.category ?? "");
@@ -468,8 +517,8 @@ export function GardenScreen() {
           <View style={styles.modalSheet}>
             <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Add a Plant</Text>
-              <Pressable onPress={() => !isSaving && setShowAddModal(false)} hitSlop={8}>
+              <Text style={styles.modalTitle}>{isEditMode ? "Edit Plant" : "Add a Plant"}</Text>
+              <Pressable onPress={() => { if (!isSaving) { setShowAddModal(false); resetForm(); } }} hitSlop={8}>
                 <MaterialCommunityIcons name="close" size={22} color={colors.greenMuted} />
               </Pressable>
             </View>
@@ -583,7 +632,7 @@ export function GardenScreen() {
               </View>
 
               <Pressable
-                onPress={handleAddPlant}
+                onPress={handleSavePlant}
                 disabled={isSaving || !plantName.trim()}
                 style={[styles.saveBtn, (isSaving || !plantName.trim()) && { opacity: 0.4 }]}
               >
@@ -591,8 +640,8 @@ export function GardenScreen() {
                   <ActivityIndicator color={colors.white} size={16} />
                 ) : (
                   <>
-                    <MaterialCommunityIcons name="flower-outline" size={17} color={colors.white} />
-                    <Text style={styles.saveBtnText}>Add to Garden</Text>
+                    <MaterialCommunityIcons name={isEditMode ? "content-save-outline" : "flower-outline"} size={17} color={colors.white} />
+                    <Text style={styles.saveBtnText}>{isEditMode ? "Save Changes" : "Add to Garden"}</Text>
                   </>
                 )}
               </Pressable>
@@ -711,7 +760,91 @@ export function GardenScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* ══════════════════════════════════════════════════
+          PLANT DETAIL MODAL
+      ══════════════════════════════════════════════════ */}
+      <Modal
+        visible={detailModalPlant !== null}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setDetailModalPlant(null)}
+      >
+        <View style={styles.detailContainer}>
+          <View style={styles.detailHeader}>
+            <Text style={styles.detailHeaderTitle} numberOfLines={1}>
+              {detailModalPlant?.name}
+            </Text>
+            <Pressable onPress={() => setDetailModalPlant(null)} hitSlop={10} style={styles.detailCloseBtn}>
+              <MaterialCommunityIcons name="close" size={22} color={colors.white} />
+            </Pressable>
+          </View>
+
+          <ScrollView contentContainerStyle={styles.detailScroll} showsVerticalScrollIndicator={false}>
+            {detailModalPlant?.photoUrl ? (
+              <Image source={{ uri: detailModalPlant.photoUrl }} style={styles.detailPhoto} />
+            ) : (
+              <View style={styles.detailPhotoFallback}>
+                <MaterialCommunityIcons name="flower" size={64} color="rgba(255,255,255,0.3)" />
+              </View>
+            )}
+
+            <View style={styles.detailBody}>
+              <Text style={styles.detailName}>{detailModalPlant?.name}</Text>
+              {detailModalPlant?.scientificName ? (
+                <Text style={styles.detailSci}>{detailModalPlant.scientificName}</Text>
+              ) : null}
+
+              <View style={styles.detailChipRow}>
+                {detailModalPlant?.category ? (
+                  <View style={styles.detailChip}>
+                    <MaterialCommunityIcons name="tag-outline" size={13} color={colors.green} />
+                    <Text style={styles.detailChipText}>{detailModalPlant.category}</Text>
+                  </View>
+                ) : null}
+                {detailModalPlant?.condition ? (
+                  <View style={[styles.detailChip, { backgroundColor: "#dcfce7" }]}>
+                    <MaterialCommunityIcons name="heart-pulse" size={13} color="#16a34a" />
+                    <Text style={[styles.detailChipText, { color: "#16a34a" }]}>{detailModalPlant.condition}</Text>
+                  </View>
+                ) : null}
+              </View>
+
+              {detailModalPlant?.careNotes ? (
+                <View style={styles.detailNotesBox}>
+                  <Text style={styles.detailNotesLabel}>Care Notes</Text>
+                  <Text style={styles.detailNotesText}>{detailModalPlant.careNotes}</Text>
+                </View>
+              ) : null}
+
+              <Pressable
+                onPress={() => {
+                  setDetailModalPlant(null);
+                  if (detailModalPlant) {
+                    setIsEditMode(true);
+                    setEditingPlantId(detailModalPlant.id);
+                    setPlantName(detailModalPlant.name);
+                    setScientificName(detailModalPlant.scientificName ?? "");
+                    setCategory(detailModalPlant.category ?? "");
+                    setCondition(detailModalPlant.condition ?? "Healthy");
+                    setCareNotes(detailModalPlant.careNotes ?? "");
+                    setPlantPhoto(null);
+                    setScanResult(null);
+                    setScanMessage(null);
+                    setShowAddModal(true);
+                  }
+                }}
+                style={styles.detailEditBtn}
+              >
+                <MaterialCommunityIcons name="pencil-outline" size={16} color={colors.white} />
+                <Text style={styles.detailEditBtnText}>Edit Plant</Text>
+              </Pressable>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
     </Screen>
+
   );
 }
 
@@ -1232,4 +1365,120 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: "center",
   },
+
+  // ── Plant Detail Modal ────────────────────────────────
+  detailContainer: {
+    flex: 1,
+    backgroundColor: colors.cream,
+  },
+  detailHeader: {
+    backgroundColor: colors.green,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 56,
+    paddingBottom: 16,
+  },
+  detailHeaderTitle: {
+    color: colors.white,
+    fontSize: 18,
+    fontWeight: "900",
+    flex: 1,
+    marginRight: 12,
+  },
+  detailCloseBtn: {
+    padding: 4,
+  },
+  detailScroll: {
+    paddingBottom: 40,
+  },
+  detailPhoto: {
+    width: "100%",
+    height: 280,
+    backgroundColor: colors.surface1,
+  },
+  detailPhotoFallback: {
+    width: "100%",
+    height: 200,
+    backgroundColor: colors.green,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  detailBody: {
+    padding: 20,
+    gap: 12,
+  },
+  detailName: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: colors.green,
+  },
+  detailSci: {
+    fontSize: 14,
+    fontStyle: "italic",
+    color: colors.greenMuted,
+    fontWeight: "600",
+  },
+  detailChipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 4,
+  },
+  detailChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: colors.surface1,
+    borderRadius: radius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: colors.line,
+  },
+  detailChipText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: colors.green,
+  },
+  detailNotesBox: {
+    backgroundColor: colors.surface1,
+    borderRadius: radius.md,
+    padding: 14,
+    gap: 6,
+    borderWidth: 1,
+    borderColor: colors.line,
+  },
+  detailNotesLabel: {
+    fontSize: 12,
+    fontWeight: "800",
+    color: colors.textSecondary,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+  },
+  detailNotesText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: colors.textPrimary,
+    lineHeight: 22,
+  },
+  detailEditBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: colors.green,
+    borderRadius: radius.full,
+    paddingVertical: 14,
+    marginTop: 8,
+  },
+  detailEditBtnText: {
+    color: colors.white,
+    fontSize: 15,
+    fontWeight: "900",
+  },
 });
+
+
+

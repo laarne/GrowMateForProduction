@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Platform, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import { Platform, RefreshControl, RefreshControlProps, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { AppHeader } from "./AppHeader";
 import { colors } from "../theme/colors";
 
@@ -12,7 +12,10 @@ type ScreenProps = {
   showHeader?: boolean;
   scroll?: boolean;
   noPadding?: boolean;
+  /** Pass a RefreshControl for pull-to-refresh support */
+  refreshControl?: React.ReactElement<RefreshControlProps>;
 };
+
 
 export function Screen({
   children,
@@ -21,6 +24,7 @@ export function Screen({
   scroll = true,
   showHeader = true,
   noPadding = false,
+  refreshControl,
 }: ScreenProps) {
   const content = (
     <View
@@ -42,6 +46,7 @@ export function Screen({
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          refreshControl={refreshControl}
         >
           {content}
         </ScrollView>
@@ -51,6 +56,7 @@ export function Screen({
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   safe: {

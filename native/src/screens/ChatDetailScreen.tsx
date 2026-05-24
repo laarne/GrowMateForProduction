@@ -8,6 +8,107 @@ import { useAuth } from "../context/AuthContext";
 import { getMessages, sendMessage, markConversationAsRead, type Message } from "../services/messages";
 import { supabase } from "../services/supabase";
 import { colors } from "../theme/colors";
+import { STORAGE_KEYS } from "../utils/storageKeys";
+
+function getLeafyResponse(userInput: string): string {
+  const q = userInput.toLowerCase();
+
+  // Watering
+  if (q.includes("water") || q.includes("watering") || q.includes("dry") || q.includes("thirsty")) {
+    return "🌊 Most indoor plants prefer the 'soak and dry' method: water thoroughly until it drains from the bottom, then let the top 2 inches of soil dry completely before watering again. Stick your finger into the soil — if it's moist, wait a day more!";
+  }
+  // Overwatering
+  if (q.includes("overwater") || q.includes("too much water") || q.includes("root rot")) {
+    return "⚠️ Overwatering is the #1 plant killer! Signs: yellowing leaves, mushy stems, soggy soil, and fungus gnats. Fix: let the soil fully dry out, improve drainage, and remove any rotten roots during repotting.";
+  }
+  // Yellow leaves
+  if (q.includes("yellow") || q.includes("yellowing")) {
+    return "🍂 Yellow leaves can mean: (1) Overwatering — most common cause, (2) Under-watering — soil too dry, (3) Low light, (4) Lack of nutrients. Check your soil moisture first. If it's wet, let it dry. If dry, water thoroughly.";
+  }
+  // Brown tips
+  if (q.includes("brown tip") || q.includes("brown edge") || q.includes("crispy")) {
+    return "🌿 Brown leaf tips usually indicate: (1) Low humidity — mist leaves or use a pebble tray, (2) Over-fertilizing — flush the soil, (3) Tap water with fluoride — try filtered or rain water.";
+  }
+  // Sunlight & light
+  if (q.includes("sunlight") || q.includes("light") || q.includes("window") || q.includes("dark")) {
+    return "☀️ Light guide: South or west windows = bright direct light (cacti, succulents). East window = bright indirect light (Monsteras, Pothos). North window = low light (Ferns, ZZ plants). Leggy stems reaching toward light = needs more!";
+  }
+  // Monstera
+  if (q.includes("monstera")) {
+    return "🌿 Monstera care: Bright indirect light, water every 1-2 weeks (when top 2 inches dry), chunky well-draining soil (add orchid bark + perlite), wipe leaves monthly. Fenestrations (holes) appear with maturity and good light!";
+  }
+  // Pothos
+  if (q.includes("pothos") || q.includes("golden pothos")) {
+    return "✨ Pothos are almost indestructible! Water when soil is dry, they tolerate low light (but variegated ones need more light). Great for beginners. Propagate easily in water — just snip below a node!";
+  }
+  // Snake plant
+  if (q.includes("snake plant") || q.includes("sansevieria") || q.includes("dracaena trifasciata")) {
+    return "🌵 Snake plants are the ultimate low-maintenance plant. Water only every 2-6 weeks, tolerate very low light, and thrive on neglect. They're one of the best air purifiers too!";
+  }
+  // Succulents
+  if (q.includes("succulent") || q.includes("cactus") || q.includes("cacti")) {
+    return "🌵 Succulents & cacti need: Bright direct sunlight (6+ hours), watering only when soil is BONE DRY, well-draining cactus mix with extra perlite, and a terracotta pot for breathability. Never leave them in standing water!";
+  }
+  // Soil & repotting
+  if (q.includes("soil") || q.includes("potting mix") || q.includes("repot") || q.includes("pot size")) {
+    return "🪴 Repotting tips: Choose a pot only 2 inches larger. Repot in spring when you see roots circling or coming out of drainage holes. Use chunky, well-draining mix. Water thoroughly after repotting and keep in indirect light for 1-2 weeks to recover.";
+  }
+  // Fertilizer
+  if (q.includes("fertiliz") || q.includes("nutrient") || q.includes("feed") || q.includes("npk")) {
+    return "🌱 Fertilizing guide: Use a balanced liquid fertilizer (e.g. 20-20-20 NPK) at half strength every 2-4 weeks during growing season (spring/summer). Don't fertilize in winter — plants rest! Always fertilize moist soil to avoid root burn.";
+  }
+  // Humidity
+  if (q.includes("humid") || q.includes("mist") || q.includes("dry air")) {
+    return "💧 Tropical plants (Calatheas, Ferns, Orchids) love humidity of 50-70%. Tips: Group plants together, use a pebble tray with water, or get a small humidifier. Misting can help but may cause fungal issues if overdone.";
+  }
+  // Propagation
+  if (q.includes("propagat") || q.includes("cutting") || q.includes("clone") || q.includes("stem")) {
+    return "✂️ Propagation tips: Most plants propagate from stem cuttings. Cut just below a node (the bump on the stem), let it callus for an hour, then place in water or moist perlite. Change water weekly. Pot up once roots are 2-3 inches long!";
+  }
+  // Pests
+  if (q.includes("pest") || q.includes("bug") || q.includes("spider mite") || q.includes("mealybug") || q.includes("aphid") || q.includes("fungus gnat")) {
+    return "🐛 Common pests: Spider mites (fine webbing, spray neem oil), Mealybugs (white fluff, wipe with isopropyl), Aphids (sticky leaves, insecticidal soap), Fungus gnats (overwatering causes these, let soil dry out and use sticky traps). Neem oil + dish soap is a great all-purpose spray!";
+  }
+  // Calathea
+  if (q.includes("calathea") || q.includes("prayer plant") || q.includes("maranta")) {
+    return "🙏 Calatheas are drama queens! They need: Filtered water (fluoride causes brown tips), high humidity, indirect light, and consistent moist (not soggy) soil. Keep them away from vents and cold drafts. They'll reward you with stunning foliage!";
+  }
+  // Orchid
+  if (q.includes("orchid") || q.includes("phalaenopsis")) {
+    return "🌸 Orchid care: Water by soaking in water for 15 minutes, then let drain completely. Water every 7-14 days. Bright indirect light, bark-based potting mix (not soil!), and fertilize with orchid food monthly. Reblooming tip: place in a cooler room (60°F/15°C) at night for 4-6 weeks.";
+  }
+  // ZZ plant
+  if (q.includes("zz plant") || q.includes("zamioculcas")) {
+    return "💪 ZZ plants are nearly indestructible! They store water in their rhizomes, so water only every 3-4 weeks. They thrive in low to medium light. Perfect for offices or dark corners. Wipe leaves to remove dust and keep them shiny.";
+  }
+  // Peace lily
+  if (q.includes("peace lily") || q.includes("spathiphyllum")) {
+    return "🕊️ Peace Lilies are great communicators — they visibly droop when thirsty! Water when they droop slightly, keep in low to medium indirect light, and they'll reward you with white blooms. Note: toxic to pets and children.";
+  }
+  // Herbs
+  if (q.includes("herb") || q.includes("basil") || q.includes("mint") || q.includes("rosemary") || q.includes("thyme")) {
+    return "🌿 Herb growing tips: Herbs need 6-8 hours of direct sunlight (south-facing window or grow light). Water when the top inch of soil is dry. Pinch off flowers (deadhead) to keep the plant producing leaves. Harvest from the top to encourage bushy growth!";
+  }
+  // Vegetables
+  if (q.includes("vegetable") || q.includes("tomato") || q.includes("chili") || q.includes("pepper") || q.includes("eggplant") || q.includes("talong")) {
+    return "🍅 Vegetable growing tips: Most veggies need full sun (6-8 hrs), consistent watering (not letting them dry out completely), and regular fertilizing. Support tall plants like tomatoes with stakes. Harvest regularly to encourage more production!";
+  }
+  // Buy/sell/market
+  if (q.includes("buy") || q.includes("sell") || q.includes("market") || q.includes("price")) {
+    return "🛒 You can find plants to buy and sell right here in the GrowMate Marketplace! Head to the Market tab to browse listings, or apply to become a verified seller in your profile settings. Happy trading! 🌱";
+  }
+  // Hello/hi greeting
+  if (q.includes("hello") || q.includes("hi") || q.includes("hey") || q === "yo" || q.includes("good morning") || q.includes("good evening")) {
+    return "🌿 Hello there, plant lover! 🌱 I'm Leafy, your personal plant care assistant. Ask me anything — watering schedules, pest problems, propagation, specific plants — I'm here to help you grow!";
+  }
+  // Thank you
+  if (q.includes("thank") || q.includes("thanks")) {
+    return "🌸 You're so welcome! Happy growing! Remember: the best plant parent is an observant one. Keep checking on your plants daily and you'll notice issues before they become serious. 🌿💚";
+  }
+
+  // Default fallback
+  return "🌿 Great question! Here's a general tip: Always observe your plant closely — look at the leaves, feel the soil, and check for pests weekly. If you notice something unusual, describe it to me and I'll help diagnose! Healthy plant care starts with good observation. 💚";
+}
 
 type ChatDetailScreenProps = {
   conversationId: string;
@@ -32,7 +133,7 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
         setIsLoading(true);
       }
       try {
-        const stored = await AsyncStorage.getItem("growmate_leafy_chat_messages");
+        const stored = await AsyncStorage.getItem(STORAGE_KEYS.LEAFY_MESSAGES);
         if (stored) {
           setMessages(JSON.parse(stored));
         } else {
@@ -45,7 +146,7 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
             createdAt: new Date().toISOString()
           };
           setMessages([welcomeMsg]);
-          await AsyncStorage.setItem("growmate_leafy_chat_messages", JSON.stringify([welcomeMsg]));
+          await AsyncStorage.setItem(STORAGE_KEYS.LEAFY_MESSAGES, JSON.stringify([welcomeMsg]));
         }
       } catch (e) {
         console.warn("AsyncStorage leafy chat error:", e);
@@ -96,7 +197,7 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
       };
       const updatedMessages = [...messages, userMsg];
       setMessages(updatedMessages);
-      await AsyncStorage.setItem("growmate_leafy_chat_messages", JSON.stringify(updatedMessages));
+      await AsyncStorage.setItem(STORAGE_KEYS.LEAFY_MESSAGES, JSON.stringify(updatedMessages));
       
       // Auto scroll
       setTimeout(() => {
@@ -108,20 +209,7 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
 
       // Generate leafy response
       setTimeout(async () => {
-        let leafyResponseText = "That's a great question! Make sure your plant gets the right amount of indirect sunlight and check the soil moisture before watering. 🌿";
-        
-        const lower = content.toLowerCase();
-        if (lower.includes("watering") || lower.includes("water")) {
-          leafyResponseText = "Most indoor plants prefer the 'soak and dry' method: water thoroughly until it drains out, then let the top 2 inches of soil dry completely before watering again.";
-        } else if (lower.includes("monstera")) {
-          leafyResponseText = "Monsteras love bright, indirect light and a well-draining soil mix (adding orchid bark and perlite helps!). Water every 1-2 weeks.";
-        } else if (lower.includes("sunlight") || lower.includes("light")) {
-          leafyResponseText = "Light is key! Direct sun can burn leaves (like Calatheas), while too little light makes plants leggy. Bright, indirect light near a window is usually safest.";
-        } else if (lower.includes("soil") || lower.includes("repot")) {
-          leafyResponseText = "When repotting, choose a container with drainage holes that is only 2 inches larger than the current pot. Use chunky soil to keep roots oxygenated!";
-        } else if (lower.includes("yellow") || lower.includes("leaves")) {
-          leafyResponseText = "Yellow leaves usually point to overwatering or root rot. Let the soil dry out, check drainage holes, and prune any yellow foliage.";
-        }
+        let leafyResponseText = getLeafyResponse(content);
 
         const leafyMsg: Message = {
           id: `msg-${Date.now()}-leafy`,
@@ -133,7 +221,7 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
         };
         const finalMessages = [...updatedMessages, leafyMsg];
         setMessages(finalMessages);
-        await AsyncStorage.setItem("growmate_leafy_chat_messages", JSON.stringify(finalMessages));
+        await AsyncStorage.setItem(STORAGE_KEYS.LEAFY_MESSAGES, JSON.stringify(finalMessages));
         
         // Disable typing animation and finish sending
         setIsLeafyTyping(false);
