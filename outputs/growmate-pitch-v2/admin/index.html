@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrowMate — Admin Control Center</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Variables & Theme ────────────────────────────── */
+    :root {
+      --bg-dark:       #080e0a;
+      --bg-surface:    #0d1510;
+      --bg-card:       #131e17;
+      --border-color:  rgba(255, 255, 255, 0.06);
+      
+      --color-green:   #4caf50;
+      --color-sage:    #81c784;
+      --color-orange:  #b85c42;
+      --color-yellow:  #facc15;
+      
+      --text-main:     #ffffff;
+      --text-muted:    #a3b899;
+      --text-dim:      rgba(255, 255, 255, 0.35);
+      
+      --sidebar-w:     280px;
+      --shadow-lg:     0 20px 48px rgba(0, 0, 0, 0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ─── Sidebar Navigation ───────────────────────────── */
+    aside {
+      width: var(--sidebar-w);
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: fixed;
+      left: 0; top: 0;
+      z-index: 100;
+    }
+    .sb-brand {
+      padding: 32px 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .brand-logo {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--color-green), var(--color-sage));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .brand-name {
+      font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
+      background: linear-gradient(to right, #fff, var(--text-muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-badge {
+      font-size: 10px; font-weight: 800; text-transform: uppercase;
+      background: rgba(76,175,80,0.15); color: var(--color-sage);
+      padding: 3px 8px; border-radius: 99px; border: 1px solid rgba(76,175,80,0.25);
+    }
+    .sb-menu {
+      flex-grow: 1;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .menu-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 18px; border-radius: 12px;
+      font-size: 15px; font-weight: 600; color: var(--text-muted);
+      text-decoration: none; cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .menu-item:hover {
+      background: rgba(255, 255, 255, 0.02);
+      color: #fff;
+    }
+    .menu-item.active {
+      background: rgba(76, 175, 80, 0.1);
+      color: var(--color-sage);
+      border: 1px solid rgba(76, 175, 80, 0.15);
+    }
+    .menu-icon { font-size: 18px; }
+    
+    .sb-footer {
+      padding: 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .user-avatar {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--color-orange); color: #fff;
+      font-size: 18px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .user-info h4 { font-size: 14px; font-weight: 700; }
+    .user-info p { font-size: 12px; color: var(--text-muted); }
+
+    /* ─── Main Content Frame ────────────────────────── */
+    main {
+      margin-left: var(--sidebar-w);
+      flex-grow: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ─── Header ────────────────────────────────────── */
+    header {
+      height: 80px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px;
+      background: var(--bg-surface);
+      position: sticky; top: 0; z-index: 90;
+    }
+    .header-left h1 {
+      font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+    }
+    .header-right {
+      display: flex; align-items: center; gap: 20px;
+    }
+    .search-box {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 99px; padding: 8px 18px;
+      display: flex; align-items: center; gap: 10px;
+      width: 280px;
+    }
+    .search-box input {
+      background: transparent; border: none; color: #fff;
+      font-family: inherit; font-size: 13px; outline: none; width: 100%;
+    }
+    .search-box input::placeholder { color: var(--text-dim); }
+    .badge-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; position: relative;
+    }
+    .badge-dot {
+      width: 8px; height: 8px; background: var(--color-orange);
+      border-radius: 50%; position: absolute; top: 10px; right: 10px;
+    }
+
+    /* ─── Dashboard Sections ────────────────────────── */
+    .content-area {
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      flex-grow: 1;
+    }
+    .tab-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Metric Grid ───────────────────────────────── */
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px; padding: 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: var(--shadow-lg);
+    }
+    .metric-left h3 {
+      font-size: 28px; font-weight: 800; margin-bottom: 4px;
+    }
+    .metric-left p {
+      font-size: 12px; color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.05em; font-weight: 600;
+    }
+    .metric-change {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 99px;
+      margin-top: 8px;
+    }
+    .change-up { background: rgba(76,175,80,0.12); color: var(--color-sage); }
+    .change-down { background: rgba(184,92,66,0.12); color: var(--color-orange); }
+    
+    .metric-right {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    .mr-green { background: rgba(76,175,80,0.1); color: var(--color-sage); }
+    .mr-orange { background: rgba(184,92,66,0.1); color: var(--color-orange); }
+    .mr-yellow { background: rgba(250,204,21,0.1); color: var(--color-yellow); }
+
+    /* ─── Analytics Layout ───────────────────────────── */
+    .analytics-row {
+      display: grid; grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+    .panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 24px; padding: 28px;
+      box-shadow: var(--shadow-lg);
+    }
+    .panel-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .panel-title {
+      font-size: 17px; font-weight: 700;
+    }
+    .panel-select {
+      background: var(--bg-dark); border: 1px solid var(--border-color);
+      color: var(--text-muted); font-size: 12px; font-weight: 600;
+      padding: 6px 12px; border-radius: 8px; outline: none;
+    }
+
+    /* SVG Chart */
+    .chart-container {
+      width: 100%; height: 260px; position: relative;
+    }
+
+    /* Logs Feed */
+    .logs-feed {
+      display: flex; flex-direction: column; gap: 14px;
+      max-height: 260px; overflow-y: auto; padding-right: 6px;
+    }
+    .logs-feed::-webkit-scrollbar { width: 4px; }
+    .logs-feed::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+    .log-item {
+      display: flex; gap: 12px; font-size: 13px; line-height: 1.4;
+      padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .log-time { color: var(--text-dim); font-weight: 600; width: 64px; flex-shrink: 0; }
+    .log-msg { color: var(--text-muted); }
+    .log-badge {
+      display: inline-block; font-size: 10px; font-weight: 800;
+      padding: 1px 6px; border-radius: 4px; margin-right: 6px;
+    }
+    .lb-info { background: rgba(76,175,80,0.15); color: var(--color-sage); }
+    .lb-warn { background: rgba(250,204,21,0.15); color: var(--color-yellow); }
+    .lb-alert { background: rgba(184,92,66,0.15); color: var(--color-orange); }
+
+    /* ─── Control Tables ────────────────────────────── */
+    .table-controls {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px;
+    }
+    .filter-tabs {
+      display: flex; gap: 8px;
+    }
+    .filter-tab {
+      padding: 8px 16px; border-radius: 8px;
+      font-size: 13px; font-weight: 700; color: var(--text-muted);
+      border: 1px solid transparent; cursor: pointer; transition: all 0.2s;
+    }
+    .filter-tab:hover { background: rgba(255,255,255,0.02); }
+    .filter-tab.active {
+      background: rgba(255,255,255,0.04);
+      border-color: var(--border-color);
+      color: #fff;
+    }
+    
+    .table-container {
+      width: 100%; overflow-x: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 16px; background: var(--bg-card);
+    }
+    table {
+      width: 100%; border-collapse: collapse; text-align: left;
+      font-size: 14px;
+    }
+    th {
+      background: rgba(255,255,255,0.01);
+      padding: 16px 24px; font-weight: 700; color: var(--text-dim);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    td {
+      padding: 16px 24px; border-bottom: 1px solid var(--border-color);
+      vertical-align: middle; color: var(--text-muted);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.01); }
+
+    /* Badges */
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 99px;
+    }
+    .sp-active { background: rgba(76,175,80,0.12); color: var(--color-sage); }
+    .sp-pending { background: rgba(250,204,21,0.12); color: var(--color-yellow); }
+    .sp-banned { background: rgba(184,92,66,0.12); color: var(--color-orange); }
+
+    /* Action Buttons */
+    .btn-action {
+      background: transparent; border: 1px solid var(--border-color);
+      color: var(--text-muted); padding: 6px 12px; border-radius: 8px;
+      font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: #fff;
+    }
+    .btn-verify {
+      background: rgba(76, 175, 80, 0.15);
+      border-color: rgba(76, 175, 80, 0.25);
+      color: var(--color-sage);
+    }
+    .btn-verify:hover {
+      background: rgba(76, 175, 80, 0.25);
+    }
+
+    /* ─── Leafy AI Safety Screen ───────────────────────── */
+    .grid-listings {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .listing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px; overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+    .list-media {
+      height: 200px; background: rgba(255,255,255,0.02);
+      position: relative; display: flex; align-items: center; justify-content: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .list-media img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .list-badge-ai {
+      position: absolute; top: 16px; left: 16px;
+      background: var(--bg-dark); border: 1px solid rgba(255,255,255,0.15);
+      font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px;
+    }
+    .list-body {
+      padding: 20px;
+    }
+    .list-title {
+      font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px;
+    }
+    .list-seller {
+      font-size: 12px; color: var(--text-muted); margin-bottom: 14px;
+    }
+    .list-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      padding-top: 14px; margin-top: 10px;
+    }
+    .list-tag {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; padding: 3px 8px; border-radius: 4px;
+    }
+    .lt-safe { background: rgba(76,175,80,0.12); color: var(--color-sage); }
+    .lt-flagged { background: rgba(184,92,66,0.12); color: var(--color-orange); }
+
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside>
+    <div class="sb-brand">
+      <div class="brand-logo">🌱</div>
+      <span class="brand-name">GrowMate</span>
+      <span class="brand-badge">Admin</span>
+    </div>
+    
+    <nav class="sb-menu">
+      <a class="menu-item active" onclick="switchTab('dashboard', this)">
+        <span class="menu-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a class="menu-item" onclick="switchTab('users', this)">
+        <span class="menu-icon">👥</span>
+        <span>User Accounts</span>
+      </a>
+      <a class="menu-item" onclick="switchTab('listings', this)">
+        <span class="menu-icon">🛡️</span>
+        <span>AI Safety Audits</span>
+      </a>
+    </nav>
+    
+    <div class="sb-footer">
+      <div class="user-avatar">GM</div>
+      <div class="user-info">
+        <h4>GM Admin</h4>
+        <p>Main Moderator</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN FRAME -->
+  <main>
+    
+    <!-- HEADER -->
+    <header>
+      <div class="header-left">
+        <h1 id="header-title">Admin Dashboard</h1>
+      </div>
+      <div class="header-right">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="global-search" placeholder="Search accounts or scans..." oninput="handleSearch(this.value)" />
+        </div>
+        <div class="badge-icon" onclick="triggerAlert()">
+          <span>🔔</span>
+          <div class="badge-dot"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT CONTAINER -->
+    <div class="content-area">
+
+      <!-- ==================== DASHBOARD TAB ==================== -->
+      <section id="tab-dashboard" class="tab-section active">
+        
+        <!-- Metrics -->
+        <div class="metrics-grid">
+          
+          <div class="metric-card">
+            <div class="metric-left">
+              <h3 id="stat-users">12,450</h3>
+              <p>Total Users</p>
+              <div class="metric-change change-up">↑ 12% MoM</div>
+            </div>
+            <div class="metric-right mr-green">👥</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-left">
+              <h3 id="stat-scans">42,890</h3>
+              <p>Leafy AI Scans</p>
+              <div class="metric-change change-up">↑ 28% MoM</div>
+            </div>
+            <div class="metric-right mr-yellow">🔍</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-left">
+              <h3 id="stat-listings">3,120</h3>
+              <p>Market Listings</p>
+              <div class="metric-change change-up">↑ 8% MoM</div>
+            </div>
+            <div class="metric-right mr-green">🛒</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-left">
+              <h3>98.7%</h3>
+              <p>Safety Check Rate</p>
+              <div class="metric-change change-down">↓ 0.2% check</div>
+            </div>
+            <div class="metric-right mr-orange">🛡️</div>
+          </div>
+
+        </div>
+
+        <!-- Charts & Logs -->
+        <div class="analytics-row" style="margin-top: 32px;">
+          
+          <!-- Line Chart -->
+          <div class="panel-card">
+            <div class="panel-head">
+              <span class="panel-title">Growth &amp; AI Scan Analytics</span>
+              <select class="panel-select">
+                <option>Last 7 Days</option>
+                <option>Last 30 Days</option>
+              </select>
+            </div>
+            <div class="chart-container">
+              <!-- SVG Interactive Line Graph -->
+              <svg width="100%" height="100%" viewBox="0 0 600 240" style="overflow: visible;">
+                <defs>
+                  <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#4caf50" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#4caf50" stop-opacity="0.0"/>
+                  </linearGradient>
+                </defs>
+                <!-- Horizontal Grid Lines -->
+                <line x1="0" y1="40" x2="600" y2="40" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                <line x1="0" y1="100" x2="600" y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                <line x1="0" y1="160" x2="600" y2="160" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                <!-- Graph Path -->
+                <path d="M 20 180 Q 100 130 180 150 T 340 70 T 500 50 L 580 90" fill="none" stroke="var(--color-green)" stroke-width="3" />
+                <path d="M 20 180 Q 100 130 180 150 T 340 70 T 500 50 L 580 90 L 580 200 L 20 200 Z" fill="url(#chart-grad)" />
+                <!-- Circles on peaks -->
+                <circle cx="340" cy="70" r="5" fill="#facc15" stroke="var(--bg-card)" stroke-width="2"/>
+                <circle cx="500" cy="50" r="5" fill="#4caf50" stroke="var(--bg-card)" stroke-width="2"/>
+                <!-- Labels -->
+                <text x="20" y="220" fill="var(--text-dim)" font-size="10" font-weight="700">MON</text>
+                <text x="136" y="220" fill="var(--text-dim)" font-size="10" font-weight="700">TUE</text>
+                <text x="252" y="220" fill="var(--text-dim)" font-size="10" font-weight="700">WED</text>
+                <text x="368" y="220" fill="var(--text-dim)" font-size="10" font-weight="700">THU</text>
+                <text x="484" y="220" fill="var(--text-dim)" font-size="10" font-weight="700">FRI</text>
+                <text x="560" y="220" fill="var(--text-dim)" font-size="10" font-weight="700">WEEKEND</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Activity Log Feed -->
+          <div class="panel-card">
+            <div class="panel-head">
+              <span class="panel-title">Real-Time Moderation Logs</span>
+              <span class="brand-badge" style="background:rgba(255,255,255,0.03);color:#fff;">Live</span>
+            </div>
+            <div class="logs-feed" id="live-logs">
+              <div class="log-item">
+                <span class="log-time">10:31:02</span>
+                <span class="log-msg"><span class="log-badge lb-info">Scan</span>User "juan_dev" scanned a Monstera Deliciosa (Safe)</span>
+              </div>
+              <div class="log-item">
+                <span class="log-time">10:29:45</span>
+                <span class="log-msg"><span class="log-badge lb-info">User</span>Seller application submitted by "maria_flora"</span>
+              </div>
+              <div class="log-item">
+                <span class="log-time">10:25:12</span>
+                <span class="log-msg"><span class="log-badge lb-warn">AI Safety</span>Adiantum pedatum flagged as invasive species</span>
+              </div>
+              <div class="log-item">
+                <span class="log-time">10:18:04</span>
+                <span class="log-msg"><span class="log-badge lb-info">Trade</span>Order #883 confirmed for ₱1,200.00</span>
+              </div>
+              <div class="log-item">
+                <span class="log-time">10:04:19</span>
+                <span class="log-msg"><span class="log-badge lb-alert">Flagged</span>Adinandra belilla listing blocked (Endangered Wild Orchid)</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ==================== USERS TAB ==================== -->
+      <section id="tab-users" class="tab-section">
+        
+        <div class="table-controls">
+          <div class="filter-tabs">
+            <span class="filter-tab active" onclick="filterUsers('all', this)">All Accounts</span>
+            <span class="filter-tab" onclick="filterUsers('seller', this)">Sellers</span>
+            <span class="filter-tab" onclick="filterUsers('flagged', this)">Flagged</span>
+          </div>
+          <button class="btn-action btn-verify" onclick="addUser()">+ Add Mock Account</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>User Account</th>
+                <th>Status</th>
+                <th>Role</th>
+                <th>Trust Score</th>
+                <th>Registration Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body">
+              <tr data-role="seller" data-flagged="false">
+                <td>
+                  <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="user-avatar" style="width:36px; height:36px; font-size:14px; background:#4caf50;">JD</div>
+                    <div>
+                      <div style="font-weight:700; color:#fff;">Juan Dela Cruz</div>
+                      <div style="font-size:12px; color:var(--text-dim);">juan@plantita.online</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="status-pill sp-active">Active</span></td>
+                <td>Seller</td>
+                <td style="font-weight:700; color:var(--color-sage);">98% Excellent</td>
+                <td>May 15, 2026</td>
+                <td>
+                  <button class="btn-action" onclick="flagUser('Juan Dela Cruz', this)">Flag Account</button>
+                </td>
+              </tr>
+              <tr data-role="buyer" data-flagged="false">
+                <td>
+                  <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="user-avatar" style="width:36px; height:36px; font-size:14px; background:#b85c42;">MD</div>
+                    <div>
+                      <div style="font-weight:700; color:#fff;">Maria Clara</div>
+                      <div style="font-size:12px; color:var(--text-dim);">maria@clara.ph</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="status-pill sp-active">Active</span></td>
+                <td>Buyer</td>
+                <td>85% Good</td>
+                <td>May 20, 2026</td>
+                <td>
+                  <button class="btn-action" onclick="flagUser('Maria Clara', this)">Flag Account</button>
+                </td>
+              </tr>
+              <tr data-role="seller" data-flagged="true">
+                <td>
+                  <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="user-avatar" style="width:36px; height:36px; font-size:14px; background:#facc15; color:#000;">PL</div>
+                    <div>
+                      <div style="font-weight:700; color:#fff;">Pedro Laya (Flagged)</div>
+                      <div style="font-size:12px; color:var(--text-dim);">pedro.laya@gmail.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="status-pill sp-pending">Pending Review</span></td>
+                <td>Seller</td>
+                <td style="font-weight:700; color:var(--color-orange);">42% Low</td>
+                <td>May 22, 2026</td>
+                <td>
+                  <button class="btn-action btn-verify" style="margin-right:8px;" onclick="approveUser('Pedro Laya', this)">Verify</button>
+                  <button class="btn-action" style="color:var(--color-orange); border-color:rgba(184,92,66,0.3);" onclick="banUser('Pedro Laya', this)">Ban</button>
+                </td>
+              </tr>
+              <tr data-role="buyer" data-flagged="false">
+                <td>
+                  <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="user-avatar" style="width:36px; height:36px; font-size:14px; background:#7a9080;">AG</div>
+                    <div>
+                      <div style="font-weight:700; color:#fff;">Amorsolo Garcia</div>
+                      <div style="font-size:12px; color:var(--text-dim);">amorsolo.g@yahoo.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="status-pill sp-active">Active</span></td>
+                <td>Buyer</td>
+                <td>90% Good</td>
+                <td>May 25, 2026</td>
+                <td>
+                  <button class="btn-action" onclick="flagUser('Amorsolo Garcia', this)">Flag Account</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+      <!-- ==================== LISTINGS SAFETY TAB ==================== -->
+      <section id="tab-listings" class="tab-section">
+        
+        <div class="table-controls">
+          <span style="font-size:14px; color:var(--text-muted);">Recent Plant Uploads - Screened by Leafy AI Safety Auditor</span>
+        </div>
+
+        <div class="grid-listings" id="listings-grid">
+          
+          <div class="listing-card">
+            <div class="list-media">
+              <span style="font-size: 48px;">🪴</span>
+              <span class="list-badge-ai lt-safe">AI: 98% Safe</span>
+            </div>
+            <div class="list-body">
+              <h3 class="list-title">Monstera Deliciosa Variegata</h3>
+              <p class="list-seller">Seller: juan_dev · ₱4,500.00</p>
+              <div class="list-footer">
+                <span class="list-tag lt-safe">Approved</span>
+                <button class="btn-action" onclick="overrideListing('Monstera Deliciosa Variegata', this)">Flag Listing</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="listing-card">
+            <div class="list-media">
+              <span style="font-size: 48px;">🌸</span>
+              <span class="list-badge-ai lt-flagged" style="border-color:rgba(184,92,66,0.3);">AI: Wildlife Threat</span>
+            </div>
+            <div class="list-body">
+              <h3 class="list-title">Waling-Waling (Endangered Orchid)</h3>
+              <p class="list-seller">Seller: shady_grower · ₱15,000.00</p>
+              <div class="list-footer">
+                <span class="list-tag lt-flagged">Flagged</span>
+                <div>
+                  <button class="btn-action btn-verify" style="margin-right:6px;" onclick="approveListing('Waling-Waling', this)">Approve</button>
+                  <button class="btn-action" style="color:var(--color-orange); border-color:rgba(184,92,66,0.2);" onclick="removeListing('Waling-Waling', this)">Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="listing-card">
+            <div class="list-media">
+              <span style="font-size: 48px;">🌵</span>
+              <span class="list-badge-ai lt-safe">AI: 95% Safe</span>
+            </div>
+            <div class="list-body">
+              <h3 class="list-title">Golden Barrel Cactus (Large)</h3>
+              <p class="list-seller">Seller: cactus_laya · ₱850.00</p>
+              <div class="list-footer">
+                <span class="list-tag lt-safe">Approved</span>
+                <button class="btn-action" onclick="overrideListing('Golden Barrel Cactus', this)">Flag Listing</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <script>
+    // Tab switching
+    function switchTab(tabId, el) {
+      document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+      document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+      
+      el.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+      
+      // Update header title
+      const titles = {
+        'dashboard': 'Control Center Analytics',
+        'users': 'User Account Management',
+        'listings': 'Leafy AI Safety Audits'
+      };
+      document.getElementById('header-title').textContent = titles[tabId];
+    }
+
+    // Dynamic notification logs simulator
+    setInterval(() => {
+      const logs = [
+        "User 'plant_queen' listed a Sansevieria Trifasciata (Safe)",
+        "AI flagged listing 'Rare Forest Fern' (Suspected poached species)",
+        "Order #892 completed by 'maria_clara' (₱550.00)",
+        "Seller 'cactus_laya' uploaded business registration document",
+        "New user sign-up: 'garden_joe_88' from Quezon City"
+      ];
+      const badges = ["lb-info", "lb-warn", "lb-info", "lb-info", "lb-info"];
+      const badgeTitles = ["Scan", "AI Safety", "Trade", "Docs", "User"];
+      
+      const logContainer = document.getElementById('live-logs');
+      if (logContainer) {
+        const time = new Date().toTimeString().split(' ')[0];
+        const idx = Math.floor(Math.random() * logs.length);
+        
+        const row = document.createElement('div');
+        row.className = 'log-item';
+        row.style.animation = 'fadeIn 0.4s ease';
+        row.innerHTML = `
+          <span class="log-time">${time}</span>
+          <span class="log-msg"><span class="log-badge ${badges[idx]}">${badgeTitles[idx]}</span>${logs[idx]}</span>
+        `;
+        logContainer.insertBefore(row, logContainer.firstChild);
+        
+        if (logContainer.children.length > 8) {
+          logContainer.lastChild.remove();
+        }
+      }
+    }, 4500);
+
+    // Global Search helper
+    function handleSearch(q) {
+      const query = q.toLowerCase();
+      
+      // Filter user rows
+      const rows = document.querySelectorAll('#users-table-body tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+      });
+
+      // Filter listing cards
+      const cards = document.querySelectorAll('#listings-grid .listing-card');
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(query) ? '' : 'none';
+      });
+    }
+
+    // Filter User Roles
+    function filterUsers(filter, el) {
+      document.querySelectorAll('#tab-users .filter-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      
+      const rows = document.querySelectorAll('#users-table-body tr');
+      rows.forEach(row => {
+        const role = row.getAttribute('data-role');
+        const flagged = row.getAttribute('data-flagged') === 'true';
+        
+        if (filter === 'all') {
+          row.style.display = '';
+        } else if (filter === 'seller' && role === 'seller') {
+          row.style.display = '';
+        } else if (filter === 'flagged' && flagged) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // Interactive Action Simulators
+    function flagUser(name, btn) {
+      alert(`Account for "${name}" has been flagged and queued for review.`);
+      const tr = btn.closest('tr');
+      tr.setAttribute('data-flagged', 'true');
+      const statusPill = tr.querySelector('.status-pill');
+      statusPill.className = 'status-pill sp-pending';
+      statusPill.textContent = 'Pending Review';
+    }
+
+    function approveUser(name, btn) {
+      alert(`Seller Account "${name}" has been fully verified.`);
+      const tr = btn.closest('tr');
+      tr.setAttribute('data-flagged', 'false');
+      const statusPill = tr.querySelector('.status-pill');
+      statusPill.className = 'status-pill sp-active';
+      statusPill.textContent = 'Active';
+      btn.remove();
+    }
+
+    function banUser(name, btn) {
+      if (confirm(`Are you sure you want to ban "${name}" from GrowMate?`)) {
+        const tr = btn.closest('tr');
+        tr.remove();
+        document.getElementById('stat-users').textContent = "12,449";
+      }
+    }
+
+    function overrideListing(title, btn) {
+      alert(`Listing "${title}" flagged. Safety Auditor notified.`);
+      const footer = btn.closest('.list-footer');
+      const tag = footer.querySelector('.list-tag');
+      tag.className = 'list-tag lt-flagged';
+      tag.textContent = 'Flagged';
+      btn.remove();
+    }
+
+    function approveListing(title, btn) {
+      alert(`Listing "${title}" approved for general marketplace.`);
+      const footer = btn.closest('.list-footer');
+      const tag = footer.querySelector('.list-tag');
+      tag.className = 'list-tag lt-safe';
+      tag.textContent = 'Approved';
+      btn.parentElement.remove();
+    }
+
+    function removeListing(title, btn) {
+      if (confirm(`Remove listing "${title}" from the marketplace permanently?`)) {
+        btn.closest('.listing-card').remove();
+        const stat = document.getElementById('stat-listings');
+        stat.textContent = parseInt(stat.textContent.replace(',', '')) - 1;
+      }
+    }
+
+    function triggerAlert() {
+      alert("No critical system alerts at this time. All GrowMate nodes running safe.");
+    }
+
+    function addUser() {
+      const names = ["Gabriel Ramos", "Corazon Aquino", "Fernando Poe"];
+      const emails = ["gab@ram.ph", "cory@aquino.org", "f.poe@star.ph"];
+      const rand = Math.floor(Math.random() * names.length);
+      
+      const body = document.getElementById('users-table-body');
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-role', 'buyer');
+      tr.setAttribute('data-flagged', 'false');
+      tr.innerHTML = `
+        <td>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="user-avatar" style="width:36px; height:36px; font-size:14px; background:#4caf50;">M</div>
+            <div>
+              <div style="font-weight:700; color:#fff;">${names[rand]}</div>
+              <div style="font-size:12px; color:var(--text-dim);">${emails[rand]}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="status-pill sp-active">Active</span></td>
+        <td>Buyer</td>
+        <td>95% Good</td>
+        <td>Just Now</td>
+        <td>
+          <button class="btn-action" onclick="flagUser('${names[rand]}', this)">Flag Account</button>
+        </td>
+      `;
+      body.insertBefore(tr, body.firstChild);
+      
+      const stat = document.getElementById('stat-users');
+      stat.textContent = (parseInt(stat.textContent.replace(',', '')) + 1).toLocaleString();
+    }
+  </script>
+
+</body>
+</html>
