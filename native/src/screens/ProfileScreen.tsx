@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Dimensions,
   Image,
+  ImageBackground,
+  Platform,
   Modal,
   Pressable,
   ScrollView,
@@ -18,9 +21,10 @@ import { SellerDashboard } from "../components/SellerDashboard";
 import { useAuth } from "../context/AuthContext";
 import { useNavigationContext } from "../context/NavigationContext";
 import { updateProfileAvatar, updateProfile, updateProfileCover } from "../services/profile";
-import { pickImageFromLibrary, uploadPublicImage } from "../services/storage";
+import { pickImageFromLibrary, uploadPublicImage, type PickedImage } from "../services/storage";
 import { getUserOrders, updateOrderStatus, type Order, type MarketListing } from "../services/listings";
 import { getUserFavorites } from "../services/favorites";
+import { createSellerApplication } from "../services/sellerApplications";
 import { createReview, getReviewForOrder } from "../services/reviews";
 import { getOrCreateMyGarden, getGardenPlants, type GardenPlant } from "../services/gardens";
 import { colors, radius, shadow, fontSize } from "../theme/colors";
@@ -29,6 +33,26 @@ import { formatCurrency } from "../utils/currency";
 const COVER_HEIGHT = 160;
 const AVATAR_SIZE = 80;
 const AVATAR_BORDER = 3;
+const SCREEN_W = Dimensions.get("window").width;
+
+const DEFAULT_COVERS = [
+  "https://images.unsplash.com/photo-1545241047-6083a3684587?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1592150621744-aca64f48394a?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1530968033775-2c9273f0865e?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1558905619-8714cdb4b2db?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1512428813824-f7258347e62a?q=80&w=800&auto=format&fit=crop",
+];
+
+function getDefaultCover(uid?: string | null): string {
+  if (!uid) return DEFAULT_COVERS[0];
+  let hash = 0;
+  for (let i = 0; i < uid.length; i++) {
+    hash = uid.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return DEFAULT_COVERS[Math.abs(hash) % DEFAULT_COVERS.length];
+}
 
 // ── Skeleton block helper ─────────────────────────────
 function Skeleton({ w, h, radius: r = 8, style }: { w: number | string; h: number; radius?: number; style?: any }) {
@@ -91,10 +115,21 @@ export function ProfileScreen({
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [localCoverUri, setLocalCoverUri] = useState<string | null>(null);
+  const [pendingCoverPhoto, setPendingCoverPhoto] = useState<PickedImage | null>(null);
   const [isLoadingProfile] = useState(false); // true on first mount until profile arrives
   const sellerStatus = profile?.seller_status ?? "not_applied";
   const canSeeSellerDashboard = sellerStatus === "verified";
   const canSeeAdminDashboard = profile?.is_admin === true;
+  const [showSellerAppModal, setShowSellerAppModal] = useState(false);
+  const [isApplyingSeller, setIsApplyingSeller] = useState(false);
+  const [sellerAppMessage, setSellerAppMessage] = useState<string | null>(null);
+  const [sellerAppError, setSellerAppError] = useState<string | null>(null);
+  const [appShopName, setAppShopName] = useState("");
+  const [appReason, setAppReason] = useState("");
+  const [idFrontPhoto, setIdFrontPhoto] = useState<PickedImage | null>(null);
+  const [idBackPhoto, setIdBackPhoto] = useState<PickedImage | null>(null);
+  const [selfieWithIdPhoto, setSelfieWithIdPhoto] = useState<PickedImage | null>(null);
+  const [selfieWithPlantPhoto, setSelfieWithPlantPhoto] = useState<PickedImage | null>(null);
 
   // Orders
   const [orders, setOrders] = useState<Order[]>([]);
@@ -148,19 +183,78 @@ export function ProfileScreen({
 
   async function handleUpdateCover() {
     if (!user) return;
-    setIsUploadingCover(true);
     try {
       const picked = await pickImageFromLibrary();
       if (!picked) return;
-      // Show immediately in local state for instant feedback
       setLocalCoverUri(picked.uri);
-      const uploaded = await uploadPublicImage("avatars", user.id, "cover", picked);
+      setPendingCoverPhoto(picked);
+    } catch (e) {
+      console.error("Cover selection failed:", e);
+    }
+  }
+
+  async function handleSaveCover() {
+    if (!user || !pendingCoverPhoto) return;
+    setIsUploadingCover(true);
+    try {
+      const uploaded = await uploadPublicImage("avatars", user.id, "cover", pendingCoverPhoto);
       await updateProfileCover(user.id, uploaded.publicUrl);
+      setLocalCoverUri(uploaded.publicUrl);
+      setPendingCoverPhoto(null);
       await refreshProfile();
     } catch (e) {
       console.error("Cover upload failed:", e);
     } finally {
       setIsUploadingCover(false);
+    }
+  }
+
+  async function handlePickSellerPhoto(setPhoto: (photo: PickedImage) => void) {
+    setSellerAppError(null);
+    try {
+      const picked = await pickImageFromLibrary();
+      if (picked) setPhoto(picked);
+    } catch (e) {
+      setSellerAppError(e instanceof Error ? e.message : "Unable to choose photo.");
+    }
+  }
+
+  async function handleApplyAsSellerSubmit() {
+    if (!user) return;
+    setIsApplyingSeller(true);
+    setSellerAppMessage(null);
+    setSellerAppError(null);
+    try {
+      if (!idFrontPhoto || !idBackPhoto || !selfieWithIdPhoto || !selfieWithPlantPhoto) {
+        throw new Error("Upload valid ID front, valid ID back, selfie with ID, and selfie with a plant.");
+      }
+
+      const [idFrontUpload, idBackUpload, selfieWithIdUpload, selfieWithPlantUpload] = await Promise.all([
+        uploadPublicImage("verification-docs" as any, user.id, "verification/id-front", idFrontPhoto),
+        uploadPublicImage("verification-docs" as any, user.id, "verification/id-back", idBackPhoto),
+        uploadPublicImage("verification-docs" as any, user.id, "verification/selfie-id", selfieWithIdPhoto),
+        uploadPublicImage("verification-docs" as any, user.id, "verification/selfie-plant", selfieWithPlantPhoto),
+      ]);
+
+      await createSellerApplication(user.id, appShopName.trim(), appReason.trim(), {
+        idFrontUrl: idFrontUpload.publicUrl,
+        idBackUrl: idBackUpload.publicUrl,
+        selfieWithIdUrl: selfieWithIdUpload.publicUrl,
+        selfieWithPlantUrl: selfieWithPlantUpload.publicUrl,
+      });
+      setSellerAppMessage("Seller application sent for admin review.");
+      setShowSellerAppModal(false);
+      setAppShopName("");
+      setAppReason("");
+      setIdFrontPhoto(null);
+      setIdBackPhoto(null);
+      setSelfieWithIdPhoto(null);
+      setSelfieWithPlantPhoto(null);
+      await refreshProfile();
+    } catch (e) {
+      setSellerAppError(e instanceof Error ? e.message : "Unable to send seller application.");
+    } finally {
+      setIsApplyingSeller(false);
     }
   }
 
@@ -453,7 +547,8 @@ export function ProfileScreen({
     disputed: "#b91c1c",
   };
 
-  const coverUri = localCoverUri ?? profile?.cover_url ?? null;
+  // Use uploaded cover, then profile cover_url, then a stable default garden landscape
+  const coverUri = localCoverUri ?? profile?.cover_url ?? getDefaultCover(user?.id);
 
   // ─────────────────────────────────────────────────────
   return (
@@ -469,23 +564,32 @@ export function ProfileScreen({
           <>
         {/* ══ Cover + Avatar ══════════════════════════════ */}
         <View style={styles.coverWrap}>
-          {/* Cover photo */}
-          <View style={styles.cover}>
-            {coverUri ? (
-              <Image source={{ uri: coverUri }} style={styles.coverImage} />
-            ) : (
-              <MaterialCommunityIcons
-                name="flower"
-                size={40}
-                color="rgba(255,255,255,0.15)"
-                style={styles.coverDecor}
+          {/* Cover photo — uses CSS backgroundImage on web for reliable rendering */}
+          <View
+            style={[
+              styles.cover,
+              Platform.OS === "web" && coverUri
+                ? ({
+                    backgroundImage: `url('${coverUri}')`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  } as any)
+                : {},
+            ]}
+          >
+            {/* Native: render Image inside; web: handled by CSS above */}
+            {Platform.OS !== "web" && coverUri && (
+              <ImageBackground
+                source={{ uri: coverUri }}
+                style={StyleSheet.absoluteFill}
+                resizeMode="cover"
               />
             )}
             {/* Uploading overlay */}
             {isUploadingCover && (
               <View style={styles.coverUploadingOverlay}>
                 <ActivityIndicator color={colors.white} size="small" />
-                <Text style={styles.coverUploadingText}>Uploading...</Text>
+                <Text style={styles.coverUploadingText}>Saving...</Text>
               </View>
             )}
           </View>
@@ -499,6 +603,26 @@ export function ProfileScreen({
           >
             <MaterialCommunityIcons name="camera-outline" size={16} color={colors.white} />
           </Pressable>
+
+          {pendingCoverPhoto && (
+            <Pressable
+              onPress={handleSaveCover}
+              disabled={isUploadingCover}
+              style={({ pressed }) => [
+                styles.coverSaveBtn,
+                (pressed || isUploadingCover) && styles.coverSaveBtnPressed,
+              ]}
+            >
+              {isUploadingCover ? (
+                <ActivityIndicator color={colors.white} size="small" />
+              ) : (
+                <>
+                  <MaterialCommunityIcons name="content-save" size={14} color={colors.white} />
+                  <Text style={styles.coverSaveText}>Save Cover</Text>
+                </>
+              )}
+            </Pressable>
+          )}
 
           {/* Avatar */}
           <Pressable onPress={handleUpdateAvatar} style={styles.avatarWrap}>
@@ -638,6 +762,38 @@ export function ProfileScreen({
         </View>
 
         {/* ══ My Market Listings ══════════════════════════ */}
+        {!canSeeSellerDashboard && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Seller Account</Text>
+            <Pressable
+              onPress={() => sellerStatus === "not_applied" && setShowSellerAppModal(true)}
+              disabled={sellerStatus !== "not_applied"}
+              style={({ pressed }) => [styles.sellerSignupCard, pressed && styles.sellerSignupCardPressed]}
+            >
+              <MaterialCommunityIcons
+                name={sellerStatus === "pending" ? "clock-outline" : "store-plus-outline"}
+                size={22}
+                color={colors.greenMid}
+              />
+              <View style={styles.sellerSignupCopy}>
+                <Text style={styles.sellerSignupTitle}>
+                  {sellerStatus === "pending" ? "Seller application pending" : "Sign up as seller"}
+                </Text>
+                <Text style={styles.sellerSignupText}>
+                  {sellerStatus === "pending"
+                    ? "Your verification is waiting for admin review."
+                    : "Verify your account to list plants in the marketplace."}
+                </Text>
+              </View>
+              {sellerStatus === "not_applied" && (
+                <MaterialCommunityIcons name="chevron-right" size={20} color={colors.greenMuted} />
+              )}
+            </Pressable>
+            {sellerAppMessage && <Text style={styles.successText}>{sellerAppMessage}</Text>}
+            {sellerAppError && <Text style={styles.errorText}>{sellerAppError}</Text>}
+          </View>
+        )}
+
         {canSeeSellerDashboard && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
@@ -681,6 +837,8 @@ export function ProfileScreen({
               const isBuyer = order.buyerId === user?.id;
               const hasReviewed = reviewedOrdersMap[order.id] ?? false;
               const statusCol = statusColor[order.status] ?? colors.greenMuted;
+              const safetyFee = order.platformFee || Math.round(order.subtotal * 0.1 * 100) / 100;
+              const sellerPayout = Math.max(order.subtotal - safetyFee, 0);
 
               return (
                 <View key={order.id} style={styles.orderCard}>
@@ -698,22 +856,41 @@ export function ProfileScreen({
                   </Text>
                   <Text style={styles.orderMeta}>{formatCurrency(order.subtotal)} · {order.quantity} unit</Text>
 
+                  {!isBuyer && (
+                    <View style={styles.payoutBox}>
+                      <View style={styles.payoutRow}>
+                        <Text style={styles.payoutLabel}>Item Price</Text>
+                        <Text style={styles.payoutValue}>{formatCurrency(order.subtotal)}</Text>
+                      </View>
+                      <View style={styles.payoutRow}>
+                        <Text style={styles.payoutLabel}>GrowMate Safety Fee (10%)</Text>
+                        <Text style={styles.payoutFee}>-{formatCurrency(safetyFee)}</Text>
+                      </View>
+                      <View style={[styles.payoutRow, styles.payoutTotalRow]}>
+                        <Text style={styles.payoutTotalLabel}>Estimated Seller Payout</Text>
+                        <Text style={styles.payoutTotalValue}>{formatCurrency(sellerPayout)}</Text>
+                      </View>
+                    </View>
+                  )}
+
                   {/* Order actions */}
                   {order.status === "pending" && (
                     <View style={styles.orderActions}>
-                      {isBuyer && (
-                        <Pressable
-                          onPress={() => handleUpdateOrderStatus(order.id, "paid")}
-                          style={styles.orderBtnPrimary}
-                        >
-                          <Text style={styles.orderBtnPrimaryText}>Pay Now</Text>
-                        </Pressable>
-                      )}
                       <Pressable
                         onPress={() => handleUpdateOrderStatus(order.id, "cancelled")}
                         style={styles.orderBtnSecondary}
                       >
                         <Text style={styles.orderBtnSecondaryText}>Cancel</Text>
+                      </Pressable>
+                    </View>
+                  )}
+                  {order.status === "accepted" && isBuyer && (
+                    <View style={styles.orderActions}>
+                      <Pressable
+                        onPress={() => handleUpdateOrderStatus(order.id, "paid")}
+                        style={styles.orderBtnPrimary}
+                      >
+                        <Text style={styles.orderBtnPrimaryText}>Pay Now</Text>
                       </Pressable>
                     </View>
                   )}
@@ -851,6 +1028,88 @@ export function ProfileScreen({
       {/* ══════════════════════════════════════════════════
           REVIEW MODAL
       ══════════════════════════════════════════════════ */}
+      <Modal visible={showSellerAppModal} animationType="slide" transparent onRequestClose={() => setShowSellerAppModal(false)}>
+        <View style={styles.modalOverlay}>
+          <Pressable style={{ flex: 1 }} onPress={() => !isApplyingSeller && setShowSellerAppModal(false)} />
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHandle} />
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Sign up as seller</Text>
+              <Pressable onPress={() => setShowSellerAppModal(false)} disabled={isApplyingSeller} hitSlop={8}>
+                <MaterialCommunityIcons name="close" size={22} color={colors.greenMuted} />
+              </Pressable>
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+              <Text style={styles.sellerAppHelp}>
+                Submit your shop details and verification photos. Admin approval is required before listings go live.
+              </Text>
+
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Shop name</Text>
+                <TextInput
+                  style={styles.fieldInput}
+                  value={appShopName}
+                  onChangeText={setAppShopName}
+                  placeholder="e.g. Laarne's Plant Corner"
+                  placeholderTextColor={colors.textTertiary}
+                />
+              </View>
+
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Why do you want to sell?</Text>
+                <TextInput
+                  style={[styles.fieldInput, styles.fieldInputMulti]}
+                  value={appReason}
+                  onChangeText={setAppReason}
+                  placeholder="Tell us about your plants and selling experience..."
+                  placeholderTextColor={colors.textTertiary}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+              </View>
+
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Verification photos</Text>
+                <View style={styles.verificationGrid}>
+                  <Pressable onPress={() => handlePickSellerPhoto(setIdFrontPhoto)} disabled={isApplyingSeller} style={styles.verificationTile}>
+                    {idFrontPhoto ? <Image source={{ uri: idFrontPhoto.uri }} style={styles.verificationThumb} /> : <MaterialCommunityIcons name="camera-plus-outline" size={24} color={colors.greenMuted} />}
+                    <Text style={styles.verificationTileText}>Valid ID front</Text>
+                  </Pressable>
+                  <Pressable onPress={() => handlePickSellerPhoto(setIdBackPhoto)} disabled={isApplyingSeller} style={styles.verificationTile}>
+                    {idBackPhoto ? <Image source={{ uri: idBackPhoto.uri }} style={styles.verificationThumb} /> : <MaterialCommunityIcons name="camera-plus-outline" size={24} color={colors.greenMuted} />}
+                    <Text style={styles.verificationTileText}>Valid ID back</Text>
+                  </Pressable>
+                  <Pressable onPress={() => handlePickSellerPhoto(setSelfieWithIdPhoto)} disabled={isApplyingSeller} style={styles.verificationTile}>
+                    {selfieWithIdPhoto ? <Image source={{ uri: selfieWithIdPhoto.uri }} style={styles.verificationThumb} /> : <MaterialCommunityIcons name="camera-plus-outline" size={24} color={colors.greenMuted} />}
+                    <Text style={styles.verificationTileText}>Selfie with ID</Text>
+                  </Pressable>
+                  <Pressable onPress={() => handlePickSellerPhoto(setSelfieWithPlantPhoto)} disabled={isApplyingSeller} style={styles.verificationTile}>
+                    {selfieWithPlantPhoto ? <Image source={{ uri: selfieWithPlantPhoto.uri }} style={styles.verificationThumb} /> : <MaterialCommunityIcons name="camera-plus-outline" size={24} color={colors.greenMuted} />}
+                    <Text style={styles.verificationTileText}>Selfie with plant</Text>
+                  </Pressable>
+                </View>
+              </View>
+
+              {sellerAppError && <Text style={styles.errorText}>{sellerAppError}</Text>}
+
+              <View style={styles.modalBtns}>
+                <Pressable
+                  onPress={handleApplyAsSellerSubmit}
+                  disabled={isApplyingSeller || !appShopName.trim()}
+                  style={[styles.primaryBtn, { flex: 1 }, (isApplyingSeller || !appShopName.trim()) && { opacity: 0.4 }]}
+                >
+                  <Text style={styles.primaryBtnText}>{isApplyingSeller ? "Submitting..." : "Submit"}</Text>
+                </Pressable>
+                <Pressable onPress={() => setShowSellerAppModal(false)} disabled={isApplyingSeller} style={[styles.secondaryBtn, { flex: 1 }]}>
+                  <Text style={styles.secondaryBtnText}>Cancel</Text>
+                </Pressable>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       <Modal visible={showReviewModal} animationType="fade" transparent onRequestClose={() => setShowReviewModal(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.reviewCard}>
@@ -909,9 +1168,11 @@ const styles = StyleSheet.create({
   },
   coverImage: {
     position: "absolute",
-    top: 0, left: 0, right: 0, bottom: 0,
-    width: "100%",
-    height: "100%",
+    top: 0,
+    left: 0,
+    width: SCREEN_W,
+    height: COVER_HEIGHT,
+    resizeMode: "cover",
   },
   coverDecor: { opacity: 0.4 },
   coverUploadingOverlay: {
@@ -933,6 +1194,29 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.35)",
     alignItems: "center",
     justifyContent: "center",
+  },
+  coverSaveBtn: {
+    position: "absolute",
+    right: 14,
+    bottom: 12,
+    minHeight: 34,
+    borderRadius: 17,
+    backgroundColor: colors.green,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingHorizontal: 12,
+    ...shadow.sm,
+  },
+  coverSaveBtnPressed: {
+    opacity: 0.82,
+    transform: [{ scale: 0.98 }],
+  },
+  coverSaveText: {
+    color: colors.white,
+    fontSize: 12,
+    fontWeight: "900",
   },
   avatarWrap: {
     position: "absolute",
@@ -1055,6 +1339,23 @@ const styles = StyleSheet.create({
     borderColor: colors.lineMid,
   },
   activePillText: { fontSize: 12, fontWeight: "700", color: colors.greenMid },
+  sellerSignupCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: colors.surface0,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.line,
+    padding: 14,
+    marginTop: 10,
+    ...shadow.sm,
+  },
+  sellerSignupCardPressed: { opacity: 0.75 },
+  sellerSignupCopy: { flex: 1, gap: 2 },
+  sellerSignupTitle: { fontSize: 14, fontWeight: "900", color: colors.textPrimary },
+  sellerSignupText: { fontSize: 12, fontWeight: "700", color: colors.textSecondary, lineHeight: 16 },
+  successText: { color: colors.greenMid, fontSize: 13, fontWeight: "700", marginTop: 8 },
 
   // ── Orders ────────────────────────────────────────────
   errorRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8 },
@@ -1087,6 +1388,27 @@ const styles = StyleSheet.create({
   orderStatusText: { fontSize: 11, fontWeight: "800", textTransform: "uppercase" },
   orderTitle: { fontSize: 15, fontWeight: "700", color: colors.textPrimary, marginBottom: 4 },
   orderMeta: { fontSize: 12, color: colors.textSecondary, fontWeight: "600", marginTop: 2 },
+  payoutBox: {
+    backgroundColor: colors.surface1,
+    borderColor: colors.line,
+    borderWidth: 1,
+    borderRadius: radius.md,
+    padding: 10,
+    gap: 6,
+    marginTop: 10,
+  },
+  payoutRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
+  },
+  payoutLabel: { color: colors.textSecondary, fontSize: 12, fontWeight: "700", flex: 1 },
+  payoutValue: { color: colors.textPrimary, fontSize: 12, fontWeight: "800" },
+  payoutFee: { color: "#b45309", fontSize: 12, fontWeight: "800" },
+  payoutTotalRow: { borderTopColor: colors.line, borderTopWidth: 1, paddingTop: 6 },
+  payoutTotalLabel: { color: colors.green, fontSize: 12, fontWeight: "900", flex: 1 },
+  payoutTotalValue: { color: colors.green, fontSize: 13, fontWeight: "900" },
   orderActions: { flexDirection: "row", gap: 8, marginTop: 10 },
   orderBtnPrimary: {
     flex: 1,
@@ -1198,6 +1520,43 @@ const styles = StyleSheet.create({
   },
   fieldInputMulti: { minHeight: 80 },
   modalBtns: { flexDirection: "row", gap: 10, marginTop: 4 },
+  sellerAppHelp: {
+    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: "600",
+    lineHeight: 18,
+    marginBottom: 14,
+  },
+  verificationGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  verificationTile: {
+    width: "48%",
+    minHeight: 104,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.surface1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 10,
+    gap: 8,
+    overflow: "hidden",
+  },
+  verificationThumb: {
+    width: "100%",
+    height: 62,
+    borderRadius: radius.sm,
+    backgroundColor: colors.surface2,
+  },
+  verificationTileText: {
+    color: colors.textPrimary,
+    fontSize: 11,
+    fontWeight: "800",
+    textAlign: "center",
+  },
 
   // ── Badges & Achievements ─────────────────────────────
   badgesScroll: { marginTop: 10, paddingBottom: 6 },

@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { sanitizeUserInput } from "../utils/sanitize";
 
 export type Conversation = {
   id: string;
@@ -136,13 +137,15 @@ export async function getMessages(conversationId: string): Promise<Message[]> {
 
 export async function sendMessage(conversationId: string, senderId: string, body: string, imageUrl?: string | null): Promise<Message> {
   if (!supabase) throw new Error("Supabase is not configured.");
+  const sanitizedBody = sanitizeUserInput(body, { maxLength: 2000, preserveNewlines: true });
+  if (!sanitizedBody) throw new Error("Message cannot be empty.");
 
   const { data, error } = await supabase
     .from("messages")
     .insert({
       conversation_id: conversationId,
       sender_id: senderId,
-      body,
+      body: sanitizedBody,
       image_url: imageUrl || null,
     })
     .select("id, conversation_id, sender_id, body, image_url, created_at")
@@ -170,61 +173,40 @@ export async function sendMessage(conversationId: string, senderId: string, body
 
 export async function getOrCreateMarketConversation(listingId: string, buyerId: string, sellerId: string, listingName: string): Promise<string> {
   if (!supabase) throw new Error("Supabase is not configured.");
+  if (!buyerId || !sellerId || !listingId || !listingName.trim()) throw new Error("Conversation details are incomplete.");
 
-  // Check if a conversation of type 'market' exists for this listing and buyer
-  const { data: existingConvo, error: checkError } = await supabase
-    .from("conversations")
-    .select(`
-      id,
-      conversation_members!inner (
-        user_id
-      )
-    `)
-    .eq("type", "market")
-    .eq("listing_id", listingId)
-    .eq("conversation_members.user_id", buyerId)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("get_or_create_market_conversation", {
+    p_listing_id: listingId,
+  });
 
-  if (existingConvo) {
-    return existingConvo.id;
+  if (error) {
+    throw error;
   }
 
-  // Create new conversation
-  const { data: newConvo, error: createError } = await supabase
-    .from("conversations")
-    .insert({
-      type: "market",
-      listing_id: listingId,
-      title: `Inquiry: ${listingName}`,
-    })
-    .select("id")
-    .single();
+  return data;
+}
 
-  if (createError) {
-    throw createError;
+export async function getOrCreateDirectConversation(otherUserId: string): Promise<string> {
+  if (!supabase) throw new Error("Supabase is not configured.");
+
+  const { data, error } = await supabase.rpc("get_or_create_direct_conversation", {
+    p_other_user_id: otherUserId,
+  });
+
+  if (error) {
+    throw error;
   }
 
-  // Add members
-  const { error: membersError } = await supabase.from("conversation_members").insert([
-    { conversation_id: newConvo.id, user_id: buyerId },
-    { conversation_id: newConvo.id, user_id: sellerId },
-  ]);
-
-  if (membersError) {
-    throw membersError;
-  }
-
-  return newConvo.id;
+  return data;
 }
 
 export async function markConversationAsRead(conversationId: string, userId: string): Promise<void> {
   if (!supabase) return;
+  if (!userId) throw new Error("Sign in before updating a conversation.");
 
-  const { error } = await supabase
-    .from("conversation_members")
-    .update({ last_read_at: new Date().toISOString() })
-    .eq("conversation_id", conversationId)
-    .eq("user_id", userId);
+  const { error } = await supabase.rpc("mark_conversation_read", {
+    p_conversation_id: conversationId,
+  });
 
   if (error) {
     throw error;

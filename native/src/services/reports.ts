@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { sanitizeNullableUserInput, sanitizeUserInput } from "../utils/sanitize";
 
 export type ReportInput = {
   reporterId: string;
@@ -25,14 +26,16 @@ export type Report = {
 
 export async function createReport(input: ReportInput): Promise<void> {
   if (!supabase) throw new Error("Supabase is not configured.");
+  const reason = sanitizeUserInput(input.reason, { maxLength: 80 });
+  if (!reason) throw new Error("Report reason is required.");
 
   const { error } = await supabase.from("reports").insert({
     reporter_id: input.reporterId,
     listing_id: input.listingId || null,
     post_id: input.postId || null,
     reported_user_id: input.reportedUserId || null,
-    reason: input.reason,
-    details: input.details || null,
+    reason,
+    details: sanitizeNullableUserInput(input.details, { maxLength: 1000, preserveNewlines: true }),
     status: "open",
   });
 

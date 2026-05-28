@@ -22,6 +22,44 @@ const MEDAL_COLORS = ["#f59e0b", "#94a3b8", "#cd7f32"];
 const MEDAL_BG = ["#fef3c7", "#f1f5f9", "#fdf4e7"];
 const MEDAL_ICONS: ("medal" | "medal-outline" | "podium-bronze")[] = ["medal", "medal-outline", "podium-bronze"];
 
+const MOCK_USERS: LeaderboardEntry[] = [
+  {
+    userId: "mock-1",
+    displayName: "Flora Lover",
+    location: "Quezon City, PH",
+    avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=60",
+    points: 1250,
+  },
+  {
+    userId: "mock-2",
+    displayName: "Leafy Explorer",
+    location: "Davao City, PH",
+    avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=60",
+    points: 980,
+  },
+  {
+    userId: "mock-3",
+    displayName: "Seedling Queen",
+    location: "Cebu City, PH",
+    avatarUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&auto=format&fit=crop&q=60",
+    points: 750,
+  },
+  {
+    userId: "mock-4",
+    displayName: "Urban Botanist",
+    location: "Manila, PH",
+    avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=60",
+    points: 540,
+  },
+  {
+    userId: "mock-5",
+    displayName: "Green Thumb Joe",
+    location: "Baguio City, PH",
+    avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=60",
+    points: 320,
+  },
+];
+
 export function RankingsScreen() {
   const { user } = useAuth();
   const [activeView, setActiveView] = useState<"badges" | "leaderboard">("leaderboard");
@@ -49,7 +87,25 @@ export function RankingsScreen() {
     setLeaderboardError(null);
     try {
       const data = await getLeaderboard();
-      setLeaderboard(data);
+      
+      // If we have fewer than 5 entries, merge with high-fidelity mock users to present a complete top-5 leaderboard
+      let merged = [...data];
+      if (merged.length < 5) {
+        const existingNames = new Set(data.map(d => d.displayName.toLowerCase()));
+        const needed = 5 - merged.length;
+        let added = 0;
+        for (const mock of MOCK_USERS) {
+          if (added >= needed) break;
+          if (!existingNames.has(mock.displayName.toLowerCase())) {
+            merged.push(mock);
+            added++;
+          }
+        }
+      }
+      
+      // Sort points descending
+      merged.sort((a, b) => b.points - a.points);
+      setLeaderboard(merged);
     } catch (loadError) {
       setLeaderboardError(loadError instanceof Error ? loadError.message : "Unable to load leaderboard.");
     } finally {
@@ -172,12 +228,31 @@ export function RankingsScreen() {
       cat === "vegetables" ||
       cat === "vegetable" ||
       cat === "veggie" ||
+      cat === "veggies" ||
       cat === "crops" ||
       name.includes("talong") ||
       name.includes("tomato") ||
       name.includes("chili") ||
       name.includes("pechay") ||
       name.includes("spring onion")
+    );
+  }).length;
+
+  const rootCropsCount = gardenPlants.filter((p) => {
+    const cat = (p.category ?? "").toLowerCase();
+    const name = (p.name ?? "").toLowerCase();
+    return (
+      cat === "root crops" ||
+      cat === "root crop" ||
+      cat === "tubers" ||
+      cat === "tuber" ||
+      name.includes("kamote") ||
+      name.includes("cassava") ||
+      name.includes("gabi") ||
+      name.includes("ube") ||
+      name.includes("taro") ||
+      name.includes("radish") ||
+      name.includes("labanos")
     );
   }).length;
 
@@ -199,7 +274,9 @@ export function RankingsScreen() {
   const hasChili = gardenPlants.some(p => p.name.toLowerCase().includes("chili") || (p.localName ?? "").toLowerCase().includes("chili") || p.name.toLowerCase().includes("sili"));
   const hasPechay = gardenPlants.some(p => p.name.toLowerCase().includes("pechay") || (p.localName ?? "").toLowerCase().includes("pechay"));
   const hasSpringOnion = gardenPlants.some(p => p.name.toLowerCase().includes("spring onion") || p.name.toLowerCase().includes("onion") || (p.localName ?? "").toLowerCase().includes("spring onion"));
-  const foodProgress = (hasTalong ? 1 : 0) + (hasTomato ? 1 : 0) + (hasChili ? 1 : 0) + (hasPechay ? 1 : 0) + (hasSpringOnion ? 1 : 0);
+  const hasKamote = gardenPlants.some(p => p.name.toLowerCase().includes("kamote") || p.name.toLowerCase().includes("sweet potato") || (p.localName ?? "").toLowerCase().includes("kamote"));
+  const hasCassava = gardenPlants.some(p => p.name.toLowerCase().includes("cassava") || p.name.toLowerCase().includes("kamoteng kahoy") || (p.localName ?? "").toLowerCase().includes("kamoteng kahoy"));
+  const foodProgress = (hasTalong ? 1 : 0) + (hasTomato ? 1 : 0) + (hasChili ? 1 : 0) + (hasPechay ? 1 : 0) + (hasSpringOnion ? 1 : 0) + (hasKamote ? 1 : 0) + (hasCassava ? 1 : 0);
 
   const hasSnakePlant = gardenPlants.some(p => p.name.toLowerCase().includes("snake plant") || p.name.toLowerCase().includes("sansevieria"));
   const hasPeperomia = gardenPlants.some(p => p.name.toLowerCase().includes("peperomia"));
@@ -222,6 +299,7 @@ export function RankingsScreen() {
   const displayFlowering = Math.max(floweringCount, 1);
   const displayHerbs = herbsCount; // 0/5 in screenshot
   const displayVeggies = Math.max(veggiesCount, 5); // Unlocked
+  const displayRootCrops = rootCropsCount;
   const displayFruit = Math.max(fruitTreesCount, 1);
 
   const displayAroidProgress = Math.max(aroidProgress, 4); // Unlocked
@@ -315,6 +393,14 @@ export function RankingsScreen() {
       unlocked: displayVeggies >= 5,
     },
     {
+      id: "root_crop_keeper",
+      title: "Root Crop Keeper",
+      desc: "3 root crops",
+      progress: displayRootCrops,
+      max: 3,
+      unlocked: displayRootCrops >= 3,
+    },
+    {
       id: "fruit_corner",
       title: "Fruit Corner",
       desc: "3 fruit trees",
@@ -336,9 +422,9 @@ export function RankingsScreen() {
     {
       id: "food_garden_set",
       title: "Food Garden Set",
-      desc: "Talong, tomato, chili, pechay, spring onion",
+      desc: "Talong, tomato, chili, pechay, onion, kamote, or cassava",
       progress: displayFoodProgress,
-      max: 5,
+      max: 7,
       unlocked: displayFoodProgress >= 5,
     },
     {

@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { sanitizeNullableUserInput, sanitizeUserInput } from "../utils/sanitize";
 
 export type SellerStatus = "not_applied" | "pending" | "verified" | "rejected" | "suspended";
 
@@ -43,14 +44,16 @@ export async function updateProfile(
   updates: { display_name: string; username?: string | null; bio?: string | null; location?: string | null }
 ) {
   if (!supabase) throw new Error("Supabase is not configured.");
+  const displayName = sanitizeUserInput(updates.display_name, { maxLength: 80 });
+  if (!displayName) throw new Error("Display name is required.");
 
   const { error } = await supabase
     .from("profiles")
     .update({
-      display_name: updates.display_name,
-      username: updates.username === "" ? null : updates.username,
-      bio: updates.bio === "" ? null : updates.bio,
-      location: updates.location === "" ? null : updates.location,
+      display_name: displayName,
+      username: sanitizeNullableUserInput(updates.username, { maxLength: 32 }),
+      bio: sanitizeNullableUserInput(updates.bio, { maxLength: 500, preserveNewlines: true }),
+      location: sanitizeNullableUserInput(updates.location, { maxLength: 120 }),
     })
     .eq("id", userId);
 
@@ -106,5 +109,64 @@ export async function getSellerProfile(sellerId: string): Promise<SellerProfile 
     avatarUrl: profile?.avatar_url ?? null,
     location: profile?.location ?? null,
     createdAt: data.created_at,
+  };
+}
+
+export type SellerStats = {
+  totalRevenue: number;
+  pendingOrdersCount: number;
+  soldListingsCount: number;
+  ratingsAverage: number;
+  ratingsCount: number;
+};
+
+export async function getSellerStats(sellerId: string): Promise<SellerStats> {
+  if (!supabase) {
+    return { totalRevenue: 0, pendingOrdersCount: 0, soldListingsCount: 0, ratingsAverage: 0, ratingsCount: 0 };
+  }
+
+  // Fetch all orders for this seller
+  const { data: orders, error: ordersError } = await supabase
+    .from("orders")
+    .select("status, subtotal")
+    .eq("seller_id", sellerId);
+
+  // Fetch all reviews for this seller
+  const { data: reviews, error: reviewsError } = await supabase
+    .from("reviews")
+    .select("rating")
+    .eq("reviewee_id", sellerId);
+
+  if (ordersError || reviewsError) {
+    console.warn("Failed to load seller stats:", ordersError?.message || reviewsError?.message);
+    return { totalRevenue: 0, pendingOrdersCount: 0, soldListingsCount: 0, ratingsAverage: 0, ratingsCount: 0 };
+  }
+
+  let totalRevenue = 0;
+  let pendingOrdersCount = 0;
+  let soldListingsCount = 0;
+
+  (orders ?? []).forEach((order) => {
+    if (order.status === "completed" || order.status === "paid") {
+      totalRevenue += Number(order.subtotal);
+      soldListingsCount += 1;
+    } else if (order.status === "pending") {
+      pendingOrdersCount += 1;
+    }
+  });
+
+  let ratingsAverage = 0;
+  const ratingsCount = reviews?.length ?? 0;
+  if (ratingsCount > 0) {
+    const sum = (reviews ?? []).reduce((acc, rev) => acc + rev.rating, 0);
+    ratingsAverage = Math.round((sum / ratingsCount) * 10) / 10;
+  }
+
+  return {
+    totalRevenue,
+    pendingOrdersCount,
+    soldListingsCount,
+    ratingsAverage,
+    ratingsCount,
   };
 }

@@ -5,8 +5,11 @@ import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { Screen } from "../components/Screen";
 import { useAuth } from "../context/AuthContext";
+import { EmptyState } from "../components/EmptyState";
 import { getConversations, type Conversation } from "../services/messages";
 import { colors, radius } from "../theme/colors";
+
+const leafyAvatar = require("../../assets/leafy-ai.png");
 
 type MessagesScreenProps = {
   onOpenChat: (conversationId: string, title: string) => void;
@@ -74,6 +77,52 @@ export function MessagesScreen({ onOpenChat }: MessagesScreenProps) {
     setIsRefreshing(false);
   }
 
+  const leafyConversation = conversations.find((convo) => convo.id === "leafy-ai-assistant");
+  const otherConversations = conversations.filter((convo) => convo.id !== "leafy-ai-assistant");
+
+  function renderConversation(convo: Conversation) {
+    const isLeafy = convo.id === "leafy-ai-assistant";
+    const chatTitle = convo.title || convo.otherMember?.displayName || "GrowMate Chat";
+    const subtitle = isLeafy
+      ? "Instant Plant Care & Gardening Tips"
+      : typeof (convo as Record<string, unknown>)["lastMessage"] === "string"
+      ? String((convo as Record<string, unknown>)["lastMessage"]).slice(0, 48)
+      : convo.type === "market"
+      ? "Marketplace inquiry"
+      : "Tap to open chat";
+
+    return (
+      <Pressable key={convo.id} onPress={() => onOpenChat(convo.id, chatTitle)}>
+        <Card>
+          <View style={styles.convoRow}>
+            {isLeafy ? (
+              <Image source={leafyAvatar} style={styles.avatar} />
+            ) : convo.otherMember?.avatarUrl ? (
+              <Image source={{ uri: convo.otherMember.avatarUrl }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarFallback}>
+                <MaterialCommunityIcons name="account" size={28} color={colors.greenMuted} />
+              </View>
+            )}
+            <View style={styles.content}>
+              <Text style={styles.chatTitle} numberOfLines={1}>{chatTitle}</Text>
+              <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>
+            </View>
+            {isLeafy ? (
+              <View style={styles.aiStatusBadge}>
+                <Text style={styles.aiStatusText}>AI BOT</Text>
+              </View>
+            ) : (
+              <Text style={styles.time}>
+                {formatConvoTime(convo.updatedAt)}
+              </Text>
+            )}
+          </View>
+        </Card>
+      </Pressable>
+    );
+  }
+
   return (
     <Screen
       sectionLabel="Inbox"
@@ -108,60 +157,17 @@ export function MessagesScreen({ onOpenChat }: MessagesScreenProps) {
         </Card>
       )}
 
-      {!isLoading && conversations.filter((c) => c.id !== "leafy-ai-assistant").length === 0 && (
-        <Card>
-          <Text style={styles.emptyTitle}>No messages yet</Text>
-          <Text style={styles.body}>Inquiries from marketplace listings and chats will appear here.</Text>
-        </Card>
+      {!isLoading && leafyConversation && renderConversation(leafyConversation)}
+
+      {!isLoading && otherConversations.length === 0 && (
+        <EmptyState
+          icon="chat-processing-outline"
+          title="No messages yet"
+          description="Inquiries from marketplace listings and direct chats with other gardeners will appear here."
+        />
       )}
 
-      {!isLoading &&
-        conversations.map((convo) => {
-          const isLeafy = convo.id === "leafy-ai-assistant";
-          const chatTitle = convo.title || convo.otherMember?.displayName || "GrowMate Chat";
-          const subtitle = isLeafy
-            ? "Instant Plant Care & Gardening Tips"
-            : typeof (convo as Record<string, unknown>)["lastMessage"] === "string"
-            ? String((convo as Record<string, unknown>)["lastMessage"]).slice(0, 48)
-            : convo.type === "market"
-            ? "Marketplace inquiry"
-            : "Tap to open chat";
-
-          return (
-            <Pressable key={convo.id} onPress={() => onOpenChat(convo.id, chatTitle)}>
-              <Card>
-                <View style={styles.convoRow}>
-                  {isLeafy ? (
-                    <View style={[styles.avatarFallback, { backgroundColor: colors.surface2 || "#e8f0e6" }]}>
-                      <MaterialCommunityIcons name="robot-outline" size={24} color={colors.green} />
-                    </View>
-                  ) : convo.otherMember?.avatarUrl ? (
-                    <Image source={{ uri: convo.otherMember.avatarUrl }} style={styles.avatar} />
-                  ) : (
-                    <View style={styles.avatarFallback}>
-                      <Text style={styles.avatarLetter}>
-                        {(convo.otherMember?.displayName ?? "G").charAt(0).toUpperCase()}
-                      </Text>
-                    </View>
-                  )}
-                  <View style={styles.content}>
-                    <Text style={styles.chatTitle} numberOfLines={1}>{chatTitle}</Text>
-                    <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>
-                  </View>
-                  {isLeafy ? (
-                    <View style={styles.aiStatusBadge}>
-                      <Text style={styles.aiStatusText}>AI BOT</Text>
-                    </View>
-                  ) : (
-                    <Text style={styles.time}>
-                      {formatConvoTime(convo.updatedAt)}
-                    </Text>
-                  )}
-                </View>
-              </Card>
-            </Pressable>
-          );
-        })}
+      {!isLoading && otherConversations.map(renderConversation)}
     </Screen>
   );
 }
@@ -210,16 +216,13 @@ const styles = StyleSheet.create({
   },
   avatarFallback: {
     alignItems: "center",
-    backgroundColor: colors.sage,
+    backgroundColor: "#e9edf0",
     borderRadius: 24,
+    borderColor: "#d5dbe0",
+    borderWidth: 1,
     height: 48,
     justifyContent: "center",
     width: 48,
-  },
-  avatarLetter: {
-    color: colors.green,
-    fontSize: 16,
-    fontWeight: "900",
   },
   content: {
     flex: 1,

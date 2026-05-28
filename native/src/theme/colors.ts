@@ -1,9 +1,15 @@
+import { StyleSheet } from "react-native";
+
+export const themeConfig = {
+  activeScheme: "light" as "light" | "dark"
+};
+
 export const colors = {
   // ── Core greens ───────────────────────────────────────
   green: "#1a3a22",        // darkest — text, active states
   greenDark: "#0f2214",    // ultra dark — header text
   greenMid: "#2d5a3d",     // medium — secondary actions
-  greenMuted: "#5a7060",   // muted — secondary text, labels
+  greenMuted: "#4b6051",   // muted — secondary text, labels (darkened for contrast)
   leaf: "#4caf50",         // vivid accent — badges, highlights
   leafLight: "#81c784",    // soft accent
 
@@ -13,7 +19,7 @@ export const colors = {
   surface1: "#f0f7ea",     // subtle tint (sage replacement)
   surface2: "#e4f0d8",     // stronger tint
 
-  // ── Legacy aliases (keep old names working) ───────────
+  // ── Legacy aliases ────────────────────────────────────
   white: "#ffffff",
   sage: "#f0f7ea",
   sageStrong: "#cfe6b5",
@@ -32,8 +38,8 @@ export const colors = {
 
   // ── Text ──────────────────────────────────────────────
   textPrimary: "#1a3a22",
-  textSecondary: "#5a7060",
-  textTertiary: "#8fa889",
+  textSecondary: "#4b6051", // darkened for contrast
+  textTertiary: "#5d7563",  // darkened for contrast
   textInverse: "#ffffff",
 };
 

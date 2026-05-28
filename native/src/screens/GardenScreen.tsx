@@ -4,9 +4,11 @@ import {
   Dimensions,
   FlatList,
   Image,
+  ImageBackground,
   Modal,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -18,6 +20,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Screen } from "../components/Screen";
 import { useAuth } from "../context/AuthContext";
+import { EmptyState } from "../components/EmptyState";
 import {
   createGardenPlant,
   updateGardenPlant,
@@ -37,12 +40,17 @@ const COVER_HEIGHT = 220;
 const CARD_GAP = 10;
 const CARD_WIDTH = (SCREEN_W - 32 - CARD_GAP) / 2;
 
-const CATEGORIES = ["All", "Indoor", "Outdoor", "Rare", "Flowering", "Succulents", "Herbs"];
+const CATEGORIES = ["All", "Indoor", "Outdoor", "Vegetables", "Root Crops", "Fruit Trees", "Rare", "Flowering", "Medicinal", "Succulents", "Herbs", "Ornamental"];
 const CONDITIONS = ["Healthy", "Thriving", "Needs Water", "Needs Care", "Blooming", "Growing"];
 
-export function GardenScreen() {
+type GardenScreenProps = {
+  onOpenChat?: (conversationId: string, title: string) => void;
+  onOpenListingDetail?: (listingId: string) => void;
+};
+
+export function GardenScreen({ onOpenChat, onOpenListingDetail }: GardenScreenProps) {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<"my_garden" | "discover">("my_garden");
+  const [activeTab, setActiveTab] = useState<"discover" | "my_garden">("my_garden");
   const [garden, setGarden] = useState<Garden | null>(null);
   const [plants, setPlants] = useState<GardenPlant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -210,8 +218,31 @@ export function GardenScreen() {
   }
 
   // Cover carousel images — use plant photos if available, else default covers
-  const coverPhotos = plants.filter((p) => p.photoUrl).map((p) => p.photoUrl!);
-  const coverImages = coverPhotos.length > 0 ? coverPhotos : [""];
+  const DEFAULT_COVERS = [
+    "https://images.unsplash.com/photo-1545241047-6083a3684587?q=80&w=600&auto=format&fit=crop", // Beautiful plant shelf
+    "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?q=80&w=600&auto=format&fit=crop", // Indoor plant collection shelf
+    "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?q=80&w=600&auto=format&fit=crop", // Veggie garden landscape greenhouse
+    "https://images.unsplash.com/photo-1592150621744-aca64f48394a?q=80&w=600&auto=format&fit=crop", // Monstera/aroid indoor shelf
+    "https://images.unsplash.com/photo-1530968033775-2c9273f0865e?q=80&w=600&auto=format&fit=crop", // Patio garden setup
+    "https://images.unsplash.com/photo-1558905619-8714cdb4b2db?q=80&w=600&auto=format&fit=crop", // Conservatory lush indoor garden
+    "https://images.unsplash.com/photo-1512428813824-f7258347e62a?q=80&w=600&auto=format&fit=crop"  // Sunny shelf with pots
+  ];
+
+  function getDefaultCover(uid?: string) {
+    if (!uid) return DEFAULT_COVERS[0];
+    let hash = 0;
+    for (let i = 0; i < uid.length; i++) {
+      hash = uid.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const idx = Math.abs(hash) % DEFAULT_COVERS.length;
+    return DEFAULT_COVERS[idx];
+  }
+
+  const DEFAULT_COVER = getDefaultCover(user?.id);
+  // Primary cover: use the garden's dedicated landscape cover photo, then plant photos as extra slides
+  const primaryCover = garden?.coverPhotoUrl || DEFAULT_COVER;
+  const plantPhotos = plants.filter((p) => p.photoUrl).map((p) => p.photoUrl!);
+  const coverImages = [primaryCover, ...plantPhotos];
 
   function handleCoverScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
     const idx = Math.round(e.nativeEvent.contentOffset.x / SCREEN_W);
@@ -229,18 +260,30 @@ export function GardenScreen() {
     ? plants
     : plants.filter((p) => (p.category ?? "").toLowerCase() === activeCategory.toLowerCase());
 
+  const activeListingsCount = plants.length;
   const statsRow = [
     { label: "Garden score", value: "9.1k" },
-    { label: "Top likes", value: plants.reduce((a, _) => a + 0, 0).toString() || "0" },
+    { label: "Active listings", value: activeListingsCount.toString() },
     { label: "Updates", value: plants.length.toString() },
   ];
+
+  function formatList(values?: string[]) {
+    return values && values.length > 0 ? values.join(", ") : "Not available";
+  }
+
+  function getSaleStatusLabel(status?: LeafyScanResult["saleStatus"]) {
+    if (status === "safe_to_sell") return "Safe to sell";
+    if (status === "review_required") return "Review required";
+    if (status === "blocked") return "Blocked";
+    return "Not available";
+  }
 
   // ─────────────────────────────────────────────────────
   return (
     <Screen showHeader={false} scroll={false} noPadding={true}>
       {/* ── Tab switcher (top) ── */}
       <View style={styles.topTabs}>
-        {(["my_garden", "discover"] as const).map((tab) => (
+        {(["discover", "my_garden"] as const).map((tab) => (
           <Pressable
             key={tab}
             onPress={() => setActiveTab(tab)}
@@ -254,7 +297,11 @@ export function GardenScreen() {
       </View>
 
       {activeTab === "discover" ? (
-        <DiscoverGardensScreen />
+        <DiscoverGardensScreen
+          currentGardenId={garden?.id}
+          onOpenChat={onOpenChat}
+          onOpenListingDetail={onOpenListingDetail}
+        />
       ) : (
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -279,13 +326,25 @@ export function GardenScreen() {
               scrollEventThrottle={16}
             >
               {coverImages.map((uri, idx) => (
-                <View key={idx} style={styles.coverSlide}>
-                  {uri ? (
-                    <Image source={{ uri }} style={styles.coverImg} />
-                  ) : (
-                    <View style={styles.coverFallback}>
-                      <MaterialCommunityIcons name="flower" size={56} color="rgba(255,255,255,0.2)" />
-                    </View>
+                <View
+                  key={idx}
+                  style={[
+                    styles.coverSlide,
+                    Platform.OS === "web" && uri
+                      ? ({
+                          backgroundImage: `url('${uri}')`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        } as any)
+                      : {},
+                  ]}
+                >
+                  {Platform.OS !== "web" && uri && (
+                    <ImageBackground
+                      source={{ uri }}
+                      style={StyleSheet.absoluteFill}
+                      resizeMode="cover"
+                    />
                   )}
                   <View style={styles.coverOverlay} />
                 </View>
@@ -322,8 +381,22 @@ export function GardenScreen() {
             <View style={styles.coverTitle}>
               <Text style={styles.coverTitleText}>{garden?.name ?? "My Plant Collection"}</Text>
               <Text style={styles.coverSubText}>
-                {plants.length} plants · {plants.length} updates · Rank #2
+                {plants.length} plants - {activeListingsCount} active listings - Rank #2
               </Text>
+              <View style={styles.coverMetaRow}>
+                <View style={styles.publicPill}>
+                  <MaterialCommunityIcons
+                    name={garden?.isPublic ? "earth" : "lock-outline"}
+                    size={12}
+                    color={colors.white}
+                  />
+                  <Text style={styles.publicPillText}>{garden?.isPublic ? "Public garden" : "Private garden"}</Text>
+                </View>
+                <Pressable style={styles.editGardenPill}>
+                  <MaterialCommunityIcons name="pencil-outline" size={12} color={colors.white} />
+                  <Text style={styles.editGardenPillText}>Edit garden</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
 
@@ -396,11 +469,43 @@ export function GardenScreen() {
 
             {/* Empty */}
             {!isLoading && plants.length === 0 && (
-              <View style={styles.center}>
-                <MaterialCommunityIcons name="flower-outline" size={48} color={colors.line} />
-                <Text style={styles.emptyTitle}>No plants yet</Text>
-                <Text style={styles.emptySub}>Add your first plant to get started!</Text>
+              <View style={styles.emptyGardenPanel}>
+                <View style={styles.emptyGardenIcon}>
+                  <MaterialCommunityIcons name="flower-outline" size={34} color={colors.green} />
+                </View>
+                <Text style={styles.emptyGardenTitle}>Start your garden</Text>
+                <Text style={styles.emptyGardenText}>
+                  Add plants to build trust, track care, and show buyers what you grow.
+                </Text>
+                <Pressable
+                  onPress={() => {
+                    resetForm();
+                    setShowAddModal(true);
+                  }}
+                  style={styles.emptyPrimaryBtn}
+                >
+                  <MaterialCommunityIcons name="plus" size={18} color={colors.white} />
+                  <Text style={styles.emptyPrimaryText}>Add first plant</Text>
+                </Pressable>
+                <Pressable onPress={handleIdentifyPlant} style={styles.emptySecondaryBtn}>
+                  <MaterialCommunityIcons name="leaf-circle-outline" size={18} color={colors.green} />
+                  <Text style={styles.emptySecondaryText}>Identify with Leafy AI</Text>
+                </Pressable>
               </View>
+            )}
+
+            {!isLoading && plants.length > 0 && filtered.length === 0 && (
+              <EmptyState
+                icon="flower-outline"
+                title={`No ${activeCategory.toLowerCase()} plants`}
+                description={`You haven't added any plants under the ${activeCategory} category yet.`}
+                buttonLabel="Add a plant"
+                onButtonPress={() => {
+                  resetForm();
+                  setCategory(activeCategory === "All" ? "" : activeCategory);
+                  setShowAddModal(true);
+                }}
+              />
             )}
 
             {/* Plant grid */}
@@ -593,7 +698,7 @@ export function GardenScreen() {
                   <Text style={styles.fieldLabel}>Category</Text>
                   <TextInput
                     style={styles.input}
-                    placeholder="e.g. Indoor, Herbs, Flowering"
+                    placeholder="e.g. Root Crops, Vegetables, Fruit Trees"
                     placeholderTextColor={colors.textTertiary}
                     value={category}
                     onChangeText={setCategory}
@@ -694,7 +799,7 @@ export function GardenScreen() {
                 <View style={styles.scannerResultCard}>
                   <View style={styles.scannerResultHeader}>
                     <MaterialCommunityIcons name="check-circle" size={24} color="#16a34a" />
-                    <Text style={styles.scannerResultTitle}>Match Found!</Text>
+                    <Text style={styles.scannerResultTitle}>Available plant data</Text>
                   </View>
                   
                   <View style={styles.scannerResultBody}>
@@ -723,6 +828,72 @@ export function GardenScreen() {
                         <Text style={styles.scannerConfText}>{scannerResult.confidence}%</Text>
                       </View>
                     </View>
+
+                    <View style={styles.scannerResultRow}>
+                      <Text style={styles.scannerResultLabel}>Common Names</Text>
+                      <Text style={styles.scannerResultVal}>{formatList(scannerResult.commonNames)}</Text>
+                    </View>
+
+                    <View style={styles.scannerResultRow}>
+                      <Text style={styles.scannerResultLabel}>Family</Text>
+                      <Text style={styles.scannerResultVal}>{scannerResult.family ?? "Not available"}</Text>
+                    </View>
+
+                    <View style={styles.scannerResultRow}>
+                      <Text style={styles.scannerResultLabel}>Genus</Text>
+                      <Text style={styles.scannerResultVal}>{scannerResult.genus ?? "Not available"}</Text>
+                    </View>
+
+                    <View style={styles.scannerResultRow}>
+                      <Text style={styles.scannerResultLabel}>Source</Text>
+                      <Text style={styles.scannerResultVal}>{scannerResult.provider}</Text>
+                    </View>
+
+                    <View style={styles.scannerResultRow}>
+                      <Text style={styles.scannerResultLabel}>Sell Check</Text>
+                      <Text style={styles.scannerResultVal}>{getSaleStatusLabel(scannerResult.saleStatus)}</Text>
+                    </View>
+
+                    <View style={styles.scannerResultNote}>
+                      <MaterialCommunityIcons name="shield-check-outline" size={16} color={colors.green} />
+                      <Text style={styles.scannerResultNoteText}>{scannerResult.reviewReason}</Text>
+                    </View>
+
+                    {typeof scannerResult.remainingRequests === "number" && (
+                      <View style={styles.scannerResultRow}>
+                        <Text style={styles.scannerResultLabel}>PlantNet Requests Left</Text>
+                        <Text style={styles.scannerResultVal}>{scannerResult.remainingRequests}</Text>
+                      </View>
+                    )}
+
+                    {scannerResult.scanLimit && (
+                      <View style={styles.scannerResultRow}>
+                        <Text style={styles.scannerResultLabel}>GrowMate Scan Limit</Text>
+                        <Text style={styles.scannerResultVal}>
+                          {scannerResult.scanLimit.used}/{scannerResult.scanLimit.limit} per {scannerResult.scanLimit.windowMinutes} min
+                        </Text>
+                      </View>
+                    )}
+
+                    {scannerResult.alternativeMatches && scannerResult.alternativeMatches.length > 0 && (
+                      <View style={styles.alternativeBlock}>
+                        <Text style={styles.alternativeTitle}>Other possible matches</Text>
+                        {scannerResult.alternativeMatches.map((match, index) => (
+                          <View key={`${match.name}-${index}`} style={styles.alternativeItem}>
+                            <View style={{ flex: 1 }}>
+                              <Text style={styles.alternativeName}>{match.name}</Text>
+                              {match.scientificName && (
+                                <Text style={styles.alternativeSci}>{match.scientificName}</Text>
+                              )}
+                              <Text style={styles.alternativeMeta}>
+                                {[match.family, match.genus].filter(Boolean).join(" / ") || "Taxonomy not available"}
+                              </Text>
+                            </View>
+                            <Text style={styles.alternativeConfidence}>{match.confidence}%</Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
                   </View>
                 </View>
               )}
@@ -871,21 +1042,19 @@ const styles = StyleSheet.create({
   scroll: { paddingBottom: 100 },
 
   // ── Cover carousel ────────────────────────────────────
-  coverWrap: { height: COVER_HEIGHT, position: "relative" },
-  coverSlide: { width: SCREEN_W, height: COVER_HEIGHT },
-  coverImg: { width: "100%", height: "100%" },
+  coverWrap: { height: COVER_HEIGHT, position: "relative", backgroundColor: colors.greenDark },
+  coverSlide: { width: SCREEN_W, height: COVER_HEIGHT, backgroundColor: colors.greenDark },
+  coverImg: { width: SCREEN_W, height: COVER_HEIGHT, resizeMode: "cover" },
   coverFallback: {
     width: "100%",
     height: "100%",
-    backgroundColor: colors.greenMid,
+    backgroundColor: colors.greenDark,
     alignItems: "center",
     justifyContent: "center",
   },
   coverOverlay: {
-    position: "absolute",
-    bottom: 0, left: 0, right: 0,
-    height: "60%",
-    backgroundColor: "rgba(0,0,0,0.25)",
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.32)",
   },
   paginationBadge: {
     position: "absolute",
@@ -940,6 +1109,42 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     marginTop: 2,
+  },
+  coverMetaRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 10,
+  },
+  publicPill: {
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.16)",
+    borderColor: "rgba(255,255,255,0.22)",
+    borderRadius: radius.full,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  publicPillText: {
+    color: colors.white,
+    fontSize: 11,
+    fontWeight: "800",
+  },
+  editGardenPill: {
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.28)",
+    borderRadius: radius.full,
+    flexDirection: "row",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  editGardenPillText: {
+    color: colors.white,
+    fontSize: 11,
+    fontWeight: "800",
   },
 
   // ── Stats card ────────────────────────────────────────
@@ -999,6 +1204,73 @@ const styles = StyleSheet.create({
   center: { alignItems: "center", paddingVertical: 32, gap: 10 },
   emptyTitle: { fontSize: 16, fontWeight: "700", color: colors.textPrimary },
   emptySub: { fontSize: 13, color: colors.textSecondary, textAlign: "center" },
+  emptyGardenPanel: {
+    alignItems: "center",
+    backgroundColor: colors.surface0,
+    borderColor: colors.line,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    padding: 18,
+    ...shadow.sm,
+  },
+  emptyGardenIcon: {
+    alignItems: "center",
+    backgroundColor: colors.surface1,
+    borderRadius: 28,
+    height: 56,
+    justifyContent: "center",
+    width: 56,
+  },
+  emptyGardenTitle: {
+    color: colors.textPrimary,
+    fontSize: 18,
+    fontWeight: "900",
+    marginTop: 12,
+  },
+  emptyGardenText: {
+    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: "700",
+    lineHeight: 19,
+    marginTop: 6,
+    textAlign: "center",
+  },
+  emptyPrimaryBtn: {
+    alignItems: "center",
+    backgroundColor: colors.green,
+    borderRadius: radius.full,
+    flexDirection: "row",
+    gap: 8,
+    justifyContent: "center",
+    marginTop: 16,
+    minHeight: 44,
+    paddingHorizontal: 20,
+    width: "100%",
+  },
+  emptyPrimaryText: {
+    color: colors.white,
+    fontSize: 14,
+    fontWeight: "900",
+  },
+  emptySecondaryBtn: {
+    alignItems: "center",
+    backgroundColor: colors.surface1,
+    borderColor: colors.lineMid,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 8,
+    justifyContent: "center",
+    marginTop: 10,
+    minHeight: 44,
+    paddingHorizontal: 20,
+    width: "100%",
+  },
+  emptySecondaryText: {
+    color: colors.green,
+    fontSize: 14,
+    fontWeight: "900",
+  },
 
   // Plant grid
   grid: {
@@ -1235,22 +1507,45 @@ const styles = StyleSheet.create({
   scannerResultRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
+    gap: 12,
   },
   scannerResultLabel: {
     fontSize: 12,
     fontWeight: "700",
     color: colors.textSecondary,
+    flex: 0.9,
   },
   scannerResultVal: {
     fontSize: 13,
     fontWeight: "700",
     color: colors.textPrimary,
+    flex: 1.2,
+    textAlign: "right",
   },
   scannerResultValBold: {
     fontSize: 14,
     fontWeight: "800",
     color: colors.green,
+    flex: 1.2,
+    textAlign: "right",
+  },
+  scannerResultNote: {
+    alignItems: "flex-start",
+    backgroundColor: colors.surface0,
+    borderColor: colors.line,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 8,
+    padding: 10,
+  },
+  scannerResultNoteText: {
+    color: colors.green,
+    flex: 1,
+    fontSize: 12,
+    fontWeight: "700",
+    lineHeight: 17,
   },
   scannerConfBadge: {
     backgroundColor: "#16a34a",
@@ -1262,6 +1557,51 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "800",
     color: colors.white,
+  },
+  alternativeBlock: {
+    borderTopColor: colors.line,
+    borderTopWidth: 1,
+    gap: 8,
+    marginTop: 4,
+    paddingTop: 12,
+  },
+  alternativeTitle: {
+    color: colors.green,
+    fontSize: 13,
+    fontWeight: "900",
+  },
+  alternativeItem: {
+    alignItems: "center",
+    backgroundColor: colors.surface0,
+    borderColor: colors.line,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 10,
+    padding: 10,
+  },
+  alternativeName: {
+    color: colors.textPrimary,
+    fontSize: 12,
+    fontWeight: "900",
+  },
+  alternativeSci: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    fontStyle: "italic",
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  alternativeMeta: {
+    color: colors.textTertiary,
+    fontSize: 10,
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  alternativeConfidence: {
+    color: colors.green,
+    fontSize: 12,
+    fontWeight: "900",
   },
   scannerActions: {
     gap: 10,
@@ -1479,6 +1819,3 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
 });
-
-
-

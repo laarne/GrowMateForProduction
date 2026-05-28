@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { sanitizeNullableUserInput, sanitizeUserInput } from "../utils/sanitize";
 
 export type Garden = {
   id: string;
@@ -17,6 +18,7 @@ export type GardenPlant = {
   category: string | null;
   condition: string | null;
   careNotes: string | null;
+  sourceListingId: string | null;
   photoUrl: string | null;
 };
 
@@ -33,6 +35,7 @@ type GardenPlantRow = {
   category: string | null;
   condition: string | null;
   care_notes: string | null;
+  source_listing_id: string | null;
   garden_plant_photos?: GardenPlantPhotoRow[];
 };
 
@@ -90,7 +93,7 @@ export async function getGardenPlants(gardenId: string): Promise<GardenPlant[]> 
 
   const { data, error } = await supabase
     .from("garden_plants")
-    .select("id, name, local_name, scientific_name, category, condition, care_notes, garden_plant_photos(storage_path, sort_order)")
+    .select("id, name, local_name, scientific_name, category, condition, care_notes, source_listing_id, garden_plant_photos(storage_path, sort_order)")
     .eq("garden_id", gardenId)
     .order("created_at", { ascending: false });
 
@@ -109,6 +112,7 @@ export async function getGardenPlants(gardenId: string): Promise<GardenPlant[]> 
       category: plant.category,
       condition: plant.condition,
       careNotes: plant.care_notes,
+      sourceListingId: plant.source_listing_id,
       photoUrl: getGardenPhotoUrl(sortedPhotos[0]?.storage_path),
     };
   });
@@ -125,17 +129,19 @@ export async function createGardenPlant(
   careNotes?: string | null
 ) {
   if (!supabase) throw new Error("Supabase is not configured.");
+  const sanitizedName = sanitizeUserInput(name, { maxLength: 80 });
+  if (!sanitizedName) throw new Error("Plant name is required.");
 
   const { data, error } = await supabase
     .from("garden_plants")
     .insert({
       garden_id: gardenId,
       user_id: userId,
-      name,
-      category: category || "Uncategorized",
-      scientific_name: scientificName || null,
-      condition: condition || "Healthy",
-      care_notes: careNotes || null,
+      name: sanitizedName,
+      category: sanitizeNullableUserInput(category, { maxLength: 60 }) || "Uncategorized",
+      scientific_name: sanitizeNullableUserInput(scientificName, { maxLength: 120 }),
+      condition: sanitizeNullableUserInput(condition, { maxLength: 40 }) || "Healthy",
+      care_notes: sanitizeNullableUserInput(careNotes, { maxLength: 1000, preserveNewlines: true }),
     })
     .select("id")
     .single();
@@ -171,15 +177,17 @@ export async function updateGardenPlant(
   }
 ) {
   if (!supabase) throw new Error("Supabase is not configured.");
+  const sanitizedName = sanitizeUserInput(updates.name, { maxLength: 80 });
+  if (!sanitizedName) throw new Error("Plant name is required.");
 
   const { error } = await supabase
     .from("garden_plants")
     .update({
-      name: updates.name,
-      scientific_name: updates.scientificName ?? null,
-      category: updates.category ?? null,
-      condition: updates.condition ?? null,
-      care_notes: updates.careNotes ?? null,
+      name: sanitizedName,
+      scientific_name: sanitizeNullableUserInput(updates.scientificName, { maxLength: 120 }),
+      category: sanitizeNullableUserInput(updates.category, { maxLength: 60 }),
+      condition: sanitizeNullableUserInput(updates.condition, { maxLength: 40 }),
+      care_notes: sanitizeNullableUserInput(updates.careNotes, { maxLength: 1000, preserveNewlines: true }),
     })
     .eq("id", plantId)
     .eq("user_id", userId);

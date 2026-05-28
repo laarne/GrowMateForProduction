@@ -27,6 +27,7 @@ WHERE id = (
 DO $$
 DECLARE
   v_user_id    uuid;
+  v_buyer_id   uuid;
   v_garden_id  uuid;
 
   p_monstera   uuid := gen_random_uuid();
@@ -160,7 +161,7 @@ BEGIN
     -- 1. Monstera Cutting
     (l_monstera, v_user_id,
      'Monstera Deliciosa', 'Monstera', 'Monstera deliciosa', 'Indoor',
-     350.00, 2, 'Cutting', 'Butuan City', 'Pickup / Meetup / Delivery',
+     350.00, 2, 'Cutting', 'Butuan City', 'Delivery',
      'Healthy Monstera cutting with 1 node and visible aerial roots. Leafy AI scanned — safe to sell, no protected species flags. Grown organically, never exposed to pesticides. Will be wrapped in moist sphagnum moss for delivery. Serious buyers only please.',
      'active', 'plant.id', 91.5,
      '{"bestMatch":"Monstera deliciosa","confidence":91.5,"saleStatus":"safe_to_sell","category":"Indoor","reviewReason":"No protected-species flag detected. Safe to trade locally."}',
@@ -169,7 +170,7 @@ BEGIN
     -- 2. Golden Pothos Pot
     (l_pothos, v_user_id,
      'Golden Pothos', 'Devil''s Ivy', 'Epipremnum aureum', 'Indoor',
-     150.00, 5, 'Pot', 'Butuan City', 'Pickup / Meetup',
+     150.00, 5, 'Pot', 'Butuan City', 'Delivery',
      'Bushy Golden Pothos in 4-inch nursery pot. Very easy to care for — perfect for beginners! Long trailing vines, full and healthy. Great for shelves, hanging baskets, or desk plants. Leafy AI verified safe to sell.',
      'active', 'plant.id', 95.2,
      '{"bestMatch":"Epipremnum aureum","confidence":95.2,"saleStatus":"safe_to_sell","category":"Indoor","reviewReason":"Common household plant. No restrictions."}',
@@ -178,7 +179,7 @@ BEGIN
     -- 3. Syngonium Pink Seedling
     (l_syngonium, v_user_id,
      'Syngonium Pink', 'Arrowhead Plant', 'Syngonium podophyllum', 'Indoor',
-     220.00, 3, 'Seedling', 'Butuan City', 'Pickup / Meetup / Delivery',
+     220.00, 3, 'Seedling', 'Butuan City', 'Delivery',
      'Beautiful pink-variegated Syngonium seedlings, approx. 3 months old. Healthy root system in premium aroid mix. Pink coloration is stable and vibrant. Each seedling individually wrapped for safe delivery. Limited stock!',
      'active', 'plant.id', 88.7,
      '{"bestMatch":"Syngonium podophyllum","confidence":88.7,"saleStatus":"safe_to_sell","category":"Indoor","reviewReason":"Common ornamental plant. No export restrictions."}',
@@ -187,7 +188,7 @@ BEGIN
     -- 4. Snake Plant Pot
     (l_snake, v_user_id,
      'Snake Plant', 'Mother-in-Law''s Tongue', 'Sansevieria trifasciata', 'Indoor',
-     280.00, 4, 'Pot', 'Butuan City', 'Pickup / Meetup / Delivery',
+     280.00, 4, 'Pot', 'Butuan City', 'Delivery',
      'Mature snake plant in 6-inch decorative pot. Standing 40-50cm tall with multiple healthy offshoots. Virtually indestructible — perfect for offices, bedrooms, or busy people. Air-purifying and ultra low-maintenance. Leafy AI verified. Free care guide included.',
      'active', 'plant.id', 97.0,
      '{"bestMatch":"Sansevieria trifasciata","confidence":97.0,"saleStatus":"safe_to_sell","category":"Indoor","reviewReason":"Very common household plant. No restrictions apply."}',
@@ -210,9 +211,75 @@ BEGIN
     (v_user_id, 'garden_plant_added', 3, '{"plant":"Monstera"}'),
     (v_user_id, 'garden_plant_added', 3, '{"plant":"Golden Pothos"}'),
     (v_user_id, 'garden_plant_added', 3, '{"plant":"Syngonium"}'),
-    (v_user_id, 'garden_plant_added', 3, '{"plant":"Snake Plant"}'),
     (v_user_id, 'sale_completed',    25, '{"note":"completed_14_sales"}')
   ON CONFLICT DO NOTHING;
+
+  -- ── Orders (4 varied orders for testing) ──────────────────
+  SELECT id INTO v_buyer_id
+  FROM public.profiles
+  WHERE id != v_user_id
+  LIMIT 1;
+
+  IF v_buyer_id IS NOT NULL THEN
+    -- Delete existing orders to avoid duplicates and have a fresh varied list
+    DELETE FROM public.orders WHERE buyer_id = v_buyer_id;
+
+    -- Order 1: Monstera Deliciosa (status: pending, subtotal: 350.00, qty: 1)
+    INSERT INTO public.orders (listing_id, buyer_id, seller_id, quantity, subtotal, platform_fee, status, meetup_or_delivery)
+    VALUES (
+      l_monstera,
+      v_buyer_id,
+      v_user_id,
+      1,
+      350.00,
+      35.00,
+      'pending',
+      'Delivery'
+    );
+
+    -- Order 2: Golden Pothos (status: accepted, subtotal: 150.00, qty: 1)
+    INSERT INTO public.orders (listing_id, buyer_id, seller_id, quantity, subtotal, platform_fee, status, meetup_or_delivery)
+    VALUES (
+      l_pothos,
+      v_buyer_id,
+      v_user_id,
+      1,
+      150.00,
+      15.00,
+      'accepted',
+      'Delivery'
+    );
+
+    -- Order 3: Syngonium Pink (status: paid, subtotal: 440.00, qty: 2)
+    INSERT INTO public.orders (listing_id, buyer_id, seller_id, quantity, subtotal, platform_fee, status, meetup_or_delivery)
+    VALUES (
+      l_syngonium,
+      v_buyer_id,
+      v_user_id,
+      2,
+      440.00,
+      44.00,
+      'paid',
+      'Delivery'
+    );
+
+    -- Order 4: Snake Plant (status: completed, subtotal: 280.00, qty: 1)
+    INSERT INTO public.orders (listing_id, buyer_id, seller_id, quantity, subtotal, platform_fee, status, meetup_or_delivery)
+    VALUES (
+      l_snake,
+      v_buyer_id,
+      v_user_id,
+      1,
+      280.00,
+      28.00,
+      'completed',
+      'Delivery'
+    );
+
+    RAISE NOTICE '   ✔ 4 varied orders seeded for buyer: %', v_buyer_id;
+  ELSE
+    RAISE NOTICE '   ⚠ No buyer profile found. Order seeding skipped. Sign up in the app first!';
+  END IF;
 
   RAISE NOTICE '✅ Seed complete!';
   RAISE NOTICE '   User ID    : %', v_user_id;

@@ -77,3 +77,24 @@ The RLS policies expect the first folder segment to be the logged-in user id.
 
 Keep secret API keys such as `PLANTNET_API_KEY` outside the mobile app. Put them in Netlify Functions, Supabase Edge Functions, or another backend-only environment.
 
+## Leafy Generative Chat
+
+`supabase/functions/leafy-chat` calls the Gemini API from a Supabase Edge Function, so the Gemini key stays off the mobile client.
+
+Required secret:
+
+```text
+GEMINI_API_KEY=...
+```
+
+Optional model override:
+
+```text
+GEMINI_MODEL=gemini-2.5-flash-lite
+```
+
+Deploy the function from the Supabase dashboard or CLI, then set the secrets in:
+
+```text
+Supabase Dashboard -> Edge Functions -> Secrets
+```

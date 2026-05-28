@@ -1,18 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Image, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View, Platform } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Image, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View, Platform, Alert } from "react-native";
 import { Button } from "../components/Button";
 import { Screen } from "../components/Screen";
 import { useAuth } from "../context/AuthContext";
 import { createPendingOrder, getActiveListings, type MarketListing } from "../services/listings";
-import { createSellerApplication } from "../services/sellerApplications";
-import { pickImageFromLibrary, uploadPublicImage, type PickedImage } from "../services/storage";
 import { getOrCreateMarketConversation } from "../services/messages";
 import { getUserFavorites, toggleFavorite } from "../services/favorites";
 import { colors, radius, shadow } from "../theme/colors";
 import { formatCurrency } from "../utils/currency";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { SellerGardenModal } from "../components/SellerGardenModal";
+import { useNavigationContext } from "../context/NavigationContext";
+import { EmptyState } from "../components/EmptyState";
+import { ImageZoomModal } from "../components/ImageZoomModal";
 
-const CATEGORIES = ["All", "Indoor", "Outdoor", "Rare", "Flowering", "Medicinal", "Succulents", "Herbs"];
+const CATEGORIES = ["All", "Indoor", "Outdoor", "Vegetables", "Root Crops", "Fruit Trees", "Rare", "Flowering", "Medicinal", "Succulents", "Herbs", "Ornamental"];
 const SORT_OPTIONS = ["Nearest", "Newest", "Price: Low", "Price: High"];
 
 export function MarketScreen({
@@ -22,10 +24,8 @@ export function MarketScreen({
   onOpenChat?: (convoId: string, title: string) => void;
   onOpenListingDetail?: (listingId: string) => void;
 }) {
-  const { profile, user } = useAuth();
-  const [isApplying, setIsApplying] = useState(false);
-  const [sellerMessage, setSellerMessage] = useState<string | null>(null);
-  const [sellerError, setSellerError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const { searchQuery, setSearchQuery } = useNavigationContext();
   const [search, setSearch] = useState("");
   const [isLoadingListings, setIsLoadingListings] = useState(true);
   const [listings, setListings] = useState<MarketListing[]>([]);
@@ -33,26 +33,29 @@ export function MarketScreen({
   const [buyingListingId, setBuyingListingId] = useState<string | null>(null);
   const [messagingListingId, setMessagingListingId] = useState<string | null>(null);
   const [orderMessage, setOrderMessage] = useState<string | null>(null);
-  const sellerStatus = profile?.seller_status ?? "not_applied";
-  const isVerifiedSeller = sellerStatus === "verified";
   const [favoriteListings, setFavoriteListings] = useState<Record<string, boolean>>({});
   const [activeCategory, setActiveCategory] = useState("All");
   const [sortIndex, setSortIndex] = useState(0);
   const [showSortMenu, setShowSortMenu] = useState(false);
-  const [showAppModal, setShowAppModal] = useState(false);
-  const [appShopName, setAppShopName] = useState("");
-  const [appReason, setAppReason] = useState("");
-  const [appPhoto, setAppPhoto] = useState<PickedImage | null>(null);
+  // Seller profile sheet states (Item 18)
+  const [selectedSellerId, setSelectedSellerId] = useState<string | null>(null);
+  const [selectedSellerName, setSelectedSellerName] = useState<string>("");
+  const [showSellerGarden, setShowSellerGarden] = useState(false);
+
+  // Zoom modal state (Item 13)
+  const [zoomImageUrl, setZoomImageUrl] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
 
   // Checkout sheet modal state
   const [showCheckout, setShowCheckout] = useState(false);
   const [checkoutListing, setCheckoutListing] = useState<MarketListing | null>(null);
   const [checkoutQty, setCheckoutQty] = useState(1);
-  const [deliveryMethod, setDeliveryMethod] = useState<"Pickup" | "Meetup" | "Delivery">("Pickup");
+  const [deliveryMethod, setDeliveryMethod] = useState<"Delivery">("Delivery");
   const [buyerNote, setBuyerNote] = useState("");
   const [isOrdering, setIsOrdering] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [cartItems, setCartItems] = useState<MarketListing[]>([]);
+  const [showCart, setShowCart] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -72,23 +75,19 @@ export function MarketScreen({
     }
   }, [user?.id, listings]);
 
-  async function handleToggleFavorite(listingId: string) {
-    if (!user) return;
-    try {
-      const favorited = await toggleFavorite(listingId, user.id);
-      setFavoriteListings((prev) => ({ ...prev, [listingId]: favorited }));
-    } catch (err) {
-      console.error("Failed to toggle favorite", err);
-    }
-  }
+  const listingsRef = useRef(listings);
+  useEffect(() => {
+    listingsRef.current = listings;
+  }, [listings]);
 
-  async function loadListings(nextSearch = search, isLoadMore = false) {
+  const loadListings = useCallback(async (nextSearch = search, isLoadMore = false) => {
     if (!isLoadMore) {
       setIsLoadingListings(true);
       setListingError(null);
     }
     try {
-      const lastItem = isLoadMore && listings.length > 0 ? listings[listings.length - 1] : undefined;
+      const currentListings = listingsRef.current;
+      const lastItem = isLoadMore && currentListings.length > 0 ? currentListings[currentListings.length - 1] : undefined;
       const data = await getActiveListings(nextSearch, 10, lastItem?.publishedAt || undefined);
       if (isLoadMore) {
         setListings((prev) => [...prev, ...data]);
@@ -102,9 +101,29 @@ export function MarketScreen({
     } finally {
       setIsLoadingListings(false);
     }
+  }, [search]);
+
+  useEffect(() => {
+    if (searchQuery !== undefined && searchQuery !== "") {
+      setSearch(searchQuery);
+      loadListings(searchQuery, false).catch(() => {});
+      setSearchQuery("");
+    }
+  }, [searchQuery, loadListings, setSearchQuery]);
+
+  async function handleToggleFavorite(listingId: string) {
+    if (!user) return;
+    try {
+      const favorited = await toggleFavorite(listingId, user.id);
+      setFavoriteListings((prev) => ({ ...prev, [listingId]: favorited }));
+    } catch (err) {
+      console.error("Failed to toggle favorite", err);
+    }
   }
 
-  useEffect(() => { loadListings(""); }, []);
+  useEffect(() => {
+    loadListings("").catch(() => {});
+  }, [loadListings]);
 
   async function handleRefresh() {
     setIsRefreshing(true);
@@ -121,40 +140,10 @@ export function MarketScreen({
     }, 500);
   }
 
-  async function handlePickAppPhoto() {
-    setSellerError(null);
-    try {
-      const picked = await pickImageFromLibrary();
-      if (picked) setAppPhoto(picked);
-    } catch (photoError) {
-      const message = photoError instanceof Error ? photoError.message : "Unable to choose photo.";
-      setSellerError(message);
-    }
-  }
-
-  async function handleApplyAsSellerSubmit() {
-    if (!user) return;
-    setIsApplying(true);
-    setSellerMessage(null);
-    setSellerError(null);
-    try {
-      let uploadedPhotoUrl: string | null = null;
-      if (appPhoto) {
-        const uploaded = await uploadPublicImage("verification-docs" as any, user.id, "verification", appPhoto);
-        uploadedPhotoUrl = uploaded.publicUrl;
-      }
-      await createSellerApplication(user.id, appShopName.trim(), appReason.trim(), uploadedPhotoUrl);
-      setSellerMessage("Seller application sent for admin review.");
-      setShowAppModal(false);
-      setAppShopName("");
-      setAppReason("");
-      setAppPhoto(null);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to send seller application.";
-      setSellerError(message);
-    } finally {
-      setIsApplying(false);
-    }
+  function handleViewSellerGarden(sellerId: string, sellerName: string) {
+    setSelectedSellerId(sellerId);
+    setSelectedSellerName(sellerName);
+    setShowSellerGarden(true);
   }
 
   async function handleBuy(listing: MarketListing) {
@@ -163,7 +152,7 @@ export function MarketScreen({
     setOrderMessage(null);
     try {
       await createPendingOrder(listing, user.id);
-      setOrderMessage(`Pending order created for ${listing.name}. The seller can confirm meetup or delivery next.`);
+      setOrderMessage(`Pending order created for ${listing.name}. The seller can confirm delivery next.`);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to start order.";
       setOrderMessage(message);
@@ -198,10 +187,24 @@ export function MarketScreen({
     }
     setCheckoutListing(listing);
     setCheckoutQty(1);
-    setDeliveryMethod("Pickup");
+    setDeliveryMethod("Delivery");
     setBuyerNote("");
     setOrderSuccess(false);
     setShowCheckout(true);
+  }
+
+  function handleAddToCart(listing: MarketListing) {
+    if (listing.sellerId === user?.id) {
+      setOrderMessage("This is your own listing. You cannot add it to cart.");
+      return;
+    }
+    setCartItems((items) => (items.some((item) => item.id === listing.id) ? items : [...items, listing]));
+    setOrderMessage(`${listing.name} added to cart.`);
+    setShowCart(true);
+  }
+
+  function handleRemoveCartItem(listingId: string) {
+    setCartItems((items) => items.filter((item) => item.id !== listingId));
   }
 
   async function handleConfirmOrder() {
@@ -212,7 +215,7 @@ export function MarketScreen({
         ...checkoutListing,
         deliveryOption: deliveryMethod,
       };
-      await createPendingOrder(marketListing, user.id);
+      await createPendingOrder(marketListing, user.id, checkoutQty, deliveryMethod);
       setOrderSuccess(true);
     } catch (error) {
       setOrderMessage(error instanceof Error ? error.message : "Unable to place order.");
@@ -223,8 +226,7 @@ export function MarketScreen({
   }
 
   const checkoutSubtotal = (checkoutListing?.price ?? 0) * checkoutQty;
-  const checkoutPlatformFee = Math.round(checkoutSubtotal * 0.1 * 100) / 100;
-  const checkoutTotal = checkoutSubtotal + checkoutPlatformFee;
+  const checkoutTotal = checkoutSubtotal;
   const checkoutMaxQty = checkoutListing?.quantity ?? 1;
 
   const filteredListings = useMemo(() => {
@@ -238,6 +240,7 @@ export function MarketScreen({
     <Screen
       sectionLabel="Marketplace"
       title="Market"
+      onCartPress={() => setShowCart(true)}
       refreshControl={
         <RefreshControl
           refreshing={isRefreshing}
@@ -310,66 +313,7 @@ export function MarketScreen({
         </View>
       )}
 
-      {/* ── Seller section ── */}
-      {!showAppModal ? (
-        isVerifiedSeller ? (
-          <View style={styles.sellerBanner}>
-            <MaterialCommunityIcons color={colors.green} name="storefront-check-outline" size={18} />
-            <Text style={styles.sellerBannerText}>Seller dashboard active</Text>
-            <Text style={styles.sellerBannerStatus}>{sellerStatus.replace("_", " ")}</Text>
-          </View>
-        ) : (
-          <Pressable
-            onPress={() => setShowAppModal(true)}
-            style={({ pressed }) => [styles.applyBanner, pressed && styles.applyBannerPressed]}
-          >
-            <MaterialCommunityIcons color={colors.green} name="plus-circle-outline" size={18} />
-            <Text style={styles.applyBannerText}>
-              {sellerStatus === "not_applied"
-                ? "Sell your plants — Apply as seller"
-                : `Application status: ${sellerStatus.replace("_", " ")}`}
-            </Text>
-            <MaterialCommunityIcons color={colors.greenMuted} name="chevron-right" size={16} />
-          </Pressable>
-        )
-      ) : (
-        <View style={styles.applyForm}>
-          <Text style={styles.applyFormTitle}>Apply for Seller Verification</Text>
-          <Text style={styles.applyFormSub}>Submit for admin review to start selling.</Text>
-          <View style={styles.formGap}>
-            {appPhoto && <Image source={{ uri: appPhoto.uri }} style={styles.preview} />}
-            <Button variant="secondary" onPress={handlePickAppPhoto}>
-              {appPhoto ? "Change proof document" : "Add proof (ID, Permit, or Greenhouse photo)"}
-            </Button>
-            <TextInput
-              onChangeText={setAppShopName}
-              placeholder="Shop Name"
-              placeholderTextColor="#8a9583"
-              style={styles.input}
-              value={appShopName}
-            />
-            <TextInput
-              onChangeText={setAppReason}
-              placeholder="Why do you want to sell on GrowMate?"
-              placeholderTextColor="#8a9583"
-              style={styles.input}
-              value={appReason}
-            />
-            <View style={styles.buttonRow}>
-              <View style={styles.flexButton}>
-                <Button disabled={isApplying || !appShopName.trim() || !appReason.trim()} onPress={handleApplyAsSellerSubmit}>
-                  {isApplying ? "Submitting..." : "Submit"}
-                </Button>
-              </View>
-              <View style={styles.flexButton}>
-                <Button variant="secondary" onPress={() => setShowAppModal(false)}>Cancel</Button>
-              </View>
-            </View>
-          </View>
-          {sellerMessage && <Text style={styles.success}>{sellerMessage}</Text>}
-          {sellerError && <Text style={styles.error}>{sellerError}</Text>}
-        </View>
-      )}
+      {/* ── Seller section hidden to keep marketplace buyer-focused ── */}
 
       {/* ── Listings header ── */}
       <View style={styles.sectionRow}>
@@ -393,11 +337,11 @@ export function MarketScreen({
         </View>
       )}
       {!isLoadingListings && !listingError && filteredListings.length === 0 && (
-        <View style={styles.centerState}>
-          <MaterialCommunityIcons color={colors.line} name="sprout-outline" size={48} />
-          <Text style={styles.emptyTitle}>No listings yet</Text>
-          <Text style={styles.stateText}>Approved listings from verified sellers appear here.</Text>
-        </View>
+        <EmptyState
+          icon="store-search-outline"
+          title="No listings yet"
+          description="Approved listings from verified sellers will appear here. Check back later or adjust your filters."
+        />
       )}
 
       {/* ── Listing grid (2 per row) ── */}
@@ -414,7 +358,16 @@ export function MarketScreen({
                 <Image source={{ uri: listing.photoUrl }} style={styles.listingImage} />
               ) : (
                 <View style={styles.photoFallback}>
-                  <MaterialCommunityIcons color={colors.greenMuted} name="flower-outline" size={32} />
+                  <MaterialCommunityIcons color={colors.greenMuted} name="flower-outline" size={24} />
+                  <Text style={styles.photoFallbackText}>No photo yet</Text>
+                </View>
+              )}
+
+              {/* AI Checked Badge Overlaid */}
+              {listing.isAiChecked && (
+                <View style={styles.aiCheckedImageOverlay}>
+                  <MaterialCommunityIcons name="check-decagram" size={10} color={colors.white} />
+                  <Text style={styles.aiCheckedImageOverlayText}>AI Checked</Text>
                 </View>
               )}
 
@@ -441,14 +394,31 @@ export function MarketScreen({
                 <Text style={styles.listingTitle} numberOfLines={2}>{listing.name}</Text>
                 <Text style={styles.price}>{formatCurrency(listing.price)}</Text>
 
-                <View style={styles.sellerRow}>
+                <Pressable
+                  onPress={(e) => {
+                    e.stopPropagation?.();
+                    if (listing.sellerId !== user?.id) {
+                      handleViewSellerGarden(listing.sellerId, listing.sellerName);
+                    }
+                  }}
+                  style={styles.sellerRow}
+                  hitSlop={6}
+                >
                   <MaterialCommunityIcons color={colors.greenMuted} name="account-outline" size={10} />
-                  <Text style={styles.metaSmall} numberOfLines={1}>
-                    {listing.sellerId === user?.id ? "You" : listing.sellerName} · {listing.location}
+                  <Text style={[styles.metaSmall, listing.sellerId !== user?.id && { textDecorationLine: "underline", color: colors.greenMid }]} numberOfLines={1}>
+                    {listing.sellerId === user?.id ? "You" : listing.sellerName}
                   </Text>
-                </View>
+                  <View style={styles.sellerTrustRow}>
+                    <MaterialCommunityIcons name="star" size={10} color="#f59e0b" />
+                    <Text style={styles.sellerTrustText}>{listing.trustScore.toFixed(1)}</Text>
+                  </View>
+                </Pressable>
 
-                {/* Actions row: Talk to Seller + Order */}
+                <Text style={styles.metaSmall} numberOfLines={1}>
+                  📍 {listing.location} · Delivery
+                </Text>
+
+                {/* Actions row: Talk to Seller + Add to Cart + Buy Now */}
                 <View style={styles.cardActionsRow}>
                   {onOpenChat && (
                     <Pressable
@@ -460,10 +430,17 @@ export function MarketScreen({
                     </Pressable>
                   )}
                   <Pressable
+                    onPress={(e) => { e.stopPropagation?.(); handleAddToCart(listing); }}
+                    style={({ pressed }) => [styles.gridCartBtn, pressed && styles.actionBtnPressed]}
+                  >
+                    <MaterialCommunityIcons color={colors.green} name="cart-plus" size={14} />
+                    <Text style={styles.gridCartBtnText}>Add</Text>
+                  </Pressable>
+                  <Pressable
                     onPress={(e) => { e.stopPropagation?.(); handleOrderPress(listing); }}
                     style={({ pressed }) => [styles.gridOrderBtn, pressed && styles.actionBtnPressed]}
                   >
-                    <Text style={styles.gridOrderBtnText}>Order</Text>
+                    <Text style={styles.gridOrderBtnText}>Buy Now</Text>
                   </Pressable>
                 </View>
               </View>
@@ -491,6 +468,62 @@ export function MarketScreen({
       {/* ══════════════════════════════════════════════
           CHECKOUT BOTTOM SHEET MODAL
       ══════════════════════════════════════════════ */}
+      <Modal visible={showCart} animationType="slide" transparent onRequestClose={() => setShowCart(false)}>
+        <View style={styles.sheetOverlay}>
+          <Pressable style={styles.sheetDismiss} onPress={() => setShowCart(false)} />
+          <View style={styles.sheet}>
+            <View style={styles.sheetHandle} />
+            <View style={styles.sheetHeader}>
+              <Text style={styles.sheetTitle}>Cart</Text>
+              <Pressable onPress={() => setShowCart(false)} hitSlop={8}>
+                <MaterialCommunityIcons color={colors.greenMuted} name="close" size={22} />
+              </Pressable>
+            </View>
+
+            {cartItems.length === 0 ? (
+              <View style={styles.cartEmpty}>
+                <MaterialCommunityIcons name="cart-outline" size={42} color={colors.lineMid} />
+                <Text style={styles.cartEmptyTitle}>Your cart is empty</Text>
+                <Text style={styles.cartEmptyText}>Tap Add to Cart on a plant listing to save it here.</Text>
+              </View>
+            ) : (
+              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.cartList}>
+                {cartItems.map((item) => (
+                  <View key={item.id} style={styles.cartItem}>
+                    {item.photoUrl ? (
+                      <Image source={{ uri: item.photoUrl }} style={styles.cartThumb} />
+                    ) : (
+                      <View style={[styles.cartThumb, styles.itemThumbFallback]}>
+                        <MaterialCommunityIcons color={colors.greenMuted} name="flower-outline" size={22} />
+                      </View>
+                    )}
+                    <View style={styles.cartItemInfo}>
+                      <Text style={styles.cartItemName} numberOfLines={2}>{item.name}</Text>
+                      <Text style={styles.cartItemMeta}>{item.sellerName} · {item.location}</Text>
+                      <Text style={styles.cartItemPrice}>{formatCurrency(item.price)}</Text>
+                    </View>
+                    <View style={styles.cartItemActions}>
+                      <Pressable onPress={() => handleRemoveCartItem(item.id)} style={styles.cartIconBtn}>
+                        <MaterialCommunityIcons name="trash-can-outline" size={17} color={colors.greenMuted} />
+                      </Pressable>
+                      <Pressable
+                        onPress={() => {
+                          setShowCart(false);
+                          handleOrderPress(item);
+                        }}
+                        style={styles.cartCheckoutBtn}
+                      >
+                        <Text style={styles.cartCheckoutText}>Buy</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
+
       <Modal
         visible={showCheckout}
         animationType="slide"
@@ -527,7 +560,7 @@ export function MarketScreen({
                     <Text style={styles.successValue}>{deliveryMethod}</Text>
                   </View>
                   <View style={[styles.successRow, styles.successTotal]}>
-                    <Text style={styles.successTotalLabel}>Total Paid</Text>
+                    <Text style={styles.successTotalLabel}>Total</Text>
                     <Text style={styles.successTotalValue}>{formatCurrency(checkoutTotal)}</Text>
                   </View>
                 </View>
@@ -557,7 +590,7 @@ export function MarketScreen({
               <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                 {/* Header */}
                 <View style={styles.sheetHeader}>
-                  <Text style={styles.sheetTitle}>Checkout</Text>
+                  <Text style={styles.sheetTitle}>Cart</Text>
                   <Pressable onPress={() => setShowCheckout(false)} hitSlop={8}>
                     <MaterialCommunityIcons color={colors.greenMuted} name="close" size={22} />
                   </Pressable>
@@ -620,7 +653,7 @@ export function MarketScreen({
                 <View style={styles.fieldBlock}>
                   <Text style={styles.fieldLabel}>How will you receive it?</Text>
                   <View style={styles.deliveryRow}>
-                    {(["Pickup", "Meetup", "Delivery"] as const).map((opt) => (
+                    {(["Delivery"] as const).map((opt) => (
                       <Pressable
                         key={opt}
                         onPress={() => setDeliveryMethod(opt)}
@@ -628,7 +661,7 @@ export function MarketScreen({
                       >
                         <MaterialCommunityIcons
                           color={deliveryMethod === opt ? colors.white : colors.greenMuted}
-                          name={opt === "Pickup" ? "home-outline" : opt === "Meetup" ? "map-marker-outline" : "truck-outline"}
+                          name="truck-outline"
                           size={16}
                         />
                         <Text style={[styles.deliveryChipText, deliveryMethod === opt && styles.deliveryChipTextActive]}>
@@ -662,22 +695,27 @@ export function MarketScreen({
                 <View style={styles.summaryBlock}>
                   <Text style={styles.fieldLabel}>Order Summary</Text>
                   <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>
-                      {checkoutListing.name} × {checkoutQty}
-                    </Text>
+                    <Text style={styles.summaryLabel}>Item Price</Text>
                     <Text style={styles.summaryValue}>{formatCurrency(checkoutSubtotal)}</Text>
                   </View>
                   <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>Platform fee (10%)</Text>
-                    <Text style={styles.summaryValue}>{formatCurrency(checkoutPlatformFee)}</Text>
+                    <Text style={styles.summaryLabel}>Delivery / Meetup Fee</Text>
+                    <Text style={styles.summaryValue}>To be confirmed</Text>
                   </View>
                   <View style={[styles.summaryRow, styles.summaryTotalRow]}>
                     <Text style={styles.summaryTotalLabel}>Total</Text>
                     <Text style={styles.summaryTotalValue}>{formatCurrency(checkoutTotal)}</Text>
                   </View>
-                  <Text style={styles.payNote}>
-                    💡 Payment is settled directly with the seller after they confirm your order.
-                  </Text>
+
+                  <View style={styles.warningContainer}>
+                    <MaterialCommunityIcons name="shield-check-outline" size={20} color={colors.greenMid} />
+                    <View style={styles.warningCopy}>
+                      <Text style={styles.warningTitle}>Safety Reminder</Text>
+                      <Text style={styles.warningText}>
+                        For your protection, keep payments and order updates inside GrowMate. Transactions outside the app may not be covered.
+                      </Text>
+                    </View>
+                  </View>
                 </View>
 
                 {/* Confirm button */}
@@ -695,7 +733,7 @@ export function MarketScreen({
                     ) : (
                       <>
                         <MaterialCommunityIcons color={colors.white} name="check" size={20} />
-                        <Text style={styles.confirmBtnText}>Proceed to Checkout · {formatCurrency(checkoutTotal)}</Text>
+                        <Text style={styles.confirmBtnText}>Send Order Request · {formatCurrency(checkoutTotal)}</Text>
                       </>
                     )}
                   </Pressable>
@@ -708,6 +746,28 @@ export function MarketScreen({
           </View>
         </View>
       </Modal>
+
+                     {/* ══════════════════════════════════════════════════
+          SELLER PUBLIC GARDEN MODAL (Item 18) — Refactored to Full Profile Sheet
+          ══════════════════════════════════════════════════ */}
+      <SellerGardenModal
+        visible={showSellerGarden}
+        onClose={() => setShowSellerGarden(false)}
+        sellerId={selectedSellerId}
+        sellerName={selectedSellerName}
+        onOpenChat={onOpenChat || (() => {})}
+        onOpenListingDetail={onOpenListingDetail}
+      />
+
+      {/* ══════════════════════════════════════════════════
+          IMAGE ZOOM MODAL (Item 13)
+      ══════════════════════════════════════════════════ */}
+      {zoomImageUrl && (
+        <ImageZoomModal
+          imageUrl={zoomImageUrl}
+          onClose={() => setZoomImageUrl(null)}
+        />
+      )}
     </Screen>
   );
 }
@@ -814,6 +874,8 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   applyBannerPressed: { opacity: 0.75 },
+  applyBannerCopy: { flex: 1, gap: 2 },
+  applyBannerTitle: { color: colors.green, fontSize: 14, fontWeight: "900" },
   applyBannerText: { flex: 1, color: colors.green, fontSize: 13, fontWeight: "800" },
   applyForm: {
     backgroundColor: colors.sage,
@@ -824,6 +886,37 @@ const styles = StyleSheet.create({
   },
   applyFormTitle: { color: colors.green, fontSize: 16, fontWeight: "900" },
   applyFormSub: { color: colors.greenMuted, fontSize: 13, fontWeight: "700", marginBottom: 8 },
+  applyReasonInput: { minHeight: 104, paddingTop: 12 },
+  verificationGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  verificationTile: {
+    width: "48%",
+    minHeight: 104,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.cream,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 10,
+    gap: 8,
+    overflow: "hidden",
+  },
+  verificationThumb: {
+    width: "100%",
+    height: 62,
+    borderRadius: 10,
+    backgroundColor: colors.sage,
+  },
+  verificationTileText: {
+    color: colors.green,
+    fontSize: 11,
+    fontWeight: "900",
+    textAlign: "center",
+  },
   formGap: { gap: 10 },
   preview: { backgroundColor: colors.sageStrong, borderRadius: 16, height: 160, width: "100%" },
   input: {
@@ -895,9 +988,19 @@ const styles = StyleSheet.create({
   photoFallback: {
     width: "100%",
     aspectRatio: 1,
-    backgroundColor: colors.sage,
+    backgroundColor: colors.surface1, // premium soft tint sage replacement
     alignItems: "center",
     justifyContent: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+  },
+  photoFallbackText: {
+    color: colors.textTertiary,
+    fontSize: 10,
+    fontWeight: "800",
+    marginTop: 6,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   heartOverlay: {
     position: "absolute",
@@ -929,13 +1032,75 @@ const styles = StyleSheet.create({
   metaSmall: { color: colors.greenMuted, fontSize: 10, fontWeight: "700", flex: 1 },
   gridOrderBtn: {
     flex: 1,
+    flexDirection: "row",
     backgroundColor: colors.green,
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
+    gap: 5,
     paddingVertical: 8,
   },
-  gridOrderBtnText: { color: colors.white, fontSize: 12, fontWeight: "900" },
+  gridOrderBtnText: { color: colors.white, fontSize: 11, fontWeight: "900" },
+  gridCartBtn: {
+    flex: 0.8,
+    flexDirection: "row",
+    backgroundColor: colors.sage,
+    borderColor: colors.line,
+    borderWidth: 1,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+    paddingVertical: 8,
+  },
+  gridCartBtnText: { color: colors.green, fontSize: 11, fontWeight: "900" },
+  cartEmpty: {
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 34,
+  },
+  cartEmptyTitle: { color: colors.green, fontSize: 18, fontWeight: "900" },
+  cartEmptyText: { color: colors.greenMuted, fontSize: 13, fontWeight: "600", textAlign: "center" },
+  cartList: { gap: 10, paddingBottom: 18 },
+  cartItem: {
+    alignItems: "center",
+    backgroundColor: colors.surface1,
+    borderColor: colors.line,
+    borderRadius: 16,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 10,
+    padding: 10,
+  },
+  cartThumb: {
+    backgroundColor: colors.sage,
+    borderRadius: 12,
+    height: 58,
+    width: 58,
+  },
+  cartItemInfo: { flex: 1, gap: 2 },
+  cartItemName: { color: colors.green, fontSize: 13, fontWeight: "900" },
+  cartItemMeta: { color: colors.greenMuted, fontSize: 10, fontWeight: "700" },
+  cartItemPrice: { color: colors.green, fontSize: 13, fontWeight: "900" },
+  cartItemActions: { alignItems: "center", gap: 8 },
+  cartIconBtn: {
+    alignItems: "center",
+    backgroundColor: colors.white,
+    borderColor: colors.line,
+    borderRadius: 16,
+    borderWidth: 1,
+    height: 32,
+    justifyContent: "center",
+    width: 32,
+  },
+  cartCheckoutBtn: {
+    backgroundColor: colors.green,
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  cartCheckoutText: { color: colors.white, fontSize: 12, fontWeight: "900" },
   actionBtn: {
     flex: 1,
     flexDirection: "row",
@@ -1159,4 +1324,361 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   doneBtnText: { color: colors.green, fontSize: 14, fontWeight: "900" },
+
+  // Modal styles for seller garden profile
+  modalContainer: {
+    flex: 1,
+    backgroundColor: colors.cream,
+    paddingTop: Platform.OS === "ios" ? 54 : 20,
+  },
+  modalHeader: {
+    paddingHorizontal: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+  },
+  modalTitle: {
+    color: colors.green,
+    fontSize: 22,
+    fontWeight: "900",
+  },
+  modalSubtitle: {
+    color: colors.greenMuted,
+    fontSize: 14,
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  modalScroll: {
+    padding: 20,
+    paddingBottom: 100,
+  },
+  modalLoading: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 40,
+  },
+  loadingText: {
+    color: colors.green,
+    fontSize: 14,
+    fontWeight: "700",
+    marginTop: 10,
+  },
+  emptyContainer: {
+    alignItems: "center",
+    padding: 40,
+    gap: 8,
+  },
+  emptyText: {
+    color: colors.greenMuted,
+    fontSize: 13,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  plantCard: {
+    backgroundColor: colors.surface0,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.line,
+    marginBottom: 16,
+    overflow: "hidden",
+    ...shadow.sm,
+  },
+  plantImage: {
+    width: "100%",
+    height: 180,
+    backgroundColor: colors.sage,
+  },
+  plantInfo: {
+    padding: 16,
+  },
+  plantName: {
+    color: colors.green,
+    fontSize: 17,
+    fontWeight: "900",
+  },
+  plantCategory: {
+    color: colors.greenMuted,
+    fontSize: 12,
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  scientificName: {
+    color: colors.greenMuted,
+    fontSize: 12,
+    fontStyle: "italic",
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  careNotesText: {
+    backgroundColor: colors.cream,
+    borderColor: colors.line,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 12,
+    fontSize: 13,
+    color: colors.greenMuted,
+    fontWeight: "700",
+    marginTop: 8,
+    lineHeight: 18,
+  },
+  // New Marketplace Redesign Styles
+  aiCheckedImageOverlay: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    backgroundColor: colors.green,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  aiCheckedImageOverlayText: {
+    color: colors.white,
+    fontSize: 9,
+    fontWeight: "900",
+  },
+  sellerTrustRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    backgroundColor: "#fef3c7",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    marginLeft: 6,
+  },
+  sellerTrustText: {
+    color: "#b45309",
+    fontSize: 9,
+    fontWeight: "900",
+  },
+  warningContainer: {
+    backgroundColor: colors.surface1,
+    borderColor: colors.lineMid,
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "flex-start",
+    marginTop: 10,
+  },
+  warningCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  warningTitle: {
+    color: colors.green,
+    fontSize: 12,
+    fontWeight: "900",
+  },
+  warningText: {
+    color: colors.greenMuted,
+    fontSize: 11,
+    fontWeight: "600",
+    lineHeight: 15,
+  },
+  // Garden Profile Modal Styles
+  sellerHeaderCard: {
+    backgroundColor: colors.white,
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.line,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  sellerHeaderTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 16,
+  },
+  sellerAvatarFallback: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.green,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  sellerAvatarText: {
+    color: colors.white,
+    fontWeight: "900",
+    fontSize: 16,
+  },
+  sellerHeaderText: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  sellerNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  sellerProfileName: {
+    fontSize: 16,
+    fontWeight: "900",
+    color: colors.textPrimary,
+  },
+  sellerBio: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  sellerStatsRow: {
+    flexDirection: "row",
+    borderTopWidth: 1,
+    borderTopColor: colors.line,
+    paddingTop: 12,
+  },
+  sellerStatCol: {
+    flex: 1,
+    alignItems: "center",
+  },
+  sellerStatVal: {
+    fontSize: 15,
+    fontWeight: "900",
+    color: colors.textPrimary,
+  },
+  sellerStatLbl: {
+    fontSize: 10,
+    color: colors.textTertiary,
+    textTransform: "uppercase",
+    marginTop: 2,
+  },
+  sellerTabRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+    marginBottom: 16,
+  },
+  sellerTabBtn: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+  sellerTabBtnActive: {
+    borderBottomColor: colors.green,
+  },
+  sellerTabText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: colors.textSecondary,
+  },
+  sellerTabTextActive: {
+    color: colors.green,
+    fontWeight: "900",
+  },
+  plantNameHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 2,
+  },
+  aiVerifiedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    backgroundColor: colors.sage,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  aiVerifiedBadgeText: {
+    fontSize: 9,
+    fontWeight: "900",
+    color: colors.green,
+  },
+  sellerShopCard: {
+    flexDirection: "row",
+    backgroundColor: colors.white,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.line,
+    padding: 10,
+    alignItems: "center",
+    marginBottom: 10,
+    gap: 12,
+  },
+  shopThumb: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: colors.sage,
+  },
+  shopThumbFallback: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: colors.sage,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  shopCardInfo: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  shopCardTitle: {
+    fontSize: 14,
+    fontWeight: "900",
+    color: colors.textPrimary,
+  },
+  shopCardPrice: {
+    fontSize: 13,
+    fontWeight: "900",
+    color: colors.green,
+    marginTop: 2,
+  },
+  shopCardLocation: {
+    fontSize: 10,
+    color: colors.textTertiary,
+    marginTop: 2,
+  },
+  sellerModalFooter: {
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: colors.line,
+    backgroundColor: colors.cream,
+    flexDirection: "row",
+    gap: 12,
+  },
+  floatingMsgBtn: {
+    flex: 1.5,
+    backgroundColor: colors.green,
+    borderRadius: 12,
+    paddingVertical: 12,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+  },
+  floatingMsgBtnText: {
+    color: colors.white,
+    fontSize: 14,
+    fontWeight: "900",
+  },
+  closeProfileBtn: {
+    flex: 1,
+    backgroundColor: colors.white,
+    borderColor: colors.line,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingVertical: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  closeProfileBtnText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    fontWeight: "700",
+  },
 });

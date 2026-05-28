@@ -5,25 +5,33 @@
     "scheme": "growmate",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/growmate-logo.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "package": "com.laarne.growmate",
       "adaptiveIcon": {
         "backgroundColor": "#F7FBF1",
-        "foregroundImage": "./assets/android-icon-foreground.png",
+        "foregroundImage": "./assets/growmate-logo.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/growmate-logo.png"
     },
     "plugins": [
-      "expo-font"
-    ]
+      "expo-font",
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9c7d0636-f9fb-4a97-907a-0d78e4d1bc76"
+      }
+    },
+    "owner": "johnmichael.beringuel"
   }
 }

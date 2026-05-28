@@ -1,17 +1,29 @@
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View, Pressable } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { Screen } from "../components/Screen";
 import { useAuth } from "../context/AuthContext";
+import { generateLeafyChatResponse } from "../services/leafyChat";
+import { scanPlantWithLeafy, type LeafyScanResult } from "../services/leafyScan";
 import { getMessages, sendMessage, markConversationAsRead, type Message } from "../services/messages";
+import { pickImageFromLibrary, type PickedImage } from "../services/storage";
 import { supabase } from "../services/supabase";
 import { colors } from "../theme/colors";
+import { unwrapDelimitedUserInput, wrapUserInputForPrompt } from "../utils/promptSafety";
+import { sanitizeUserInput } from "../utils/sanitize";
 import { STORAGE_KEYS } from "../utils/storageKeys";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-function getLeafyResponse(userInput: string): string {
-  const q = userInput.toLowerCase();
+const leafyAvatar = require("../../assets/leafy-ai.png");
+
+function getLeafyMessagesStorageKey(userId: string) {
+  return `${STORAGE_KEYS.LEAFY_MESSAGES}:${userId}`;
+}
+
+function getLeafyResponse(delimitedUserInput: string): string {
+  const q = unwrapDelimitedUserInput(delimitedUserInput).toLowerCase();
 
   // Watering
   if (q.includes("water") || q.includes("watering") || q.includes("dry") || q.includes("thirsty")) {
@@ -93,6 +105,14 @@ function getLeafyResponse(userInput: string): string {
   if (q.includes("vegetable") || q.includes("tomato") || q.includes("chili") || q.includes("pepper") || q.includes("eggplant") || q.includes("talong")) {
     return "🍅 Vegetable growing tips: Most veggies need full sun (6-8 hrs), consistent watering (not letting them dry out completely), and regular fertilizing. Support tall plants like tomatoes with stakes. Harvest regularly to encourage more production!";
   }
+  // Root crops
+  if (q.includes("root crop") || q.includes("kamote") || q.includes("sweet potato") || q.includes("cassava") || q.includes("kamoteng kahoy") || q.includes("gabi") || q.includes("taro") || q.includes("ube")) {
+    return "Root crop tips: Use loose, deep, well-draining soil so tubers can expand. Keep moisture steady while vines/leaves are growing, avoid waterlogged soil, and harvest only after the plant has had enough time to size up. For kamote and cassava, start with healthy cuttings and give them full sun.";
+  }
+  // Fruit trees
+  if (q.includes("fruit tree") || q.includes("calamansi") || q.includes("mango") || q.includes("papaya") || q.includes("banana") || q.includes("guava")) {
+    return "Fruit tree tips: Give young trees full sun, deep watering, and room for roots. Mulch around the base but keep mulch away from the trunk. Feed lightly during active growth, and watch for pests on new leaves and flowers.";
+  }
   // Buy/sell/market
   if (q.includes("buy") || q.includes("sell") || q.includes("market") || q.includes("price")) {
     return "🛒 You can find plants to buy and sell right here in the GrowMate Marketplace! Head to the Market tab to browse listings, or apply to become a verified seller in your profile settings. Happy trading! 🌱";
@@ -116,6 +136,30 @@ type ChatDetailScreenProps = {
   onClose: () => void;
 };
 
+function formatLeafyScanResponse(result: LeafyScanResult): string {
+  const commonNames = result.commonNames.length ? result.commonNames.slice(0, 3).join(", ") : "Not available";
+  const alternatives = result.alternativeMatches?.length
+    ? `\n\nOther possible matches: ${result.alternativeMatches
+        .slice(0, 3)
+        .map((match) => `${match.name} (${match.confidence}%)`)
+        .join(", ")}.`
+    : "";
+
+  return [
+    `I scanned the photo and the best match is ${result.bestMatch}${result.scientificName ? ` (${result.scientificName})` : ""}.`,
+    `Confidence: ${result.confidence}%`,
+    `Common names: ${commonNames}`,
+    `Family: ${result.family ?? "Not available"}`,
+    `Genus: ${result.genus ?? "Not available"}`,
+    `Category: ${result.category}`,
+    `Safety status: ${result.saleStatus.replace(/_/g, " ")}`,
+    result.reviewReason ? `Note: ${result.reviewReason}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n")
+    .concat(alternatives);
+}
+
 export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailScreenProps) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -124,6 +168,7 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLeafyTyping, setIsLeafyTyping] = useState(false);
+  const [attachedImage, setAttachedImage] = useState<PickedImage | null>(null);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -132,8 +177,14 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
       if (!silent) {
         setIsLoading(true);
       }
+      if (!user?.id) {
+        setMessages([]);
+        setIsLoading(false);
+        return;
+      }
       try {
-        const stored = await AsyncStorage.getItem(STORAGE_KEYS.LEAFY_MESSAGES);
+        const leafyStorageKey = getLeafyMessagesStorageKey(user.id);
+        const stored = await AsyncStorage.getItem(leafyStorageKey);
         if (stored) {
           setMessages(JSON.parse(stored));
         } else {
@@ -146,7 +197,7 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
             createdAt: new Date().toISOString()
           };
           setMessages([welcomeMsg]);
-          await AsyncStorage.setItem(STORAGE_KEYS.LEAFY_MESSAGES, JSON.stringify([welcomeMsg]));
+          await AsyncStorage.setItem(leafyStorageKey, JSON.stringify([welcomeMsg]));
         }
       } catch (e) {
         console.warn("AsyncStorage leafy chat error:", e);
@@ -180,24 +231,29 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
   }
 
   async function handleSend() {
-    if (!user || !text.trim() || isSending) return;
+    if (!user || isSending) return;
+
+    const selectedImage = conversationId === "leafy-ai-assistant" ? attachedImage : null;
+    const content = sanitizeUserInput(text, { maxLength: 2000, preserveNewlines: true });
+    if (!content && !selectedImage) return;
 
     setIsSending(true);
-    const content = text.trim();
     setText("");
+    setAttachedImage(null);
 
     if (conversationId === "leafy-ai-assistant") {
+      const leafyStorageKey = getLeafyMessagesStorageKey(user.id);
       const userMsg: Message = {
         id: `msg-${Date.now()}`,
         conversationId: "leafy-ai-assistant",
         senderId: user.id,
-        body: content,
-        imageUrl: null,
+        body: content || "Shared a plant photo",
+        imageUrl: selectedImage?.uri ?? null,
         createdAt: new Date().toISOString()
       };
       const updatedMessages = [...messages, userMsg];
       setMessages(updatedMessages);
-      await AsyncStorage.setItem(STORAGE_KEYS.LEAFY_MESSAGES, JSON.stringify(updatedMessages));
+      await AsyncStorage.setItem(leafyStorageKey, JSON.stringify(updatedMessages));
       
       // Auto scroll
       setTimeout(() => {
@@ -207,9 +263,30 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
       // Start typing indicator simulation
       setIsLeafyTyping(true);
 
-      // Generate leafy response
+      // Generate Leafy response
       setTimeout(async () => {
-        let leafyResponseText = getLeafyResponse(content);
+        const delimitedUserContent = wrapUserInputForPrompt(content);
+        const leafyHistory = updatedMessages
+          .slice(-10)
+          .map((messageItem) => ({
+            role: messageItem.senderId === "leafy-ai" ? "assistant" as const : "user" as const,
+            content: messageItem.body,
+          }));
+        let leafyResponseText = "";
+
+        try {
+          if (selectedImage) {
+            const scanResult = await scanPlantWithLeafy(selectedImage);
+            leafyResponseText = formatLeafyScanResponse(scanResult);
+          } else {
+            leafyResponseText = await generateLeafyChatResponse(content, leafyHistory);
+          }
+        } catch (leafyError) {
+          console.warn("Leafy generative response failed, using local fallback:", leafyError);
+          leafyResponseText = selectedImage
+            ? "I could not scan that photo yet. Please try another clear plant photo, or describe the plant and symptoms so I can still help."
+            : getLeafyResponse(delimitedUserContent);
+        }
 
         const leafyMsg: Message = {
           id: `msg-${Date.now()}-leafy`,
@@ -221,7 +298,7 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
         };
         const finalMessages = [...updatedMessages, leafyMsg];
         setMessages(finalMessages);
-        await AsyncStorage.setItem(STORAGE_KEYS.LEAFY_MESSAGES, JSON.stringify(finalMessages));
+        await AsyncStorage.setItem(leafyStorageKey, JSON.stringify(finalMessages));
         
         // Disable typing animation and finish sending
         setIsLeafyTyping(false);
@@ -243,6 +320,19 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
       setError(message);
     } finally {
       setIsSending(false);
+    }
+  }
+
+  async function handlePickLeafyImage() {
+    try {
+      const image = await pickImageFromLibrary();
+      if (image) {
+        setAttachedImage(image);
+        setError(null);
+      }
+    } catch (pickError) {
+      const message = pickError instanceof Error ? pickError.message : "Unable to choose image.";
+      setError(message);
     }
   }
 
@@ -318,11 +408,12 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.root}>
-      <Screen>
+      <Screen scroll={false}>
         <View style={styles.header}>
-          <Button variant="secondary" onPress={onClose}>
-            Back
-          </Button>
+          <Pressable onPress={onClose} style={styles.backButton} hitSlop={8}>
+            <MaterialCommunityIcons name="arrow-left" size={18} color={colors.green} />
+            <Text style={styles.backButtonText}>Back</Text>
+          </Pressable>
           <Text numberOfLines={1} style={styles.title}>
             {title}
           </Text>
@@ -351,7 +442,11 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
                   const isMe = msg.senderId === user?.id;
                   return (
                     <View key={msg.id} style={[styles.bubbleWrap, isMe ? styles.bubbleWrapMe : styles.bubbleWrapOther]}>
+                      {!isMe && conversationId === "leafy-ai-assistant" && (
+                        <Image source={leafyAvatar} style={styles.leafyAvatar} />
+                      )}
                       <View style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleOther]}>
+                        {msg.imageUrl && <Image source={{ uri: msg.imageUrl }} style={styles.messageImage} />}
                         <Text style={[styles.bubbleText, isMe ? styles.bubbleTextMe : styles.bubbleTextOther]}>
                           {msg.body}
                         </Text>
@@ -367,6 +462,9 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
                 })}
                 {isLeafyTyping && (
                   <View style={[styles.bubbleWrap, styles.bubbleWrapOther]}>
+                    {conversationId === "leafy-ai-assistant" && (
+                      <Image source={leafyAvatar} style={styles.leafyAvatar} />
+                    )}
                     <View style={[styles.bubble, styles.bubbleOther, styles.typingBubble]}>
                       <ActivityIndicator size="small" color={colors.green} style={styles.typingIndicator} />
                       <Text style={[styles.bubbleText, styles.bubbleTextOther, styles.typingText]}>
@@ -380,7 +478,54 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
           </ScrollView>
         )}
 
+        {conversationId === "leafy-ai-assistant" && (
+          <View style={styles.suggestionsContainer}>
+            <Text style={styles.suggestionsTitle}>Ask Leafy AI:</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScroll}>
+              {[
+                { label: "Watering Monstera", query: "How often should I water my Monstera?" },
+                { label: "Succulent Soil Mix", query: "What soil mix is best for succulents?" },
+                { label: "Propagate Pothos", query: "How do I propagate pothos cuttings?" },
+                { label: "Treat Yellow Leaves", query: "How do I treat yellow leaves?" },
+              ].map((item, idx) => (
+                <Pressable
+                  key={idx}
+                  onPress={() => {
+                    setText(item.query);
+                  }}
+                  style={styles.suggestionChip}
+                >
+                  <Text style={styles.suggestionChipText}>{item.label}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {conversationId === "leafy-ai-assistant" && attachedImage && (
+          <View style={styles.attachmentPreview}>
+            <Image source={{ uri: attachedImage.uri }} style={styles.attachmentThumb} />
+            <View style={styles.attachmentTextWrap}>
+              <Text numberOfLines={1} style={styles.attachmentTitle}>Photo attached</Text>
+              <Text numberOfLines={1} style={styles.attachmentSubtitle}>Leafy will scan this image when you send.</Text>
+            </View>
+            <Pressable onPress={() => setAttachedImage(null)} style={styles.removeAttachmentBtn} hitSlop={8}>
+              <MaterialCommunityIcons color={colors.greenMuted} name="close" size={18} />
+            </Pressable>
+          </View>
+        )}
+
         <View style={styles.composerRow}>
+          {conversationId === "leafy-ai-assistant" && (
+            <Pressable
+              accessibilityLabel="Upload plant photo"
+              disabled={isSending}
+              onPress={handlePickLeafyImage}
+              style={({ pressed }) => [styles.attachButton, pressed && styles.attachButtonPressed]}
+            >
+              <MaterialCommunityIcons color={colors.green} name="image-plus" size={21} />
+            </Pressable>
+          )}
           <TextInput
             multiline
             onChangeText={setText}
@@ -389,7 +534,7 @@ export function ChatDetailScreen({ conversationId, title, onClose }: ChatDetailS
             style={styles.input}
             value={text}
           />
-          <Button disabled={isSending || !text.trim()} onPress={handleSend}>
+          <Button disabled={isSending || (!text.trim() && !(conversationId === "leafy-ai-assistant" && attachedImage))} onPress={handleSend}>
             {isSending ? "Sending" : "Send"}
           </Button>
         </View>
@@ -408,27 +553,46 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.line,
     borderBottomWidth: 1,
     flexDirection: "row",
-    gap: 12,
-    paddingBottom: 12,
+    gap: 10,
+    paddingBottom: 8,
   },
   title: {
     color: colors.green,
     flex: 1,
-    fontSize: 20,
+    fontSize: 18,
+    fontWeight: "900",
+  },
+  backButton: {
+    alignItems: "center",
+    backgroundColor: colors.surface1,
+    borderColor: colors.line,
+    borderRadius: 999,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 4,
+    minHeight: 30,
+    paddingHorizontal: 10,
+  },
+  backButtonText: {
+    color: colors.green,
+    fontSize: 12,
     fontWeight: "900",
   },
   scroll: {
     flex: 1,
-    marginVertical: 10,
+    marginVertical: 6,
   },
   messagesList: {
     flexGrow: 1,
-    justifyContent: "flex-end",
-    paddingBottom: 10,
+    justifyContent: "flex-start",
+    paddingTop: 8,
+    paddingBottom: 6,
   },
   bubbleWrap: {
+    alignItems: "flex-end",
     flexDirection: "row",
-    marginVertical: 6,
+    gap: 8,
+    marginVertical: 4,
     width: "100%",
   },
   bubbleWrapMe: {
@@ -437,11 +601,19 @@ const styles = StyleSheet.create({
   bubbleWrapOther: {
     justifyContent: "flex-start",
   },
+  leafyAvatar: {
+    backgroundColor: colors.sage,
+    borderColor: colors.lineMid,
+    borderRadius: 16,
+    borderWidth: 1,
+    height: 32,
+    width: 32,
+  },
   bubble: {
     borderRadius: 20,
     maxWidth: "80%",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
   },
   bubbleMe: {
     backgroundColor: colors.green,
@@ -480,7 +652,21 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     flexDirection: "row",
     gap: 10,
-    paddingTop: 10,
+    paddingTop: 8,
+    paddingBottom: 6,
+  },
+  attachButton: {
+    alignItems: "center",
+    backgroundColor: colors.white,
+    borderColor: colors.line,
+    borderRadius: 22,
+    borderWidth: 1,
+    height: 44,
+    justifyContent: "center",
+    width: 44,
+  },
+  attachButtonPressed: {
+    backgroundColor: colors.sage,
   },
   input: {
     backgroundColor: colors.white,
@@ -494,6 +680,51 @@ const styles = StyleSheet.create({
     maxHeight: 80,
     paddingHorizontal: 16,
     paddingVertical: 10,
+  },
+  attachmentPreview: {
+    alignItems: "center",
+    backgroundColor: colors.white,
+    borderColor: colors.line,
+    borderRadius: 16,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 6,
+    padding: 8,
+  },
+  attachmentThumb: {
+    backgroundColor: colors.sage,
+    borderRadius: 10,
+    height: 44,
+    width: 44,
+  },
+  attachmentTextWrap: {
+    flex: 1,
+  },
+  attachmentTitle: {
+    color: colors.green,
+    fontSize: 12,
+    fontWeight: "900",
+  },
+  attachmentSubtitle: {
+    color: colors.greenMuted,
+    fontSize: 11,
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  removeAttachmentBtn: {
+    alignItems: "center",
+    borderRadius: 14,
+    height: 28,
+    justifyContent: "center",
+    width: 28,
+  },
+  messageImage: {
+    aspectRatio: 1,
+    backgroundColor: colors.sage,
+    borderRadius: 14,
+    marginBottom: 8,
+    width: 180,
   },
   loaderWrap: {
     alignItems: "center",
@@ -535,5 +766,38 @@ const styles = StyleSheet.create({
   typingText: {
     fontStyle: "italic",
     color: colors.greenMuted,
+  },
+  suggestionsContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 4,
+    borderTopWidth: 1,
+    borderTopColor: colors.line,
+    backgroundColor: colors.cream,
+  },
+  suggestionsTitle: {
+    fontSize: 11,
+    fontWeight: "800",
+    color: colors.greenMid,
+    textTransform: "uppercase",
+    marginBottom: 6,
+    letterSpacing: 0.5,
+  },
+  suggestionsScroll: {
+    gap: 8,
+    paddingBottom: 4,
+  },
+  suggestionChip: {
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.lineMid,
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  suggestionChipText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: colors.green,
   },
 });

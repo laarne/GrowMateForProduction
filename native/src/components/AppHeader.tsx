@@ -6,19 +6,19 @@ import { useNavigationContext } from "../context/NavigationContext";
 type AppHeaderProps = {
   sectionLabel?: string;
   title?: string;
-  onMessagesPress?: () => void;
+  onCartPress?: () => void;
 };
 
-const logoSource = require("../../assets/icon.png");
+const logoSource = require("../../assets/growmate-logo.png");
 
-export function AppHeader({ sectionLabel, title, onMessagesPress }: AppHeaderProps) {
-  const { setActiveTab, unreadCount } = useNavigationContext();
+export function AppHeader({ sectionLabel, title, onCartPress }: AppHeaderProps) {
+  const { setActiveTab } = useNavigationContext();
 
   const handlePress = () => {
-    if (onMessagesPress) {
-      onMessagesPress();
+    if (onCartPress) {
+      onCartPress();
     } else {
-      setActiveTab("Messages");
+      setActiveTab("Orders");
     }
   };
 
@@ -35,18 +35,13 @@ export function AppHeader({ sectionLabel, title, onMessagesPress }: AppHeaderPro
         </View>
       </View>
 
-      {/* Right: messages button with badge */}
+      {/* Right: cart shortcut */}
       <Pressable
-        accessibilityLabel="Open messages"
+        accessibilityLabel="Open cart"
         onPress={handlePress}
         style={({ pressed }) => [styles.msgButton, pressed && styles.pressed]}
       >
-        <MaterialCommunityIcons color={colors.white} name="forum" size={20} />
-        {unreadCount > 0 && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{unreadCount > 99 ? "99+" : unreadCount}</Text>
-          </View>
-        )}
+        <MaterialCommunityIcons color={colors.white} name="cart-outline" size={21} />
       </Pressable>
     </View>
   );
@@ -81,7 +76,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 40,
     height: 40,
-    borderRadius: 12,
   },
   labelWrap: {
     flexDirection: "column",

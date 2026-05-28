@@ -6,7 +6,7 @@ type BrandMarkProps = {
   size?: number;
 };
 
-const logoSource = require("../../assets/icon.png");
+const logoSource = require("../../assets/growmate-logo.png");
 
 export function BrandMark({ compact = false, size = 42 }: BrandMarkProps) {
   return (
@@ -28,9 +28,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
   },
-  logo: {
-    borderRadius: 12,
-  },
+  logo: {},
   wordmark: {
     color: colors.green,
     fontSize: 22,

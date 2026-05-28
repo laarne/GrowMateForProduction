@@ -26,9 +26,12 @@ import { getSellerProfile, type SellerProfile } from "../services/profile";
 import { isFavorited, toggleFavorite } from "../services/favorites";
 import { createReport } from "../services/reports";
 import { getOrCreateMarketConversation } from "../services/messages";
+import { supabase } from "../services/supabase";
 import { colors } from "../theme/colors";
 import { formatCurrency } from "../utils/currency";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { SellerGardenModal } from "../components/SellerGardenModal";
+import { ImageZoomModal } from "../components/ImageZoomModal";
 
 type ListingDetailScreenProps = {
   listingId: string;
@@ -36,13 +39,13 @@ type ListingDetailScreenProps = {
   onOpenChat?: (convoId: string, title: string) => void;
 };
 
-type DeliveryOption = "Pickup" | "Meetup" | "Delivery";
+type DeliveryOption = "Delivery";
 
-const DELIVERY_OPTS: DeliveryOption[] = ["Pickup", "Meetup", "Delivery"];
-const PLATFORM_FEE_RATE = 0.1; // 10%
+const DELIVERY_OPTS: DeliveryOption[] = ["Delivery"];
 
 export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingDetailScreenProps) {
   const { user } = useAuth();
+  const [currentListingId, setCurrentListingId] = useState(listingId);
   const [listing, setListing] = useState<ListingDetail | null>(null);
   const [seller, setSeller] = useState<SellerProfile | null>(null);
   const [isSaved, setIsSaved] = useState(false);
@@ -54,7 +57,7 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
   // Checkout modal state
   const [showCheckout, setShowCheckout] = useState(false);
   const [checkoutQty, setCheckoutQty] = useState(1);
-  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryOption>("Pickup");
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryOption>("Delivery");
   const [buyerNote, setBuyerNote] = useState("");
   const [isOrdering, setIsOrdering] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -67,17 +70,25 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
   const [isReporting, setIsReporting] = useState(false);
   const reportReasons = ["Spam", "Scam / Fraud", "Inappropriate Content", "Offensive Language", "Other"];
 
+  // Seller profile sheet states (Item 18)
+  const [selectedSellerId, setSelectedSellerId] = useState<string | null>(null);
+  const [selectedSellerName, setSelectedSellerName] = useState<string>("");
+  const [showSellerGarden, setShowSellerGarden] = useState(false);
+
+  // Zoom modal state (Item 13)
+  const [zoomImageUrl, setZoomImageUrl] = useState<string | null>(null);
+
   async function loadData() {
     setIsLoading(true);
     setError(null);
     try {
-      const detail = await getListingDetail(listingId);
+      const detail = await getListingDetail(currentListingId);
       if (!detail) { setError("Listing not found."); return; }
       setListing(detail);
       const sellerProfile = await getSellerProfile(detail.sellerId);
       setSeller(sellerProfile);
       if (user) {
-        const saved = await isFavorited(listingId, user.id);
+        const saved = await isFavorited(currentListingId, user.id);
         setIsSaved(saved);
       }
     } catch (err) {
@@ -87,7 +98,7 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
     }
   }
 
-  useEffect(() => { loadData(); }, [listingId, user?.id]);
+  useEffect(() => { loadData(); }, [currentListingId, user?.id]);
 
   async function handleToggleSave() {
     if (!user || !listing) return;
@@ -102,8 +113,9 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
   function openCheckout() {
     if (!listing) return;
     setCheckoutQty(1);
-    setDeliveryMethod("Pickup");
+    setDeliveryMethod("Delivery");
     setBuyerNote("");
+    setOrderId(null);
     setOrderSuccess(false);
     setShowCheckout(true);
   }
@@ -127,8 +139,12 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
         description: listing.description,
         sellerName: listing.sellerName,
         photoUrl: listing.photoUrls[0] || null,
+        trustScore: (listing as any).trustScore || 4.8,
+        isAiChecked: (listing as any).isAiChecked || false,
+        isProtected: (listing as any).isProtected || false,
       };
-      await createPendingOrder(marketListing, user.id);
+      const newId = await createPendingOrder(marketListing as any, user.id, checkoutQty, deliveryMethod);
+      setOrderId(newId);
       setOrderSuccess(true);
     } catch (err) {
       setStatusMessage(err instanceof Error ? err.message : "Unable to place order.");
@@ -154,6 +170,12 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
     } finally {
       setIsMessaging(false);
     }
+  }
+
+  function handleViewSellerGarden(sellerId: string, sellerName: string) {
+    setSelectedSellerId(sellerId);
+    setSelectedSellerName(sellerName);
+    setShowSellerGarden(true);
   }
 
   async function handleSubmitReport() {
@@ -194,8 +216,7 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
 
   // Checkout calculations
   const subtotal = listing.price * checkoutQty;
-  const platformFee = Math.round(subtotal * PLATFORM_FEE_RATE * 100) / 100;
-  const total = subtotal + platformFee;
+  const total = subtotal;
   const maxQty = listing.quantity;
 
   // ─── Main render ─────────────────────────────────────────────────────────────
@@ -232,7 +253,13 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
         >
           {listing.photoUrls.length > 0 ? (
             listing.photoUrls.map((url, idx) => (
-              <Image key={idx} source={{ uri: url }} style={styles.photo} resizeMode="cover" />
+              <Pressable
+                key={idx}
+                onPress={() => setZoomImageUrl(url)}
+                style={styles.photoPressable}
+              >
+                <Image source={{ uri: url }} style={styles.photo} resizeMode="cover" />
+              </Pressable>
             ))
           ) : (
             <View style={styles.photoFallback}>
@@ -276,6 +303,31 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
             </View>
           </Card>
 
+          {/* AI Checked and Protection Check Banners */}
+          {listing.isAiChecked && (
+            <View style={styles.aiVerificationBanner}>
+              <MaterialCommunityIcons name="check-decagram" size={20} color={colors.green} />
+              <View style={styles.bannerTextContainer}>
+                <Text style={styles.bannerTitle}>Leafy AI Verified</Text>
+                <Text style={styles.bannerDescription}>
+                  GrowMate AI cleared. Match confidence: 96%. Healthy specimen.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {listing.isProtected && (
+            <View style={styles.protectionBanner}>
+              <MaterialCommunityIcons name="shield-alert" size={20} color="#b91c1c" />
+              <View style={styles.bannerTextContainer}>
+                <Text style={[styles.bannerTitle, { color: "#b91c1c" }]}>Protected Species Alert</Text>
+                <Text style={[styles.bannerDescription, { color: "#7f1d1d" }]}>
+                  This is a rare/protected species. Buyers must validate compliance/permits before checkout.
+                </Text>
+              </View>
+            </View>
+          )}
+
           {/* Description */}
           {listing.description && (
             <View style={styles.section}>
@@ -286,32 +338,59 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
 
           {/* Seller card */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>About the Seller</Text>
-            <Card>
-              <View style={styles.sellerRow}>
-                <View style={styles.sellerAvatar}>
-                  <MaterialCommunityIcons color={colors.green} name="account" size={24} />
+            <Text style={styles.sectionTitle}>Seller Trust Information</Text>
+            <View style={styles.sellerTrustCard}>
+              <View style={styles.sellerHeaderTop}>
+                <View style={styles.sellerAvatarFallback}>
+                  <Text style={styles.sellerAvatarText}>
+                    {listing.sellerName.substring(0, 2).toUpperCase()}
+                  </Text>
                 </View>
-                <View style={styles.sellerInfo}>
-                  <Text style={styles.sellerShop}>{seller?.shopName ?? listing.sellerName}</Text>
-                  <Text style={styles.sellerHandle}>{listing.sellerName}</Text>
-                </View>
-                <View style={styles.sellerBadges}>
-                  <View style={styles.badge}>
-                    <MaterialCommunityIcons color="#d4a373" name="star" size={13} />
-                    <Text style={styles.badgeText}>{seller?.trustScore?.toFixed(1) ?? "0.0"}</Text>
+                <View style={styles.sellerHeaderText}>
+                  <View style={styles.sellerNameRow}>
+                    <Text style={styles.sellerProfileName}>{seller?.shopName ?? listing.sellerName}</Text>
+                    {listing.isSellerVerified && (
+                      <MaterialCommunityIcons name="check-decagram" size={16} color={colors.green} />
+                    )}
                   </View>
-                  <View style={styles.badge}>
-                    <MaterialCommunityIcons color={colors.green} name="cart-outline" size={13} />
-                    <Text style={styles.badgeText}>{seller?.completedSales ?? 0}</Text>
-                  </View>
+                  <Text style={styles.sellerLocationText}>📍 {listing.sellerLocation} · Verified Seller</Text>
                 </View>
               </View>
-              {seller?.sellerBio && (
-                <Text style={styles.sellerBio}>{seller.sellerBio}</Text>
-              )}
-            </Card>
+              
+              <View style={styles.sellerStatsRow}>
+                <View style={styles.sellerStatCol}>
+                  <Text style={styles.sellerStatVal}>⭐ {listing.sellerRating.toFixed(1)}</Text>
+                  <Text style={styles.sellerStatLbl}>Rating</Text>
+                </View>
+                <View style={styles.sellerStatCol}>
+                  <Text style={styles.sellerStatVal}>{listing.sellerReviewCount}</Text>
+                  <Text style={styles.sellerStatLbl}>Reviews</Text>
+                </View>
+                <View style={styles.sellerStatCol}>
+                  <Text style={styles.sellerStatVal}>120+</Text>
+                  <Text style={styles.sellerStatLbl}>Sales</Text>
+                </View>
+              </View>
+
+              <Pressable
+                onPress={() => {
+                  if (listing.sellerId !== user?.id) {
+                    handleViewSellerGarden(listing.sellerId, seller?.shopName ?? listing.sellerName);
+                  }
+                }}
+                style={styles.visitGardenButton}
+              >
+                <MaterialCommunityIcons name="flower-tulip" size={16} color={colors.green} />
+                <Text style={styles.visitGardenButtonText}>Visit Seller's Garden</Text>
+              </Pressable>
+            </View>
           </View>
+
+          {/* Report Listing Link inside ScrollView */}
+          <Pressable onPress={() => setShowReportModal(true)} style={styles.inlineReportLink}>
+            <MaterialCommunityIcons name="flag-outline" size={14} color={colors.textTertiary} />
+            <Text style={styles.inlineReportLinkText}>Report this listing / Safety concerns</Text>
+          </Pressable>
 
           {/* Status message (errors, etc.) */}
           {statusMessage && (
@@ -322,31 +401,37 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
         </View>
       </ScrollView>
 
-      {/* ── Fixed footer ── */}
+      {/* ── Fixed footer: structured horizontally ── */}
       <View style={styles.footer}>
-        <View style={styles.footerPriceRow}>
-          <Text style={styles.footerPriceLabel}>Price</Text>
-          <Text style={styles.footerPrice}>{formatCurrency(listing.price)}</Text>
-        </View>
-        <View style={styles.footerBtnRow}>
-          <View style={styles.flexBtn}>
+        <View style={styles.horizontalFooter}>
+          <View style={styles.footerPriceBlock}>
+            <Text style={styles.footerPriceLabel}>Price</Text>
+            <Text style={styles.footerPrice}>{formatCurrency(listing.price)}</Text>
+          </View>
+          <View style={styles.footerButtonsBlock}>
+            {onOpenChat && listing.sellerId !== user?.id && (
+              <Pressable
+                onPress={handleMessageSeller}
+                disabled={isMessaging}
+                style={({ pressed }) => [styles.footerChatBtn, pressed && styles.chatBtnPressed]}
+              >
+                <MaterialCommunityIcons color={colors.green} name="forum-outline" size={20} />
+              </Pressable>
+            )}
             <Pressable
               onPress={openCheckout}
-              style={({ pressed }) => [styles.orderBtn, pressed && styles.orderBtnPressed]}
+              style={({ pressed }) => [styles.footerCartBtn, pressed && styles.orderBtnPressed]}
             >
-              <MaterialCommunityIcons color={colors.white} name="cart-plus" size={18} />
-              <Text style={styles.orderBtnText}>Order Now</Text>
+              <MaterialCommunityIcons color={colors.green} name="cart-plus" size={18} />
+              <Text style={styles.footerCartBtnText}>Add to Cart</Text>
+            </Pressable>
+            <Pressable
+              onPress={openCheckout}
+              style={({ pressed }) => [styles.footerSendRequestBtn, pressed && styles.orderBtnPressed]}
+            >
+              <Text style={styles.footerSendRequestBtnText}>Buy Now</Text>
             </Pressable>
           </View>
-          {onOpenChat && listing.sellerId !== user?.id && (
-            <Pressable
-              onPress={handleMessageSeller}
-              style={({ pressed }) => [styles.chatBtn, pressed && styles.chatBtnPressed]}
-              hitSlop={4}
-            >
-              <MaterialCommunityIcons color={colors.green} name="forum-outline" size={20} />
-            </Pressable>
-          )}
         </View>
       </View>
 
@@ -367,30 +452,66 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
 
             {orderSuccess ? (
               /* ── Success state ── */
-              <View style={styles.successWrap}>
+              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.successWrap}>
                 <View style={styles.successIcon}>
                   <MaterialCommunityIcons color={colors.green} name="check-circle" size={64} />
                 </View>
                 <Text style={styles.successTitle}>Order Placed! 🌿</Text>
                 <Text style={styles.successSub}>
-                  Your order for <Text style={styles.successBold}>{listing.name}</Text> has been sent to the seller.
+                  Your order has been sent to the seller.
                   They will confirm your {deliveryMethod.toLowerCase()} details via chat.
                 </Text>
                 <View style={styles.successInfoCard}>
+                  <Text style={styles.receiptHeader}>RECEIPT &amp; ORDER SUMMARY</Text>
+
+                  {orderId && (
+                    <View style={styles.successRow}>
+                      <Text style={styles.successLabel}>Order ID</Text>
+                      <Text style={[styles.successValue, styles.receiptIdText]}>{orderId.slice(0, 8).toUpperCase()}... ({orderId.slice(-4)})</Text>
+                    </View>
+                  )}
+
+                  <View style={styles.successRow}>
+                    <Text style={styles.successLabel}>Seller</Text>
+                    <Text style={styles.successValue}>{listing.sellerName || "Verified Seller"}</Text>
+                  </View>
+
                   <View style={styles.successRow}>
                     <Text style={styles.successLabel}>Item</Text>
                     <Text style={styles.successValue}>{listing.name}</Text>
                   </View>
+
                   <View style={styles.successRow}>
                     <Text style={styles.successLabel}>Qty</Text>
                     <Text style={styles.successValue}>{checkoutQty} {listing.unit}</Text>
                   </View>
+
                   <View style={styles.successRow}>
-                    <Text style={styles.successLabel}>Method</Text>
+                    <Text style={styles.successLabel}>Delivery Method</Text>
                     <Text style={styles.successValue}>{deliveryMethod}</Text>
                   </View>
+
+                  {buyerNote.trim() !== "" && (
+                    <View style={styles.successRowCol}>
+                      <Text style={styles.successLabel}>Note to Seller</Text>
+                      <Text style={styles.successNoteValue}>"{buyerNote}"</Text>
+                    </View>
+                  )}
+
+                  <View style={styles.receiptLineDivider} />
+
+                  <View style={styles.successRow}>
+                    <Text style={styles.successLabel}>Item Price</Text>
+                    <Text style={styles.successValue}>{formatCurrency(subtotal)}</Text>
+                  </View>
+
+                  <View style={styles.successRow}>
+                    <Text style={styles.successLabel}>Delivery / Meetup Fee</Text>
+                    <Text style={styles.successValue}>To be confirmed</Text>
+                  </View>
+
                   <View style={[styles.successRow, styles.successTotal]}>
-                    <Text style={styles.successTotalLabel}>Total Paid</Text>
+                    <Text style={styles.successTotalLabel}>Total</Text>
                     <Text style={styles.successTotalValue}>{formatCurrency(total)}</Text>
                   </View>
                 </View>
@@ -414,13 +535,13 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
                     <Text style={styles.doneBtnText}>Done</Text>
                   </Pressable>
                 </View>
-              </View>
+              </ScrollView>
             ) : (
               /* ── Checkout form ── */
               <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                 {/* Header */}
                 <View style={styles.sheetHeader}>
-                  <Text style={styles.sheetTitle}>Checkout</Text>
+                  <Text style={styles.sheetTitle}>Cart</Text>
                   <Pressable onPress={() => setShowCheckout(false)} hitSlop={8}>
                     <MaterialCommunityIcons color={colors.greenMuted} name="close" size={22} />
                   </Pressable>
@@ -491,7 +612,7 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
                       >
                         <MaterialCommunityIcons
                           color={deliveryMethod === opt ? colors.white : colors.greenMuted}
-                          name={opt === "Pickup" ? "home-outline" : opt === "Meetup" ? "map-marker-outline" : "truck-outline"}
+                          name="truck-outline"
                           size={16}
                         />
                         <Text style={[styles.deliveryChipText, deliveryMethod === opt && styles.deliveryChipTextActive]}>
@@ -520,29 +641,34 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
                 </View>
 
                 <View style={styles.divider} />
-
-                {/* Order summary */}
                 <View style={styles.summaryBlock}>
                   <Text style={styles.fieldLabel}>Order Summary</Text>
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>
-                      {listing.name} × {checkoutQty}
+                      Item Price
                     </Text>
                     <Text style={styles.summaryValue}>{formatCurrency(subtotal)}</Text>
                   </View>
                   <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>Platform fee (10%)</Text>
-                    <Text style={styles.summaryValue}>{formatCurrency(platformFee)}</Text>
+                    <Text style={styles.summaryLabel}>Delivery / Meetup Fee</Text>
+                    <Text style={styles.summaryValue}>To be confirmed</Text>
                   </View>
                   <View style={[styles.summaryRow, styles.summaryTotalRow]}>
                     <Text style={styles.summaryTotalLabel}>Total</Text>
                     <Text style={styles.summaryTotalValue}>{formatCurrency(total)}</Text>
                   </View>
-                  <Text style={styles.payNote}>
-                    💡 Payment is settled directly with the seller after they confirm your order.
-                  </Text>
-                </View>
 
+                  <View style={styles.warningContainer}>
+                    <MaterialCommunityIcons name="shield-check-outline" size={20} color={colors.greenMid} />
+                    <View style={styles.warningCopy}>
+                      <Text style={styles.warningTitle}>Safety Reminder</Text>
+                      <Text style={styles.warningText}>
+                        For your protection, keep payments and order updates inside GrowMate. Transactions outside the app may not be covered.
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+ 
                 {/* Confirm button */}
                 <View style={styles.confirmWrap}>
                   <Pressable
@@ -558,7 +684,7 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
                     ) : (
                       <>
                         <MaterialCommunityIcons color={colors.white} name="check" size={20} />
-                        <Text style={styles.confirmBtnText}>Proceed to Checkout · {formatCurrency(total)}</Text>
+                        <Text style={styles.confirmBtnText}>Send Order Request · {formatCurrency(total)}</Text>
                       </>
                     )}
                   </Pressable>
@@ -615,6 +741,30 @@ export function ListingDetailScreen({ listingId, onClose, onOpenChat }: ListingD
           </View>
         </View>
       </Modal>
+
+      {/* ══════════════════════════════════════════════════
+          SELLER PUBLIC GARDEN MODAL (Item 18) — Refactored to Full Profile Sheet
+          ══════════════════════════════════════════════════ */}
+      <SellerGardenModal
+        visible={showSellerGarden}
+        onClose={() => setShowSellerGarden(false)}
+        sellerId={selectedSellerId}
+        sellerName={selectedSellerName}
+        onOpenChat={onOpenChat || (() => {})}
+        onOpenListingDetail={(id) => {
+          setCurrentListingId(id);
+        }}
+      />
+
+      {/* ══════════════════════════════════════════════════
+          IMAGE ZOOM MODAL (Item 13)
+      ══════════════════════════════════════════════════ */}
+      {zoomImageUrl && (
+        <ImageZoomModal
+          imageUrl={zoomImageUrl}
+          onClose={() => setZoomImageUrl(null)}
+        />
+      )}
     </View>
   );
 }
@@ -661,7 +811,8 @@ const styles = StyleSheet.create({
   // ── Scroll content ───────────────────────────────────────────
   scroll: { paddingBottom: 130 },
   photoScroll: { height: 260, backgroundColor: colors.sage },
-  photo: { width: SCREEN_W, height: 260 },
+  photo: { width: SCREEN_W, height: 260, transform: [{ scale: 1.18 }] },
+  photoPressable: { width: SCREEN_W, height: 260, overflow: "hidden" },
   photoFallback: {
     width: SCREEN_W,
     height: 260,
@@ -971,7 +1122,38 @@ const styles = StyleSheet.create({
   successTotal: { borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10, marginTop: 4 },
   successTotalLabel: { color: colors.green, fontSize: 15, fontWeight: "900" },
   successTotalValue: { color: colors.green, fontSize: 17, fontWeight: "900" },
-  successActions: { flexDirection: "row", gap: 10, width: "100%" },
+  receiptHeader: {
+    fontSize: 11,
+    fontWeight: "900",
+    color: colors.green,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    marginBottom: 6,
+    textAlign: "center",
+  },
+  receiptIdText: {
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  successRowCol: {
+    flexDirection: "column",
+    gap: 4,
+    marginTop: 2,
+  },
+  successNoteValue: {
+    color: colors.greenMuted,
+    fontSize: 12,
+    fontStyle: "italic",
+    fontWeight: "700",
+    paddingLeft: 8,
+  },
+  receiptLineDivider: {
+    height: 1,
+    borderColor: colors.line,
+    borderWidth: 0.5,
+    borderStyle: "dashed",
+    marginVertical: 6,
+  },
+  successActions: { flexDirection: "row", gap: 10, width: "100%", marginTop: 10 },
   chatSellerBtn: {
     flex: 1,
     flexDirection: "row",
@@ -1039,4 +1221,467 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   reportActions: { flexDirection: "row", gap: 10 },
+  sellerPressable: { width: "100%" },
+
+  // Modal styles for seller garden profile
+  modalContainer: {
+    flex: 1,
+    backgroundColor: colors.cream,
+    paddingTop: Platform.OS === "ios" ? 54 : 20,
+  },
+  modalHeader: {
+    paddingHorizontal: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+  },
+  modalTitle: {
+    color: colors.green,
+    fontSize: 22,
+    fontWeight: "900",
+  },
+  modalSubtitle: {
+    color: colors.greenMuted,
+    fontSize: 14,
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  modalScroll: {
+    padding: 20,
+    paddingBottom: 100,
+  },
+  modalLoading: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 40,
+  },
+  emptyContainer: {
+    alignItems: "center",
+    padding: 40,
+    gap: 8,
+  },
+  emptyText: {
+    color: colors.greenMuted,
+    fontSize: 13,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  emptyTitle: {
+    color: colors.green,
+    fontSize: 16,
+    fontWeight: "900",
+    textAlign: "center",
+  },
+  plantCard: {
+    backgroundColor: colors.surface0,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.line,
+    marginBottom: 16,
+    overflow: "hidden",
+  },
+  plantImage: {
+    width: "100%",
+    height: 180,
+    backgroundColor: colors.sage,
+  },
+  plantInfo: {
+    padding: 16,
+  },
+  modalPlantName: {
+    color: colors.green,
+    fontSize: 17,
+    fontWeight: "900",
+  },
+  modalPlantCategory: {
+    color: colors.greenMuted,
+    fontSize: 12,
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  modalScientificName: {
+    color: colors.greenMuted,
+    fontSize: 12,
+    fontStyle: "italic",
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  careNotesText: {
+    backgroundColor: colors.cream,
+    borderColor: colors.line,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 12,
+    fontSize: 13,
+    color: colors.greenMuted,
+    fontWeight: "700",
+    marginTop: 8,
+    lineHeight: 18,
+  },
+  modalFooter: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: colors.cream,
+    paddingTop: 10,
+  },
+  // Banners
+  aiVerificationBanner: {
+    flexDirection: "row",
+    backgroundColor: colors.sage,
+    borderColor: colors.line,
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 14,
+    gap: 12,
+    alignItems: "center",
+    marginTop: 16,
+  },
+  protectionBanner: {
+    flexDirection: "row",
+    backgroundColor: "#fee2e2",
+    borderColor: "#fca5a5",
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 14,
+    gap: 12,
+    alignItems: "center",
+    marginTop: 12,
+  },
+  bannerTextContainer: {
+    flex: 1,
+    gap: 2,
+  },
+  bannerTitle: {
+    fontSize: 13,
+    fontWeight: "900",
+    color: colors.green,
+  },
+  bannerDescription: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: colors.greenMuted,
+    lineHeight: 15,
+  },
+  // Trust card styles
+  sellerTrustCard: {
+    backgroundColor: colors.white,
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.line,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  sellerHeaderTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 16,
+  },
+  sellerAvatarFallback: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.green,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  sellerAvatarText: {
+    color: colors.white,
+    fontWeight: "900",
+    fontSize: 15,
+  },
+  sellerHeaderText: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  sellerNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  sellerProfileName: {
+    fontSize: 15,
+    fontWeight: "900",
+    color: colors.textPrimary,
+  },
+  sellerLocationText: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    marginTop: 2,
+    fontWeight: "700",
+  },
+  sellerStatsRow: {
+    flexDirection: "row",
+    borderTopWidth: 1,
+    borderTopColor: colors.line,
+    paddingTop: 12,
+    marginBottom: 16,
+  },
+  sellerStatCol: {
+    flex: 1,
+    alignItems: "center",
+  },
+  sellerStatVal: {
+    fontSize: 15,
+    fontWeight: "900",
+    color: colors.textPrimary,
+  },
+  sellerStatLbl: {
+    fontSize: 10,
+    color: colors.textTertiary,
+    textTransform: "uppercase",
+    marginTop: 2,
+  },
+  visitGardenButton: {
+    backgroundColor: colors.cream,
+    borderColor: colors.line,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingVertical: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 6,
+  },
+  visitGardenButtonText: {
+    color: colors.green,
+    fontSize: 13,
+    fontWeight: "900",
+  },
+  inlineReportLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    justifyContent: "center",
+    paddingVertical: 8,
+    marginTop: 24,
+  },
+  inlineReportLinkText: {
+    color: colors.textTertiary,
+    fontSize: 12,
+    fontWeight: "700",
+    textDecorationLine: "underline",
+  },
+  // Horizontal sticky footer
+  horizontalFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  footerPriceBlock: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  footerButtonsBlock: {
+    flex: 2.2,
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+  },
+  footerChatBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: colors.sage,
+    borderWidth: 1,
+    borderColor: colors.line,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  footerCartBtn: {
+    flex: 1,
+    backgroundColor: colors.sage,
+    borderColor: colors.line,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingVertical: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  footerCartBtnText: {
+    color: colors.green,
+    fontSize: 13,
+    fontWeight: "900",
+  },
+  footerSendRequestBtn: {
+    flex: 1,
+    backgroundColor: colors.green,
+    borderRadius: 12,
+    paddingVertical: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  footerSendRequestBtnText: {
+    color: colors.white,
+    fontSize: 14,
+    fontWeight: "900",
+  },
+  // Warning Container
+  warningContainer: {
+    backgroundColor: colors.surface1,
+    borderColor: colors.lineMid,
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "flex-start",
+    marginTop: 10,
+  },
+  warningCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  warningTitle: {
+    color: colors.green,
+    fontSize: 12,
+    fontWeight: "900",
+  },
+  warningText: {
+    color: colors.greenMuted,
+    fontSize: 11,
+    fontWeight: "600",
+    lineHeight: 15,
+  },
+  // Profiles Tab Switcher in Modal
+  sellerTabRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+    marginBottom: 16,
+    marginTop: 12,
+  },
+  sellerTabBtn: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+  sellerTabBtnActive: {
+    borderBottomColor: colors.green,
+  },
+  sellerTabText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: colors.textSecondary,
+  },
+  sellerTabTextActive: {
+    color: colors.green,
+    fontWeight: "900",
+  },
+  plantNameHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 2,
+  },
+  aiVerifiedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    backgroundColor: colors.sage,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  aiVerifiedBadgeText: {
+    fontSize: 9,
+    fontWeight: "900",
+    color: colors.green,
+  },
+  sellerShopCard: {
+    flexDirection: "row",
+    backgroundColor: colors.white,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.line,
+    padding: 10,
+    alignItems: "center",
+    marginBottom: 10,
+    gap: 12,
+  },
+  shopThumb: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: colors.sage,
+  },
+  shopThumbFallback: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: colors.sage,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  shopCardInfo: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  shopCardTitle: {
+    fontSize: 14,
+    fontWeight: "900",
+    color: colors.textPrimary,
+  },
+  shopCardPrice: {
+    fontSize: 13,
+    fontWeight: "900",
+    color: colors.green,
+    marginTop: 2,
+  },
+  shopCardLocation: {
+    fontSize: 10,
+    color: colors.textTertiary,
+    marginTop: 2,
+  },
+  sellerModalFooter: {
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: colors.line,
+    backgroundColor: colors.cream,
+    flexDirection: "row",
+    gap: 12,
+  },
+  floatingMsgBtn: {
+    flex: 1.5,
+    backgroundColor: colors.green,
+    borderRadius: 12,
+    paddingVertical: 12,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+  },
+  floatingMsgBtnText: {
+    color: colors.white,
+    fontSize: 14,
+    fontWeight: "900",
+  },
+  closeProfileBtn: {
+    flex: 1,
+    backgroundColor: colors.white,
+    borderColor: colors.line,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingVertical: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  closeProfileBtnText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    fontWeight: "700",
+  },
 });

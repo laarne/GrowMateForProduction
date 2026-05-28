@@ -1,5 +1,15 @@
 import { supabase } from "./supabase";
 
+export type GardenPreviewPlant = {
+  id: string;
+  name: string;
+  category: string | null;
+  condition: string | null;
+  label: string;
+  photoUrl: string | null;
+  sourceListingId: string | null;
+};
+
 export type FollowedGarden = {
   id: string;
   name: string;
@@ -8,7 +18,112 @@ export type FollowedGarden = {
   userId: string;
   userName: string;
   avatarUrl: string | null;
+  location: string | null;
+  isVerifiedSeller: boolean;
+  trustScore: number | null;
+  completedSales: number;
+  plantCount: number;
+  activeListingsCount: number;
+  firstListingId: string | null;
+  firstListingName: string | null;
+  previewPlants: GardenPreviewPlant[];
+  previewPhotoUrls: string[];
 };
+
+function getGardenPhotoUrl(storagePath?: string | null) {
+  if (!supabase || !storagePath) return null;
+  return supabase.storage.from("garden-photos").getPublicUrl(storagePath).data.publicUrl;
+}
+
+type BaseGarden = Omit<
+  FollowedGarden,
+  "plantCount" | "activeListingsCount" | "firstListingId" | "firstListingName" | "previewPlants" | "previewPhotoUrls"
+>;
+
+function getPreviewLabel(plant: {
+  category?: string | null;
+  condition?: string | null;
+  source_listing_id?: string | null;
+}) {
+  const category = plant.category?.toLowerCase() ?? "";
+  const condition = plant.condition?.toLowerCase() ?? "";
+
+  if (plant.source_listing_id) return "For Sale";
+  if (category.includes("rare")) return "Rare";
+  if (condition.includes("healthy") || condition.includes("thriving")) return "Healthy";
+  return "AI Checked";
+}
+
+async function enrichGarden(garden: BaseGarden): Promise<FollowedGarden> {
+  if (!supabase || !garden.id) {
+    return {
+      ...garden,
+      plantCount: 0,
+      activeListingsCount: 0,
+      firstListingId: null,
+      firstListingName: null,
+      previewPlants: [],
+      previewPhotoUrls: [],
+    };
+  }
+
+  const [plantsResult, listingsResult, previewResult] = await Promise.all([
+    supabase.from("garden_plants").select("id", { count: "exact", head: true }).eq("garden_id", garden.id),
+    supabase
+      .from("listings")
+      .select("id, name", { count: "exact" })
+      .eq("seller_id", garden.userId)
+      .eq("status", "active")
+      .order("published_at", { ascending: false })
+      .limit(1),
+    supabase
+      .from("garden_plants")
+      .select("id, name, category, condition, source_listing_id, garden_plant_photos(storage_path, sort_order)")
+      .eq("garden_id", garden.id)
+      .limit(6),
+  ]);
+
+  if (plantsResult.error) throw plantsResult.error;
+  if (listingsResult.error) throw listingsResult.error;
+  if (previewResult.error) throw previewResult.error;
+
+  const previewPlants = ((previewResult.data ?? []) as any[])
+    .map((plant): GardenPreviewPlant => {
+      const sortedPhotos = [...(plant.garden_plant_photos ?? [])].sort(
+        (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
+      );
+
+      return {
+        id: plant.id,
+        name: plant.name ?? "Plant",
+        category: plant.category ?? null,
+        condition: plant.condition ?? null,
+        sourceListingId: plant.source_listing_id ?? null,
+        label: getPreviewLabel(plant),
+        photoUrl: getGardenPhotoUrl(sortedPhotos[0]?.storage_path),
+      };
+    })
+    .slice(0, 6);
+
+  const previewPhotoUrls = previewPlants.map((plant) => plant.photoUrl).filter(Boolean).slice(0, 3) as string[];
+
+  const firstListing = listingsResult.data?.[0] ?? null;
+
+  return {
+    ...garden,
+    plantCount: plantsResult.count ?? 0,
+    activeListingsCount: listingsResult.count ?? 0,
+    firstListingId: firstListing?.id ?? null,
+    firstListingName: firstListing?.name ?? null,
+    previewPlants,
+    previewPhotoUrls,
+  };
+}
+
+function getSellerProfileJoin(owner: any) {
+  if (!owner?.seller_profiles) return null;
+  return Array.isArray(owner.seller_profiles) ? owner.seller_profiles[0] : owner.seller_profiles;
+}
 
 export async function isFollowingGarden(gardenId: string, followerId: string): Promise<boolean> {
   if (!supabase) return false;
@@ -80,7 +195,13 @@ export async function getFollowedGardens(followerId: string): Promise<FollowedGa
         bio,
         cover_photo_url,
         user_id,
-        owner:profiles!gardens_user_id_fkey(display_name, avatar_url)
+        owner:profiles!gardens_user_id_fkey(
+          display_name,
+          avatar_url,
+          location,
+          seller_status,
+          seller_profiles(trust_score, completed_sales)
+        )
       )
     `)
     .eq("follower_id", followerId);
@@ -89,9 +210,10 @@ export async function getFollowedGardens(followerId: string): Promise<FollowedGa
     throw error;
   }
 
-  return (data ?? []).map((row: any) => {
+  const gardens = (data ?? []).map((row: any): BaseGarden => {
     const garden = row.garden;
     const owner = Array.isArray(garden?.owner) ? garden.owner[0] : garden?.owner;
+    const sellerProfile = getSellerProfileJoin(owner);
 
     return {
       id: garden?.id ?? "",
@@ -101,8 +223,14 @@ export async function getFollowedGardens(followerId: string): Promise<FollowedGa
       userId: garden?.user_id ?? "",
       userName: owner?.display_name ?? "GrowMate Gardener",
       avatarUrl: owner?.avatar_url ?? null,
+      location: owner?.location ?? null,
+      isVerifiedSeller: owner?.seller_status === "verified",
+      trustScore: sellerProfile?.trust_score === undefined ? null : Number(sellerProfile.trust_score),
+      completedSales: sellerProfile?.completed_sales ?? 0,
     };
   });
+
+  return Promise.all(gardens.map(enrichGarden));
 }
 
 export async function getDiscoverableGardens(currentUserId: string): Promise<FollowedGarden[]> {
@@ -116,7 +244,13 @@ export async function getDiscoverableGardens(currentUserId: string): Promise<Fol
       bio,
       cover_photo_url,
       user_id,
-      owner:profiles!gardens_user_id_fkey(display_name, avatar_url)
+      owner:profiles!gardens_user_id_fkey(
+        display_name,
+        avatar_url,
+        location,
+        seller_status,
+        seller_profiles(trust_score, completed_sales)
+      )
     `)
     .eq("is_public", true)
     .neq("user_id", currentUserId)
@@ -124,8 +258,9 @@ export async function getDiscoverableGardens(currentUserId: string): Promise<Fol
 
   if (error) throw error;
 
-  return (data ?? []).map((garden: any) => {
+  const gardens = (data ?? []).map((garden: any): BaseGarden => {
     const owner = Array.isArray(garden.owner) ? garden.owner[0] : garden.owner;
+    const sellerProfile = getSellerProfileJoin(owner);
     return {
       id: garden.id,
       name: garden.name,
@@ -134,6 +269,12 @@ export async function getDiscoverableGardens(currentUserId: string): Promise<Fol
       userId: garden.user_id,
       userName: owner?.display_name ?? "GrowMate Gardener",
       avatarUrl: owner?.avatar_url ?? null,
+      location: owner?.location ?? null,
+      isVerifiedSeller: owner?.seller_status === "verified",
+      trustScore: sellerProfile?.trust_score === undefined ? null : Number(sellerProfile.trust_score),
+      completedSales: sellerProfile?.completed_sales ?? 0,
     };
   });
+
+  return Promise.all(gardens.map(enrichGarden));
 }

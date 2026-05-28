@@ -138,6 +138,20 @@ export function AdminDashboard() {
               {application.applicantName} - {application.applicantLocation ?? "No location"}
             </Text>
             {application.reason && <Text style={styles.body}>{application.reason}</Text>}
+            <View style={styles.proofGrid}>
+              {[
+                ["ID front", application.idFrontUrl || application.proofPhotoUrl],
+                ["ID back", application.idBackUrl],
+                ["Selfie with ID", application.selfieWithIdUrl],
+                ["Selfie with plant", application.selfieWithPlantUrl],
+              ].map(([label, url]) => (
+                <View key={label} style={[styles.proofPill, !url && styles.proofPillMissing]}>
+                  <Text style={[styles.proofPillText, !url && styles.proofPillTextMissing]}>
+                    {url ? "Uploaded" : "Missing"} · {label}
+                  </Text>
+                </View>
+              ))}
+            </View>
             {user &&
               renderActionButtons(
                 "seller",
@@ -283,6 +297,32 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "800",
     marginTop: 5,
+  },
+  proofGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 10,
+  },
+  proofPill: {
+    backgroundColor: "#ecfdf5",
+    borderColor: "#bbf7d0",
+    borderRadius: 999,
+    borderWidth: 1,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+  },
+  proofPillMissing: {
+    backgroundColor: "#fff7ed",
+    borderColor: "#fed7aa",
+  },
+  proofPillText: {
+    color: "#166534",
+    fontSize: 10,
+    fontWeight: "900",
+  },
+  proofPillTextMissing: {
+    color: "#9a3412",
   },
   buttonRow: {
     flexDirection: "row",

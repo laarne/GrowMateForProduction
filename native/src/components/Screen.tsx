@@ -12,6 +12,7 @@ type ScreenProps = {
   showHeader?: boolean;
   scroll?: boolean;
   noPadding?: boolean;
+  onCartPress?: () => void;
   /** Pass a RefreshControl for pull-to-refresh support */
   refreshControl?: React.ReactElement<RefreshControlProps>;
 };
@@ -24,6 +25,7 @@ export function Screen({
   scroll = true,
   showHeader = true,
   noPadding = false,
+  onCartPress,
   refreshControl,
 }: ScreenProps) {
   const content = (
@@ -40,7 +42,7 @@ export function Screen({
 
   return (
     <SafeAreaView style={styles.safe}>
-      {showHeader && <AppHeader sectionLabel={sectionLabel} title={title} />}
+      {showHeader && <AppHeader sectionLabel={sectionLabel} title={title} onCartPress={onCartPress} />}
       {scroll ? (
         <ScrollView
           contentContainerStyle={styles.scroll}

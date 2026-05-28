@@ -12,8 +12,36 @@ export type LeafyScanResult = {
   category: string;
   saleStatus: "safe_to_sell" | "review_required" | "blocked";
   reviewReason: string;
+  alternativeMatches?: {
+    name: string;
+    scientificName: string | null;
+    commonNames: string[];
+    confidence: number;
+    family: string | null;
+    genus: string | null;
+  }[];
   remainingRequests?: number;
+  scanLimit?: {
+    used: number;
+    limit: number;
+    windowMinutes: number;
+  };
 };
+
+async function getFunctionErrorMessage(error: unknown) {
+  const context = typeof error === "object" && error !== null && "context" in error ? (error as { context?: unknown }).context : null;
+
+  if (context instanceof Response) {
+    try {
+      const body = (await context.json()) as { error?: unknown };
+      if (typeof body.error === "string") return body.error;
+    } catch {
+      // Fall back to the SDK error message below.
+    }
+  }
+
+  return error instanceof Error ? error.message : "Leafy scan failed.";
+}
 
 export async function scanPlantWithLeafy(image: PickedImage): Promise<LeafyScanResult> {
   if (!supabase) throw new Error("Supabase is not configured.");
@@ -28,7 +56,7 @@ export async function scanPlantWithLeafy(image: PickedImage): Promise<LeafyScanR
   });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(await getFunctionErrorMessage(error));
   }
 
   if (!data) {

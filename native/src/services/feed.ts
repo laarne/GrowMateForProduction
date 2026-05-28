@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { sanitizeUserInput } from "../utils/sanitize";
 
 type AuthorRow = {
   display_name: string;
@@ -39,6 +40,7 @@ export type FeedPost = {
   createdAt: string;
   authorName: string;
   authorLocation: string | null;
+  authorAvatarUrl: string | null;
   reactionsCount: number;
   commentsCount: number;
   isLikedByMe: boolean;
@@ -136,6 +138,7 @@ export async function getFeedPosts(currentUserId?: string, limit = 10, lastCreat
       createdAt: post.created_at,
       authorName: author?.display_name ?? "GrowMate user",
       authorLocation: author?.location ?? null,
+      authorAvatarUrl: author?.avatar_url ?? null,
       reactionsCount: reactions.length,
       commentsCount: comments.length,
       isLikedByMe,
@@ -153,10 +156,12 @@ export async function createFeedPost(
   gardenPlantId?: string | null
 ) {
   if (!supabase) throw new Error("Supabase is not configured.");
+  const sanitizedBody = sanitizeUserInput(body, { maxLength: 2000, preserveNewlines: true });
+  if (!sanitizedBody) throw new Error("Post cannot be empty.");
 
   const { error } = await supabase.from("feed_posts").insert({
     user_id: userId,
-    body,
+    body: sanitizedBody,
     type,
     image_url: imageUrl || null,
     garden_plant_id: gardenPlantId || null,
@@ -244,13 +249,15 @@ export async function getPostComments(postId: string): Promise<PostComment[]> {
 
 export async function addPostComment(postId: string, userId: string, body: string): Promise<PostComment> {
   if (!supabase) throw new Error("Supabase is not configured.");
+  const sanitizedBody = sanitizeUserInput(body, { maxLength: 500 });
+  if (!sanitizedBody) throw new Error("Comment cannot be empty.");
 
   const { data, error } = await supabase
     .from("post_comments")
     .insert({
       post_id: postId,
       user_id: userId,
-      body,
+      body: sanitizedBody,
     })
     .select(`
       id,

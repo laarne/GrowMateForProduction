@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { sanitizeNullableUserInput } from "../utils/sanitize";
 
 export type Review = {
   id: string;
@@ -26,7 +27,7 @@ export async function createReview(
     reviewer_id: reviewerId,
     reviewee_id: revieweeId,
     rating,
-    comment,
+    comment: sanitizeNullableUserInput(comment, { maxLength: 1000, preserveNewlines: true }),
   });
 
   if (error) {

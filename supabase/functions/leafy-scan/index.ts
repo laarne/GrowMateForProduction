@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js@2";
 
 type ScanRequest = {
   imageBase64?: string;
@@ -31,6 +32,8 @@ const corsHeaders = {
 };
 
 const allowedOrgans = new Set(["leaf", "flower", "fruit", "bark", "habit", "other"]);
+const scanLimit = 5;
+const scanWindowMs = 60 * 60 * 1000;
 
 const reviewTerms = [
   "waling-waling",
@@ -74,10 +77,14 @@ function inferCategory(name: string, commonNames: string[]) {
   const combined = normalizeText([name, ...commonNames].join(" "));
 
   if (/(basil|rosemary|mint|oregano|thyme|parsley|cilantro|herb)/.test(combined)) return "Herbs";
-  if (/(pechay|bok choy|eggplant|talong|onion|sibuyas|tomato|chili|sili|lettuce|vegetable)/.test(combined)) return "Veggies";
-  if (/(calamansi|citrus|mango|guava|papaya|banana|fruit)/.test(combined)) return "Fruit Trees";
+  if (/(cassava|kamoteng kahoy|sweet potato|kamote|taro|gabi|yam|ube|potato|radish|labanos|carrot|beetroot|beet|turnip|ginger|luya|turmeric|luyang dilaw|arrowroot)/.test(combined)) return "Root Crops";
+  if (/(pechay|bok choy|eggplant|talong|onion|sibuyas|tomato|chili|sili|lettuce|okra|ampalaya|bitter melon|squash|kalabasa|cucumber|pipino|sitaw|long bean|beans|malunggay|moringa|vegetable|veggie)/.test(combined)) return "Vegetables";
+  if (/(calamansi|citrus|mango|guava|papaya|banana|coconut|buko|avocado|atis|sugar apple|lanzones|rambutan|fruit)/.test(combined)) return "Fruit Trees";
+  if (/(lagundi|sambong|yerba buena|insulin plant|serpentina|oregano|medicinal)/.test(combined)) return "Medicinal";
   if (/(cactus|succulent|echeveria|aloe|haworthia)/.test(combined)) return "Succulents";
   if (/(orchid|hoya|bougainvillea|flower)/.test(combined)) return "Flowering";
+  if (/(rose|gumamela|hibiscus|santan|coleus|croton|ornamental)/.test(combined)) return "Ornamental";
+  if (/(tree|palm|bamboo|ficus|narra|acacia)/.test(combined)) return "Outdoor";
   if (/(monstera|philodendron|pothos|calathea|alocasia|anthurium|fern|snake plant|sansevieria)/.test(combined)) return "Indoor";
 
   return "Indoor";
@@ -107,6 +114,12 @@ function getSaleDecision(name: string, commonNames: string[], confidence: number
   };
 }
 
+function getBearerToken(request: Request) {
+  const authHeader = request.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) return null;
+  return authHeader;
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -114,6 +127,35 @@ Deno.serve(async (request) => {
 
   if (request.method !== "POST") {
     return jsonResponse({ error: "Method not allowed." }, 405);
+  }
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+  const authorization = getBearerToken(request);
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return jsonResponse({ error: "Supabase function environment is not configured." }, 500);
+  }
+
+  if (!authorization) {
+    return jsonResponse({ error: "Sign in before scanning plants." }, 401);
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      headers: {
+        Authorization: authorization,
+      },
+    },
+  });
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return jsonResponse({ error: "Sign in before scanning plants." }, 401);
   }
 
   const apiKey = Deno.env.get("PLANTNET_API_KEY");
@@ -134,16 +176,49 @@ Deno.serve(async (request) => {
     return jsonResponse({ error: "imageBase64 is required." }, 400);
   }
 
+  const windowStart = new Date(Date.now() - scanWindowMs).toISOString();
+  const { count, error: countError } = await supabase
+    .from("leafy_scan_events")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .gte("scanned_at", windowStart);
+
+  if (countError) {
+    return jsonResponse({ error: "Unable to check scan limit." }, 500);
+  }
+
+  if ((count ?? 0) >= scanLimit) {
+    return jsonResponse(
+      {
+        error: `Leafy scan limit reached. Try again later.`,
+        limit: scanLimit,
+        windowMinutes: Math.round(scanWindowMs / 60000),
+      },
+      429,
+    );
+  }
+
+  const { error: insertError } = await supabase.from("leafy_scan_events").insert({
+    user_id: user.id,
+  });
+
+  if (insertError) {
+    return jsonResponse({ error: "Unable to record scan attempt." }, 500);
+  }
+
   const mimeType = payload.mimeType ?? "image/jpeg";
   const organ = allowedOrgans.has(payload.organ ?? "") ? payload.organ! : "leaf";
   const formData = new FormData();
 
+  // User-provided image bytes and organ labels are forwarded only as data fields,
+  // never as privileged instructions or prompt/system text.
   formData.append("images", base64ToBlob(payload.imageBase64, mimeType), `scan.${mimeType.includes("png") ? "png" : "jpg"}`);
   formData.append("organs", organ);
 
   const endpoint = new URL("https://my-api.plantnet.org/v2/identify/all");
   endpoint.searchParams.set("api-key", apiKey);
   endpoint.searchParams.set("lang", "en");
+  endpoint.searchParams.set("detailed", "true");
   endpoint.searchParams.set("include-related-images", "false");
   endpoint.searchParams.set("nb-results", "5");
 
@@ -175,6 +250,19 @@ Deno.serve(async (request) => {
   const commonNames = best.species.commonNames ?? [];
   const confidence = Math.round((best.score ?? 0) * 1000) / 10;
   const decision = getSaleDecision(scientificName, commonNames, confidence);
+  const alternativeMatches = (data.results ?? []).slice(1, 5).map((match) => {
+    const matchScientificName = match.species?.scientificNameWithoutAuthor ?? null;
+    const matchCommonNames = match.species?.commonNames ?? [];
+
+    return {
+      name: matchCommonNames[0] ?? matchScientificName ?? "Unknown plant",
+      scientificName: matchScientificName,
+      commonNames: matchCommonNames,
+      confidence: Math.round((match.score ?? 0) * 1000) / 10,
+      family: match.species?.family?.scientificNameWithoutAuthor ?? null,
+      genus: match.species?.genus?.scientificNameWithoutAuthor ?? null,
+    };
+  });
 
   return jsonResponse({
     provider: "PlantNet",
@@ -187,6 +275,12 @@ Deno.serve(async (request) => {
     category: inferCategory(scientificName, commonNames),
     saleStatus: decision.saleStatus,
     reviewReason: decision.reviewReason,
+    alternativeMatches,
     remainingRequests: data.query?.remainingIdentificationRequests,
+    scanLimit: {
+      used: (count ?? 0) + 1,
+      limit: scanLimit,
+      windowMinutes: Math.round(scanWindowMs / 60000),
+    },
   });
 });

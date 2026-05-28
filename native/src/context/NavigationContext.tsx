@@ -2,18 +2,21 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { useAuth } from "./AuthContext";
 import { getUnreadMessagesCount } from "../services/messages";
 
-export type TabKey = "Market" | "Feed" | "Garden" | "Messages" | "Rankings" | "Profile";
+export type TabKey = "Market" | "Feed" | "Garden" | "Messages" | "Rankings" | "Orders" | "Profile";
 
 type NavigationContextType = {
   activeTab: TabKey;
   setActiveTab: (tab: TabKey) => void;
   unreadCount: number;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 };
 
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
 
 export function NavigationProvider({ children }: { children: ReactNode }) {
   const [activeTab, setActiveTab] = useState<TabKey>("Market");
+  const [searchQuery, setSearchQuery] = useState("");
   const { session, user } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -36,7 +39,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   }, [session, user?.id]);
 
   return (
-    <NavigationContext.Provider value={{ activeTab, setActiveTab, unreadCount }}>
+    <NavigationContext.Provider value={{ activeTab, setActiveTab, unreadCount, searchQuery, setSearchQuery }}>
       {children}
     </NavigationContext.Provider>
   );

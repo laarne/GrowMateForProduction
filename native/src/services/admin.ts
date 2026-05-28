@@ -12,6 +12,10 @@ type SellerApplicationRow = {
   shop_name: string | null;
   reason: string | null;
   proof_photo_url: string | null;
+  id_front_url: string | null;
+  id_back_url: string | null;
+  selfie_with_id_url: string | null;
+  selfie_with_plant_url: string | null;
   status: string;
   created_at: string;
 };
@@ -39,6 +43,10 @@ export type PendingSellerApplication = {
   shopName: string | null;
   reason: string | null;
   proofPhotoUrl: string | null;
+  idFrontUrl: string | null;
+  idBackUrl: string | null;
+  selfieWithIdUrl: string | null;
+  selfieWithPlantUrl: string | null;
   status: string;
   createdAt: string;
 };
@@ -76,7 +84,7 @@ export async function getPendingSellerApplications(): Promise<PendingSellerAppli
 
   const { data, error } = await supabase
     .from("seller_applications")
-    .select("id, user_id, shop_name, reason, proof_photo_url, status, created_at")
+    .select("id, user_id, shop_name, reason, proof_photo_url, id_front_url, id_back_url, selfie_with_id_url, selfie_with_plant_url, status, created_at")
     .eq("status", "pending")
     .order("created_at", { ascending: true });
 
@@ -98,6 +106,10 @@ export async function getPendingSellerApplications(): Promise<PendingSellerAppli
       shopName: application.shop_name,
       reason: application.reason,
       proofPhotoUrl: application.proof_photo_url,
+      idFrontUrl: application.id_front_url,
+      idBackUrl: application.id_back_url,
+      selfieWithIdUrl: application.selfie_with_id_url,
+      selfieWithPlantUrl: application.selfie_with_plant_url,
       status: application.status,
       createdAt: application.created_at,
     };
